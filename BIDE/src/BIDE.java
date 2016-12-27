@@ -9,7 +9,7 @@ public class BIDE {
 	 * Example: 0x89 => "+"
 	 * 
 	 * Order by numerical value of the casio character.
-	 */  
+	 */     
 	public static final String[] convTable = {
 			"0C", "&disp;",
 			"0D", "\n",
