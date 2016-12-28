@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import b2c.B2C;
+
 public class BIDE {
 	
 	/* Left: casio characters, right: ascii characters
@@ -20,6 +22,7 @@ public class BIDE {
 			"12", ">=",
 			"13", "=>",
 			"26", "&amp;",
+			"27", "//",
 			"86", "&sqrt;",
 			"87", "&neg;",
 			"89", "+",
@@ -60,13 +63,14 @@ public class BIDE {
 		test.replace(new byte[]{0x00, 0x30}, new byte[]{'A', 'B', 'C'});
 		IO.writeToFile(new File("C:\\Users\\Catherine\\Desktop\\locate.g1m"), test.getContent(), true);*/
 		createG1M("prog.txt");
+		B2C.main(new String[]{});
 	}
 	
 	public static void createG1M(String path) {
 		
 		CasioString content = new CasioString(IO.readFromRelativeFile("prog.txt"));
-		CasioString progName = content.substring(14, 18);
-		System.out.println(progName);
+		CasioString progName = content.substring(14, content.indexOf('\n'));
+		//System.out.println(progName);
 		content = content.substring(content.indexOf('\n')+1);
 		
 		//Convert ascii to casio
@@ -112,7 +116,7 @@ public class BIDE {
 		//header.add(new byte[]{(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0x00,1});
 		CasioString header2 = new CasioString();
 		for (int i = 0; i < header.length(); i++) {
-			System.out.println(Integer.toHexString(0xFF-header.charAt(i)));
+			//System.out.println(Integer.toHexString(0xFF-header.charAt(i)));
 			header2.add(0xFF-header.charAt(i));
 		}
 		content.add(0, header2);
