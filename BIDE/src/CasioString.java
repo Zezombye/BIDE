@@ -64,6 +64,7 @@ public class CasioString {
 	}
 	public void add(int index, byte[] byteArray) {add(index, byteArrayToList(byteArray));}
 	public void add(int index, CasioString str) {add(index, str.getContent());}
+	
 	/**
 	 * Replace the contents of the CasioString that matches target with the replacement.
 	 * Unlike String's replace method, it does not need to be assigned to the string.
@@ -76,7 +77,7 @@ public class CasioString {
 			if (this.content.subList(i, i+target.size()).equals(target)) {
 				this.content.subList(i, i+target.size()).clear();
 				this.content.addAll(i, replacement);
-				i += replacement.size();
+				i += replacement.size()-1;
 			}
 		}
 	}
