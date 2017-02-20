@@ -10,7 +10,8 @@ public class BIDE {
 	/* Left: casio characters, right: ascii characters
 	 * Example: 0x89 => "+"
 	 * 
-	 * Order by numerical value of the casio character.
+	 * Order by numerical value of the casio character when possible.
+	 * For example, WhileEnd/LpWhile have to be before While, else they are not properly replaced.
 	 */     
 	public static final String[] convTable = {
 			"0C", "&disp;",
@@ -40,7 +41,11 @@ public class BIDE {
 			"CE", "&theta;",
 			"D0", "&pi;",
 			"7F40", "Mat ",
+			"7F51", "List ",
 			"7F87", "RanInt#(",
+			"7F8F", "GetKey",
+			"7FB0", " And ",
+			"7FB3", "Not ",
 			"F700", "If ",
 			"F701", "Then ",
 			"F702", "Else ",
@@ -49,24 +54,25 @@ public class BIDE {
 			"F705", " To ",
 			"F706", " Step ",
 			"F707", "Next",
-			"F708", "While ",
+			"F70B", "LpWhile ",
 			"F709", "WhileEnd",
+			"F708", "While ",
 			"F70A", "Do",
-			"F70B", "LpWhile",
 			"F70C", "Return",
 			"F710", "Locate ",
 			
 	};
 	
 	public static void main(String[] args) {
+		String destPath = "C:\\Users\\Catherine\\Desktop\\test.g1m";
 		/*CasioString test = new CasioString(new byte[]{(byte) 0xFF, 0x00, 0x30, (byte) 0x90});
 		test.replace(new byte[]{0x00, 0x30}, new byte[]{'A', 'B', 'C'});
 		IO.writeToFile(new File("C:\\Users\\Catherine\\Desktop\\locate.g1m"), test.getContent(), true);*/
-		createG1M("prog.txt");
-		B2C.main(new String[]{});
+		createG1M("prog.txt", destPath);
+		B2C.main(new String[]{destPath, "TEST"});
 	}
 	
-	public static void createG1M(String path) {
+	public static void createG1M(String path, String destPath) {
 		
 		CasioString content = new CasioString(IO.readFromRelativeFile("prog.txt"));
 		CasioString progName = content.substring(14, content.indexOf('\n'));
@@ -120,7 +126,8 @@ public class BIDE {
 			header2.add(0xFF-header.charAt(i));
 		}
 		content.add(0, header2);
-		IO.writeToFile(new File("C:\\Users\\Catherine\\Desktop\\test.g1m"), content.getContent(), true);
+		IO.writeToFile(new File(destPath), content.getContent(), true);
+		
 	}
 	/*
 	public static void createG1M(String content, String progName) {

@@ -73,7 +73,7 @@ public class CasioString {
 	 * @param replacement The string used as replacement.
 	 */
 	public void replace(List<Byte> target, List<Byte> replacement) {
-		for (int i = 0; i < this.content.size()-target.size(); i++) {
+		for (int i = 0; i < this.content.size()-target.size()+1; i++) {
 			if (this.content.subList(i, i+target.size()).equals(target)) {
 				this.content.subList(i, i+target.size()).clear();
 				this.content.addAll(i, replacement);
