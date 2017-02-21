@@ -36,7 +36,7 @@ public class IO {
 		byte[] encoded = null;
 		try {
 			//For some reason it appends a '/' to the beginning of the string, making the file path invalid
-			String relativePath = BIDE.class.getClassLoader().getResource(fileName).getPath().substring(1);
+			String relativePath = getRelativeFilePath(fileName);
 			encoded = Files.readAllBytes(Paths.get(relativePath));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -49,6 +49,10 @@ public class IO {
 		}
 		
 		return content;
+	}
+	
+	public static String getRelativeFilePath(String fileName) {
+		return BIDE.class.getClassLoader().getResource(fileName).getPath().substring(1);
 	}
 	
 	public static String readFromFile(String path) {
@@ -64,13 +68,13 @@ public class IO {
 		byte[] encoded;
 		try {
 			encoded = Files.readAllBytes(Paths.get(path));
-			content = new String(encoded, "Cp1252");
+			content = new String(encoded, "ISO-8859-1");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 		//due to unicode encoding, some characters get encoded as others
-
+		/*
 		content = content.replaceAll("\\u2020", new String(new char[]{0x86}));
 		content = content.replaceAll("\\u2021", new String(new char[]{0x87}));
 		content = content.replaceAll("\\u02C6", new String(new char[]{0x88}));
@@ -81,7 +85,7 @@ public class IO {
 		content = content.replaceAll("\\u2122", new String(new char[]{0x99}));
 		content = content.replaceAll("\\u0161", new String(new char[]{0x9A}));
 		content = content.replaceAll("\\u203A", new String(new char[]{0x9B}));
-		
+		*/
 		return content;
 	}
 }
