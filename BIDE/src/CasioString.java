@@ -27,8 +27,8 @@ public class CasioString {
 		return this.content.size();
 	}
 	
-	public byte charAt(int index) {
-		return this.content.get(index);
+	public short charAt(int index) {
+		return (short)(this.content.get(index)&0xFF);
 	}
 	
 	public int indexOf(byte char_) {
@@ -58,6 +58,7 @@ public class CasioString {
 	}
 	public void add(byte[] byteArray) {add(byteArrayToList(byteArray));}
 	public void add(CasioString str) {add(str.getContent());}
+	public void add(String str) {add(byteArrayToList(str.getBytes()));}
 	
 	public void add(int index, List<Byte> lb) {
 		this.content.addAll(index, lb);
@@ -107,13 +108,14 @@ public class CasioString {
 	}
 
 	public void setContent(List<Byte> content) {
-		this.content = content;
+		this.content = new ArrayList<Byte>(content);
 	}
 	
 	@Override
 	public String toString() {
 		return new String(listToByteArray(this.getContent()));
 	}
+
 
 	
 }

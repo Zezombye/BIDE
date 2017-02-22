@@ -1,5 +1,6 @@
 //Taken from B2C
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,6 +12,13 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+/**
+ * ONLY EVER USE CASIOSTRINGS WHEN HANDLING CASIO ENCODING!
+ * The reason is that Strings use UTF-16, and invalid encodings are replaced by '?'
+ * Try to create the string with byte[]{0xAA, 0xAC, 0xBD, 0xAF, 0x90, 0x88, 0x9A, 0x8D}.
+ * You'll see that some characters are replaced by '?'.
+ */
 
 public class IO {
 	public static void writeToFile(File file, List<Byte> content, boolean deleteFile) {
@@ -32,30 +40,25 @@ public class IO {
 		}
 	}
 	
-	public static List<Byte> readFromRelativeFile(String fileName) {
+	/*public static CasioString readFromRelativeFile(String fileName) {
 		byte[] encoded = null;
 		try {
 			//For some reason it appends a '/' to the beginning of the string, making the file path invalid
 			String relativePath = getRelativeFilePath(fileName);
-			encoded = Files.readAllBytes(Paths.get(relativePath));
+			encoded = new BufferedReader(new InputStreamReader(new InputStream(getClass().getResourceAsStream("/opcodes.txt"))));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		//Convert from byte[] to List<Byte>
-		List<Byte> content = new ArrayList<Byte>();
-		for (int i = 0; i < encoded.length; i++) {
-			content.add(encoded[i]);
-		}
-		
-		return content;
+				
+		return new CasioString(encoded);
 	}
 	
 	public static String getRelativeFilePath(String fileName) {
-		return BIDE.class.getClassLoader().getResource(fileName).getPath().substring(1);
-	}
+		//return BIDE.class.getClass().getResource(fileName).getPath().substring(0);
+		return "./" + fileName;
+	}*/
 	
-	public static String readFromFile(String path) {
+	public static CasioString readFromFile(String path) {
 		/*String content = "";
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "Cp1252"))) {
 		    content = br.
@@ -64,11 +67,9 @@ public class IO {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}*/
-		String content = "";
-		byte[] encoded;
+		byte[] encoded = null;
 		try {
 			encoded = Files.readAllBytes(Paths.get(path));
-			content = new String(encoded, "ISO-8859-1");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -86,6 +87,6 @@ public class IO {
 		content = content.replaceAll("\\u0161", new String(new char[]{0x9A}));
 		content = content.replaceAll("\\u203A", new String(new char[]{0x9B}));
 		*/
-		return content;
+		return new CasioString(encoded);
 	}
 }

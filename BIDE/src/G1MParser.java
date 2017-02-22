@@ -12,8 +12,8 @@ public class G1MParser {
 	public final int TYPE_CAPT = 4;
 	
 	String path;
-	String fileContent;
-	List<String> parts = new ArrayList<String>();
+	CasioString fileContent;
+	List<CasioString> parts = new ArrayList<CasioString>();
 	
 	public G1MParser(String path) {
 		this.path = path;
@@ -25,22 +25,26 @@ public class G1MParser {
 		while (fileIndex < fileContent.length()) {
 			//Seek the size of the subpart and add size of header which is 44 bytes long
 			//Lots of magic numbers in there
-			int partSize = fileContent.charAt(fileIndex+37)*16777216 + fileContent.charAt(fileIndex+38)*65536 + fileContent.charAt(fileIndex+39)*256 + fileContent.charAt(fileIndex+40) + 44;
+			int partSize = 44;
+			for (int i = 0; i < 4; i++) {
+				partSize += ((fileContent.charAt(fileIndex+37+i)&0xFF)<<(8*(3-i)));
+			}
+			//fileContent.charAt(fileIndex+37)*16777216 + fileContent.charAt(fileIndex+38)*65536 + fileContent.charAt(fileIndex+39)*256 + fileContent.charAt(fileIndex+40) + 44;
 			parts.add(fileContent.substring(fileIndex, fileIndex+partSize));
 			fileIndex += partSize;
 		}
-		System.out.println(parts);
+		//System.out.println(parts);
 	}
 	
-	public String getPartContent(String part) {
+	public CasioString getPartContent(CasioString part) {
 		return part.substring(44);
 	}
 	
-	public String getPartName(String part) {
+	public CasioString getPartName(CasioString part) {
 		return part.substring(28, 36);
 	}
 	
-	public int getPartType(String part) {
+	public int getPartType(CasioString part) {
 		int type = part.charAt(36);
 		switch (type) {
 			case 0x01:

@@ -1,15 +1,14 @@
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import b2c.B2C;
+import java.util.Scanner;
 
 public class BIDE {
 	
@@ -18,14 +17,49 @@ public class BIDE {
 	public static void main(String[] args) {
 		
 		boolean casioToAscii = false;
+		boolean debug = true;
 		
 		getOpcodes();
 		
-		if (casioToAscii) {
-			readFromG1M("C:\\Users\\Catherine\\Desktop\\demnr.g1m", "C:\\Users\\Catherine\\Desktop\\prog.txt");
+		if (debug) {
+
+			Scanner sc = new Scanner(System.in);
+			boolean noExceptions = true;
+			String g1mpath, asciipath = "";
+			do {
+				noExceptions = true;
+				try {
+					System.out.println("Enter the path to the .g1m file:");
+					g1mpath = sc.nextLine();
+					System.out.println("Enter the path to the output .bide (or .txt) file:");
+					asciipath = sc.nextLine();
+					
+					readFromG1M(g1mpath, asciipath);
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+					noExceptions = false;
+					System.out.println("Seems at least one of the paths specified is invalid.");
+				}
+			} while (!noExceptions);
+			
+			System.out.println("Enter the path to the output g1m file:");
+			String outputg1mpath = sc.nextLine();
+			while (true) {
+				System.out.println("Write anything in this console to write to the specified g1m file.");
+				sc.nextLine();
+				writeToG1M(asciipath, outputg1mpath);
+			}
+			
 		} else {
-			writeToG1M("C:\\Users\\Catherine\\Desktop\\prog.txt", "C:\\Users\\Catherine\\Desktop\\demnr.g1m");
+			if (casioToAscii) {
+				readFromG1M("C:\\Users\\Catherine\\Desktop\\bundle.g1m", "C:\\Users\\Catherine\\Desktop\\prog.bide");
+			} else {
+				writeToG1M("C:\\Users\\Catherine\\Desktop\\prog.bide", "C:\\Users\\Catherine\\Desktop\\bundle2.g1m");
+			}
 		}
+		
+		
 		
 		
 		//createG1M("prog.txt", destPath);
@@ -33,6 +67,7 @@ public class BIDE {
 	}
 	
 	public static void readFromG1M(String g1mpath, String destPath) {
+		System.out.println("Reading from g1m at " + g1mpath);
 		String result = "";
 		G1MParser g1mparser = new G1MParser(g1mpath);
 		g1mparser.divideG1MIntoParts();
@@ -40,87 +75,169 @@ public class BIDE {
 			
 			if (g1mparser.getPartType(g1mparser.parts.get(h)) == g1mparser.TYPE_PROG) {
 				
+				System.out.println("Found basic program");
 				String progName = casioToAscii(g1mparser.getPartName(g1mparser.parts.get(h)));
 				String progPw = casioToAscii(g1mparser.parts.get(h).substring(44, 52));
 				if (progPw.isEmpty()) {
 					progPw = "<no password>";
 				}
+				System.out.println("Name = " + progName + ", password = " + progPw);
 				if (h > 0) {
 					result += "\n";
 				}
-				result += "#\n#Program name: "+progName+"\n#Password: " + progPw + "\n#\n";
+				result += "#\n#Program name: "+progName+"\n#Password: " + progPw + "\n";
 				
 				result += casioToAscii(g1mparser.getPartContent(g1mparser.parts.get(h)).substring(10));
 				result += "\n#End of program";
 			}
 		}
-				
+		System.out.println("Finished reading from g1m");
 		IO.writeToFile(new File(destPath), byteArrayToList(result.getBytes()), true);
 	}
 	
-	public static void writeToG1M(String progpath, String destPath) {
+	public static void writeToG1M(String progPath, String destPath) {
 		
 		G1MWrapper g1mwrapper = new G1MWrapper();
 		
-		
-		
-		CasioString content = new CasioString(IO.readFromRelativeFile("prog.txt"));
-		CasioString progName = content.substring(14, content.indexOf('\n'));
-		//System.out.println(progName);
-		content = content.substring(content.indexOf('\n')+1);
-		
-		//Convert ascii to casio
-		for (int i = 0; i < convTable.length/2; i++) {
-			//System.out.println(Integer.toHexString((char)convTable[2*i]));
-			//Split the character if multi
-			List<Byte> casioChar = (int)Integer.valueOf(convTable[2*i], 16) > 0xFF 
-					? byteArrayToList(new byte[]{(byte)(Integer.valueOf((String)convTable[2*i], 16)/0x100), (byte)(Integer.valueOf((String)convTable[2*i], 16) % 0x100)})
-					: byteArrayToList(new byte[]{(byte)(int)(Integer.valueOf((String)convTable[2*i], 16))});
-			content.replace(((String)convTable[2*i+1]).getBytes(), casioChar);
+		List<AsciiProg> parts = new ArrayList<AsciiProg>();
+		//Parse text file
+		String line;
+		int lineNb = 0;
+		AsciiProg currentPart = new AsciiProg("","","", 0);
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(new File(progPath)));
 			
+			while ((line = br.readLine()) != null) {
+				lineNb++;
+				if (line.startsWith("#")) {
+					if (line.startsWith("#Program name: ")) {
+						currentPart = new AsciiProg("","","", lineNb);
+						currentPart.name = line.substring(15);
+						
+					} else if (line.startsWith("#Password: ")) {
+						if (!line.substring(11).equals("<no password>")) {
+							currentPart.password = line.substring(11);
+						}
+					} else if (line.equals("#End of program")) {
+						parts.add(currentPart);
+					} else if (line.equals("#")) {
+						continue;
+					} else {
+						error("Unknown preprocessor directive " + line, lineNb);
+					}
+				} else {
+					if (line.endsWith("Then") || line.endsWith("Else")) {
+						line += " ";
+					}
+					currentPart.content += line + "\n";
+				}
+			}
+			br.close();
+		    
+		} catch (Exception e) {
+			error(e.getMessage(), lineNb);
 		}
-		//Padding
-		byte[] padding = {0, 0, 0, 0, 0, 0, 0, 0};
-		content.add(Arrays.copyOfRange(padding, 0, 4-(content.length()+0x56)%4));
+		//System.out.println(asciiParts);
 		
-		content.add(0, new byte[]{0,0,0,0,0,0,0,0,0,0});
-		
-		CasioString sizeString = new CasioString(new byte[]{0,0,0,0});
-		for (int i = 0; i < 4; i++) {
-			sizeString.setCharAt(i, (byte)(content.length()>>(8*(3-i))));
+		//Add each part (program) of the ascii file
+		byte[] padding = {0,0,0,0,0,0,0,0};
+		for (int i = 0; i < parts.size(); i++) {
+			CasioString password = new CasioString(asciiToCasio(parts.get(i).password, true, parts.get(i).lineStart));
+			if (password.length() > 8) {
+				password = password.substring(0, 8);
+			}
+			password.add(Arrays.copyOfRange(padding, 0, 8-password.length()));
+			CasioString name = new CasioString(asciiToCasio(parts.get(i).name, true, parts.get(i).lineStart+1));
+			if (name.length() > 8) {
+				name = name.substring(0, 8);
+			}
+			name.add(Arrays.copyOfRange(padding, 0, 8-name.length()));
+			CasioString part = new CasioString(password); 
+			part.add(new byte[]{0,0});
+			part.add(asciiToCasio(parts.get(i).content, false, parts.get(i).lineStart+2));
+			part.add(Arrays.copyOfRange(padding, 0, 4-part.length()%4));
+			g1mwrapper.addPart(part, name, g1mwrapper.TYPE_PROG);
 		}
-		//System.out.println(sizeString);
-		//Subheader
-		CasioString subheader = new CasioString(new byte[]{'P','R','O','G','R','A','M',0,0,0,0,0,0,0,0,0, 0,0,0,1, 's','y','s','t','e','m', 0,0});
-		subheader.add(progName.getContent());
-		subheader.add(Arrays.copyOfRange(padding, 0, 8-progName.length()));
-		subheader.add(1);
-		subheader.add(sizeString);
-		subheader.add(new byte[]{0,0,0});
-		content.add(0, subheader);
 		
-		//Header
-		CasioString sizeString2 = new CasioString(new byte[]{0,0,0,0});
-		
-		for (int i = 0; i < 4; i++) {
-			sizeString2.setCharAt(i, (byte)((content.length()+0x20)>>(8*(3-i))));
-		}
-		CasioString header = new CasioString(new byte[]{'U','S','B','P','o','w','e','r', 0x31, 0,0x10,0,0x10,0, (byte)(sizeString2.charAt(3)+0x41), 1});
-		header.add(sizeString2);
-		header.add((sizeString2.charAt(3)+0xB8)%0x100);
-		header.add(new byte[]{(byte)0xBD, (byte)0xB6, (byte)0xBB, (byte)0xBA, (byte)0xDF, (byte)0x8F, (byte)0x8D, (byte)0x90, (byte)0x98, 0, 1});
-		//header.add(new byte[]{(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0xFF,(byte)0x00,1});
-		CasioString header2 = new CasioString();
-		for (int i = 0; i < header.length(); i++) {
-			//System.out.println(Integer.toHexString(0xFF-header.charAt(i)));
-			header2.add(0xFF-header.charAt(i));
-		}
-		content.add(0, header2);
-		IO.writeToFile(new File(destPath), content.getContent(), true);
+		g1mwrapper.generateG1M(destPath);
+		System.out.println("Finished writing to g1m");
 		
 	}
 	
-	public static String casioToAscii(String content) {
+	public static CasioString asciiToCasio(String content, boolean allowUnknownOpcodes, int lineStart) {
+		CasioString result = new CasioString();
+		
+		
+
+		//Optimise for less wasted space
+		content = content.replaceAll("Else \\n", "Else ");
+		content = content.replaceAll(":Then \\n", "\nThen ");
+		content = content.replaceAll("Then \\n", "Then ");
+		
+		String[] lines = content.split("\\n");
+		
+		
+		
+		for (int h = 0; h < lines.length; h++) {
+			
+			boolean currentPosIsString = false;
+			boolean escapeNextChar = false;
+			
+			for (int i = 0; i < lines[h].length(); i++) {
+				
+				boolean foundMatch = false;
+				
+				if (lines[h].charAt(i) == '"' && !escapeNextChar) {
+					currentPosIsString = !currentPosIsString;
+				}
+				
+				if (lines[h].charAt(i) == '\\' && !escapeNextChar) {
+					escapeNextChar = true;
+				} else {
+					escapeNextChar = false;
+				}
+				
+				for (int j = 0; j < opcodes.size(); j++) {
+					if (lines[h].startsWith(opcodes.get(j).ascii, i)) {
+						foundMatch = true;
+						
+						if (opcodes.get(j).hex.length() > 2) {
+							result.add(Integer.parseInt(opcodes.get(j).hex.substring(0, 2), 16));
+							result.add(Integer.parseInt(opcodes.get(j).hex.substring(2), 16));
+						} else if (opcodes.get(j).hex.length() > 0) {
+							result.add(Integer.parseInt(opcodes.get(j).hex, 16));
+						}
+						i += opcodes.get(j).ascii.length()-1;
+						System.out.println("Found opcode \"" + opcodes.get(j).ascii + "\"");
+						break;
+					}
+				}
+				
+				if (!foundMatch) {
+					if (!allowUnknownOpcodes && !currentPosIsString) {
+						if (lines[h].charAt(i) != ' ') {
+							error("line " + (h+lineStart) + ", col " + (i+1) + ": Unknown opcode \"" + lines[h].substring(i) + "\"");
+						}
+					} else {
+						result.add(lines[h].charAt(i));
+					}
+					
+				}
+				
+			}
+			
+			//add line feed
+			if (h < lines.length-1) {
+				result.add(0x0D);
+			}
+			
+		}
+		
+		
+		return result;
+	}
+	
+	public static String casioToAscii(CasioString content) {
 		String allowedCharacters = " !#$%&;@_abcdefghijklmnopqrstuvwxyz|";
 		
 		//Opcodes causing indentation
@@ -148,17 +265,17 @@ public class BIDE {
 		boolean unindentCurrentLineAndIndentNext = false;
 		
 		for (int i = 0; i < content.length(); i++) {
-			boolean isMultiByte = isMultibytePrefix(content.charAt(i));
+			boolean isMultiByte = isMultibytePrefix((byte)content.charAt(i));
 			boolean foundMatch = false;
 			
 			//Allow characters that are not in the opcodes
-			if (allowedCharacters.contains(""+content.charAt(i))) {
-				currentLine += content.charAt(i);
+			if (allowedCharacters.contains(""+(char)content.charAt(i))) {
+				currentLine += (char)content.charAt(i);
 				continue;
 			}
-			String hex = Integer.toHexString(content.charAt(i));
+			String hex = Integer.toHexString(content.charAt(i)&0xFF);
 			if (hex.equals("0")) {
-				System.out.println("Found end of program");
+				System.out.println("Found end of given string");
 				break;
 			}
 			if (isMultiByte) {
@@ -177,8 +294,6 @@ public class BIDE {
 				indentLevel--;
 				tabs = tabs.substring(1);
 			}
-			
-			
 			
 			//line feed
 			if (hex.equalsIgnoreCase("D")) {
@@ -203,7 +318,7 @@ public class BIDE {
 					currentLine += " :Then";
 					i += 2;
 				}
-					
+				
 				lines.add(currentLine + "\n");
 				
 				currentLine = "";
@@ -298,11 +413,12 @@ public class BIDE {
 	}*/
 	
 	public static void getOpcodes() {
-		String relativePath = IO.getRelativeFilePath("opcodes.txt");
+		//String relativePath = IO.getRelativeFilePath("opcodes.txt");
 		String line;
 		int lineNb = 0;
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(new File(relativePath)));
+			//BufferedReader br = new BufferedReader(new FileReader(new File(relativePath)));
+			BufferedReader br = new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/opcodes.txt")));
 			String hex, ascii;
 			boolean escape = false;
 			
@@ -331,7 +447,7 @@ public class BIDE {
 				opcodes.add(new Opcode(hex, ascii));
 				
 				//This is to allow removal of trailing whitespace when converting ascii->casio
-				opcodes.add(new Opcode(hex, ascii.replaceAll(" +?$", "")));
+				//opcodes.add(new Opcode(hex, ascii.replaceAll(" +?$", "")));
 		       
 		       
 			}
@@ -349,7 +465,7 @@ public class BIDE {
 		
 		//Add whitespace
 		opcodes.add(new Opcode("", "\t"));
-		opcodes.add(new Opcode("", " "));
+		//opcodes.add(new Opcode("", " "));
 		
 		//Add newline
 		opcodes.add(new Opcode("D", "\n"));
@@ -371,13 +487,13 @@ public class BIDE {
 		return result;
 	}
 	
-	public static boolean isMultibytePrefix(char prefix) {
-		if (prefix == (char)0xF7 ||
-				prefix == (char)0x7F ||
-				prefix == (char)0xF9 ||
-				prefix == (char)0xE5 ||
-				prefix == (char)0xE6 ||
-				prefix == (char)0xE7)
+	public static boolean isMultibytePrefix(byte prefix) {
+		if (prefix == (byte)0xF7 ||
+				prefix == (byte)0x7F ||
+				prefix == (byte)0xF9 ||
+				prefix == (byte)0xE5 ||
+				prefix == (byte)0xE6 ||
+				prefix == (byte)0xE7)
 			return true;
 		return false;
 	}

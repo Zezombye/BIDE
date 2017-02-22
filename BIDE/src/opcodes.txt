@@ -456,7 +456,7 @@ F706  Step  f
 F707 Next f
 F708 While  f
 F709 WhileEnd f
-F70A Do  f
+F70A Do f
 F70B LpWhile  f
 F70C Return f
 F70D Break f
