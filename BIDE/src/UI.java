@@ -86,9 +86,13 @@ public class UI {
 				if (file.isDirectory()) {
 					return true;
 				}
-				String extension = file.getPath().substring(file.getPath().lastIndexOf('.')).toLowerCase();
-				if (extension.equals(".bide") || extension.matches("\\.g[12][mr]")) {
-					return true;
+				try {
+					String extension = file.getPath().substring(file.getPath().lastIndexOf('.')).toLowerCase();
+					if (extension.equals(".bide") || extension.matches("\\.g[12][mr]")) {
+						return true;
+					}
+				} catch (Exception e) {
+					
 				}
 				return false;
 			}
@@ -166,6 +170,7 @@ public class UI {
 						    jtp.removeAll();
 				    		for (int i = 0; i < progs.size(); i++) {
 				    			jtp.addTab(progs.get(i).substring(15, progs.get(i).indexOf("\n")), new Program(progs.get(i)));
+				    			//Update textpanes for the syntax coloration to be correct
 				    			((Program)jtp.getComponentAt(i)).textPane.setText(((Program)jtp.getComponentAt(i)).textPane.getText());
 				    		}
 				    	}

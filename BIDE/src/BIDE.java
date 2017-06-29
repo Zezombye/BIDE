@@ -133,6 +133,10 @@ public class BIDE {
 		}*/
 		//System.out.println(asciiParts);
 		
+		if (parts.size() == 0) {
+			System.out.println("No programs detected! Make sure to include the directives (see tutorial).");
+			return;
+		}
 		//Add each part (program) of the ascii file
 		byte[] padding = {0,0,0,0,0,0,0,0};
 		for (int i = 0; i < parts.size(); i++) {
@@ -330,7 +334,7 @@ public class BIDE {
 				}
 				
 				//Replace "\nThen" by ":Then\n"
-				if (content.substring(i, i+3).equals(new CasioString(new byte[]{0x0D, (byte)0xF7, 0x01}))) {
+				if (i+3 < content.length() && content.substring(i, i+3).equals(new CasioString(new byte[]{0x0D, (byte)0xF7, 0x01}))) {
 					//System.out.println("Replacing a then");
 					currentLine += " :Then";
 					i += 2;
