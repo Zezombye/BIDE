@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.Arrays;
  */
 
 public class IO {
-	public static void writeToFile(File file, List<Byte> content, boolean deleteFile) {
+	public static void writeToFile(File file, List<Byte> content, boolean deleteFile) throws IOException {
 		try {
 			if (deleteFile) {
 				file.delete();
@@ -58,7 +59,7 @@ public class IO {
 		return "./" + fileName;
 	}*/
 	
-	public static CasioString readFromFile(String path) {
+	public static CasioString readFromFile(String path) throws IOException {
 		/*String content = "";
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "Cp1252"))) {
 		    content = br.
@@ -67,12 +68,8 @@ public class IO {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}*/
-		byte[] encoded = null;
-		try {
-			encoded = Files.readAllBytes(Paths.get(path));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		byte[] encoded = Files.readAllBytes(Paths.get(path));
+		
 		
 		//due to unicode encoding, some characters get encoded as others
 		/*

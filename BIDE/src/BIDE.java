@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -14,62 +15,49 @@ public class BIDE {
 	
 	public static List<Opcode> opcodes = new ArrayList<Opcode>();
 	
+	public static String pathToG1M = System.getProperty("user.home");
+	public static String pathToSavedG1M = "";
+	public static UI ui = new UI();
+	
 	public static void main(String[] args) {
 		
-		boolean casioToAscii = false;
-		boolean debug = true;
-		
+		pathToG1M += "/desktop/clonelab.g1m";
 		getOpcodes();
+				
+		ui.createAndDisplayUI();
 		
-		if (debug) {
-
-			Scanner sc = new Scanner(System.in);
-			boolean noExceptions = true;
-			String g1mpath, asciipath = "";
-			do {
-				noExceptions = true;
-				try {
-					System.out.println("Enter the path to the .g1m file:");
-					g1mpath = sc.nextLine();
-					System.out.println("Enter the path to the output .bide (or .txt) file:");
-					asciipath = sc.nextLine();
-					
-					readFromG1M(g1mpath, asciipath);
-					
-				} catch (Exception e) {
-					e.printStackTrace();
-					noExceptions = false;
-					System.out.println("Seems at least one of the paths specified is invalid.");
-				}
-			} while (!noExceptions);
-			
-			System.out.println("Enter the path to the output g1m file:");
-			String outputg1mpath = sc.nextLine();
-			while (true) {
-				System.out.println("Write anything in this console to write to the specified g1m file.");
-				sc.nextLine();
-				writeToG1M(asciipath, outputg1mpath);
+		//System.out.println(readFromG1M("C:\\Users\\Catherine\\Desktop\\clonelab.g1m"));
+		//readFromG1M("C:\\Users\\Catherine\\Desktop\\iceslide.g1m");
+		/*} else {
+			writeToG1M("C:\\Users\\Catherine\\Desktop\\prog.bide", "C:\\Users\\Catherine\\Desktop\\bundle2.g1m");
+		}*/
+		
+		
+		
+		//Test stdout
+		/*while(true) {
+			System.out.println("test" + Math.random());
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-			
-		} else {
-			if (casioToAscii) {
-				readFromG1M("C:\\Users\\Catherine\\Desktop\\bundle.g1m", "C:\\Users\\Catherine\\Desktop\\prog.bide");
-			} else {
-				writeToG1M("C:\\Users\\Catherine\\Desktop\\prog.bide", "C:\\Users\\Catherine\\Desktop\\bundle2.g1m");
-			}
-		}
-		
-		
+		}*/
 		
 		
 		//createG1M("prog.txt", destPath);
 		//B2C.main(new String[]{destPath, "TEST"});
 	}
 	
-	public static void readFromG1M(String g1mpath, String destPath) {
+	public static ArrayList<String> readFromG1M(String g1mpath) throws IOException {
+		ArrayList<String> progs = new ArrayList<String>();
 		System.out.println("Reading from g1m at " + g1mpath);
-		String result = "";
 		G1MParser g1mparser = new G1MParser(g1mpath);
+		g1mparser.readG1M();
+		if (!g1mparser.checkValidity()) {
+			error("Invalid g1m!");
+			return null;
+		}
 		g1mparser.divideG1MIntoParts();
 		for (int h = 0; h < g1mparser.parts.size(); h++) {
 			
@@ -78,65 +66,71 @@ public class BIDE {
 				System.out.println("Found basic program");
 				String progName = casioToAscii(g1mparser.getPartName(g1mparser.parts.get(h)));
 				String progPw = casioToAscii(g1mparser.parts.get(h).substring(44, 52));
+
 				if (progPw.isEmpty()) {
 					progPw = "<no password>";
 				}
 				System.out.println("Name = " + progName + ", password = " + progPw);
-				if (h > 0) {
-					result += "\n";
-				}
-				result += "#\n#Program name: "+progName+"\n#Password: " + progPw + "\n";
 				
-				result += casioToAscii(g1mparser.getPartContent(g1mparser.parts.get(h)).substring(10));
-				result += "\n#End of program";
+				String progContent = casioToAscii(g1mparser.getPartContent(g1mparser.parts.get(h)).substring(10));
+				
+				if (progName == null || progPw == null || progContent == null) {
+					return null;
+				}
+				
+				progs.add("#Program name: "+progName+"\n#Password: " + progPw + "\n"+ progContent);
 			}
 		}
 		System.out.println("Finished reading from g1m");
-		IO.writeToFile(new File(destPath), byteArrayToList(result.getBytes()), true);
+		return progs;
 	}
 	
-	public static void writeToG1M(String progPath, String destPath) {
+	public static void writeToG1M(String destPath) throws IOException {
 		
+		System.out.println("Saving to \""+destPath+"\"...");
+		
+		String[] lines = ui.getTextPane().getText().split("\\n|\\r|\\r\\n");
 		G1MWrapper g1mwrapper = new G1MWrapper();
 		
 		List<AsciiProg> parts = new ArrayList<AsciiProg>();
 		//Parse text file
 		String line;
-		int lineNb = 0;
 		AsciiProg currentPart = new AsciiProg("","","", 0);
-		try {
+		/*try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(progPath)));
 			
-			while ((line = br.readLine()) != null) {
-				lineNb++;
-				if (line.startsWith("#")) {
-					if (line.startsWith("#Program name: ")) {
-						currentPart = new AsciiProg("","","", lineNb);
-						currentPart.name = line.substring(15);
-						
-					} else if (line.startsWith("#Password: ")) {
-						if (!line.substring(11).equals("<no password>")) {
-							currentPart.password = line.substring(11);
-						}
-					} else if (line.equals("#End of program")) {
-						parts.add(currentPart);
-					} else if (line.equals("#")) {
-						continue;
-					} else {
-						error("Unknown preprocessor directive " + line, lineNb);
+			while ((line = br.readLine()) != null) {*/
+		for (int i = 0; i < lines.length; i++) {
+			line = lines[i];
+			if (line.startsWith("#")) {
+				if (line.startsWith("#Program name: ")) {
+					currentPart = new AsciiProg("","","", i);
+					currentPart.name = line.substring(15);
+					
+				} else if (line.startsWith("#Password: ")) {
+					if (!line.substring(11).equals("<no password>")) {
+						currentPart.password = line.substring(11);
 					}
+				} else if (line.equals("#End of program")) {
+					parts.add(currentPart);
+				} else if (line.equals("#")) {
+					continue;
 				} else {
-					if (line.endsWith("Then") || line.endsWith("Else")) {
-						line += " ";
-					}
-					currentPart.content += line + "\n";
+					error("Unknown preprocessor directive " + line, i+1);
 				}
+			} else {
+				if (line.endsWith("Then") || line.endsWith("Else")) {
+					line += " ";
+				}
+				currentPart.content += line + "\n";
 			}
+		}
+			/*}
 			br.close();
 		    
 		} catch (Exception e) {
 			error(e.getMessage(), lineNb);
-		}
+		}*/
 		//System.out.println(asciiParts);
 		
 		//Add each part (program) of the ascii file
@@ -174,7 +168,7 @@ public class BIDE {
 		content = content.replaceAll(":Then \\n", "\nThen ");
 		content = content.replaceAll("Then \\n", "Then ");
 		
-		String[] lines = content.split("\\n");
+		String[] lines = content.split("\\n|\\r|\\r\\n");
 		
 		
 		
@@ -182,6 +176,7 @@ public class BIDE {
 			
 			boolean currentPosIsString = false;
 			boolean escapeNextChar = false;
+			boolean currentPosIsComment = false;
 			
 			for (int i = 0; i < lines[h].length(); i++) {
 				
@@ -197,6 +192,25 @@ public class BIDE {
 					escapeNextChar = false;
 				}
 				
+				if (lines[h].charAt(i) == '\'') {
+					currentPosIsComment = true;
+				}
+				
+				//hex escape
+				if (lines[h].startsWith("&#", i)) {
+					String hexEsc = lines[h].substring(i+2, lines[h].indexOf(";", i));
+					if (hexEsc.length() != 2 && hexEsc.length() != 4) {
+						error("Hex escape must be 2 or 4 characters long! (escape: " + hexEsc + ")", h);
+						return null;
+					}
+					result.add(Integer.parseInt(hexEsc.substring(0, 2), 16));
+					if (hexEsc.length() > 2) {
+						result.add(Integer.parseInt(hexEsc.substring(2, 4), 16));
+					}
+					i += 2 + hexEsc.length();
+					continue;
+				}
+				
 				for (int j = 0; j < opcodes.size(); j++) {
 					if (lines[h].startsWith(opcodes.get(j).ascii, i)) {
 						foundMatch = true;
@@ -208,15 +222,17 @@ public class BIDE {
 							result.add(Integer.parseInt(opcodes.get(j).hex, 16));
 						}
 						i += opcodes.get(j).ascii.length()-1;
-						System.out.println("Found opcode \"" + opcodes.get(j).ascii + "\"");
+						//System.out.println("Found opcode \"" + opcodes.get(j).ascii + "\"");
 						break;
 					}
 				}
 				
 				if (!foundMatch) {
-					if (!allowUnknownOpcodes && !currentPosIsString) {
+					if (!allowUnknownOpcodes && !currentPosIsString && !currentPosIsComment) {
 						if (lines[h].charAt(i) != ' ') {
-							error("line " + (h+lineStart) + ", col " + (i+1) + ": Unknown opcode \"" + lines[h].substring(i) + "\"");
+							error("line " + (h+lineStart+1) + ", col " + (i+1) + ": The char '" + lines[h].charAt(i) + 
+									"' shouldn't be here, BIDE did not recognize that opcode. Check the spelling and case.");
+							return null;
 						}
 					} else {
 						result.add(lines[h].charAt(i));
@@ -228,7 +244,7 @@ public class BIDE {
 			
 			//add line feed
 			if (h < lines.length-1) {
-				result.add(0x0D);
+				//result.add(0x0D);
 			}
 			
 		}
@@ -238,7 +254,7 @@ public class BIDE {
 	}
 	
 	public static String casioToAscii(CasioString content) {
-		String allowedCharacters = " !#$%&;@_abcdefghijklmnopqrstuvwxyz|";
+		String allowedCharacters = " !#$%;@^_abcdefghijklmnopqrstuvwxyz|";
 		
 		//Opcodes causing indentation
 		List<String> indent = Arrays.asList(new String[]{
@@ -296,7 +312,7 @@ public class BIDE {
 			}
 			
 			//line feed
-			if (hex.equalsIgnoreCase("D")) {
+			if (hex.equalsIgnoreCase("D")||hex.equalsIgnoreCase("C")) {
 				
 				currentLine = tabs + currentLine;
 				//remove tab if unindenting
@@ -314,24 +330,26 @@ public class BIDE {
 				}
 				
 				//Replace "\nThen" by ":Then\n"
-				if (content.substring(i, i+3).equals(new String(new char[]{0x0D, 0xF7, 0x01}))) {
+				if (content.substring(i, i+3).equals(new CasioString(new byte[]{0x0D, (byte)0xF7, 0x01}))) {
+					//System.out.println("Replacing a then");
 					currentLine += " :Then";
 					i += 2;
 				}
 				
-				lines.add(currentLine + "\n");
+				lines.add(currentLine + (hex.equalsIgnoreCase("C") ? "&disp;" : "") + "\n");
 				
 				currentLine = "";
 				currentIndentLevel = indentLevel;
 				continue;
 			}
 			
-			System.out.println("Testing for opcode " + hex);
+			
+			//System.out.println("Testing for opcode " + hex);
 			for (int j = 0; j < opcodes.size(); j++) {
 				if (hex.equalsIgnoreCase(opcodes.get(j).hex)) {
 					currentLine += opcodes.get(j).ascii;
 					foundMatch = true;
-					System.out.println("Matches opcode " + opcodes.get(j).ascii);
+					//System.out.println("Matches opcode " + opcodes.get(j).ascii);
 					break;
 				}
 			}
@@ -342,7 +360,8 @@ public class BIDE {
 			}
 			
 			if (!foundMatch) {
-				error("Unknown opcode " + hex);
+				error("Unknown opcode 0x" + hex + "\nTell Zezombye to add it, or add it yourself in opcodes.txt");
+				return null;
 			}
 
 			
@@ -470,6 +489,9 @@ public class BIDE {
 		//Add newline
 		opcodes.add(new Opcode("D", "\n"));
 		
+		//Add disp
+		//opcodes.add(new Opcode("C", "&disp;\n"));
+		
 		//Order opcodes by inverse alphabetical order of their ascii string
 		Collections.sort(opcodes, new Comparator<Opcode>() {
 			@Override
@@ -500,7 +522,7 @@ public class BIDE {
 	
 	public static void error(String error) {
 		System.out.println("\nERROR: "+error+"\n");
-		System.exit(0);
+		//System.exit(0);
 	}
 	
 	public static void error(String error, int line) {

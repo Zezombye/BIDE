@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,7 +51,7 @@ public class G1MWrapper {
 		parts.add(part);
 	}
 	
-	public void generateG1M(String destPath) {
+	public void generateG1M(String destPath) throws IOException {
 		//Header
 		CasioString content = new CasioString();
 		for (int i = 0; i < parts.size(); i++) {

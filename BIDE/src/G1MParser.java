@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,15 @@ public class G1MParser {
 	
 	public G1MParser(String path) {
 		this.path = path;
+		
+	}
+	
+	public void readG1M() throws IOException {
 		this.fileContent = IO.readFromFile(path);
+	}
+	
+	public boolean checkValidity() {
+		return fileContent.substring(0, 8).equals(new CasioString(new byte[]{(byte)0xAA, (byte)0xAC, (byte)0xBD, (byte)0xAF, (byte)0x90, (byte)0x88, (byte)0x9A, (byte)0x8D}));
 	}
 	
 	public void divideG1MIntoParts() {

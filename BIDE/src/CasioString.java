@@ -115,6 +115,15 @@ public class CasioString {
 	public String toString() {
 		return new String(listToByteArray(this.getContent()));
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj.getClass() != CasioString.class) {
+			return false;
+		}
+		CasioString cs = (CasioString)obj;
+		return cs.getContent().equals(this.getContent());
+	}
 
 
 	
