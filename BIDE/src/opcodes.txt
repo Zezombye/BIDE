@@ -22,6 +22,7 @@
 9 tera t
 A peta t
 B exa t
+C disp t
 E -> f
 F x10^ t
 10 <= f
@@ -33,6 +34,8 @@ F x10^ t
 2B ascii_+ t
 2D ascii_- t
 2F ascii_/ t
+3D = t
+3E > t
 80 Pol( f
 81 sin  f
 82 cos  f
@@ -192,13 +195,13 @@ FE prob_t( t
 7F2E Mean( f
 7F2F Median( f
 7F30 SolveN( f
-7F34 Red f
-7F35 Blue f
-7F36 Green f
+7F34 Red  f
+7F35 Blue  f
+7F36 Green  f
 7F3A MOD( t
 7F3B MOD_Exp( f
-7F3C GCD( f
-7F3D LCM( f
+7F3C GCD( t
+7F3D LCM( t
 7F3E StdDev( f
 7F3F Variance( f
 7F40 Mat  f
@@ -457,8 +460,8 @@ E57E capital_cyrillic_e t
 E580 capital_yu t
 E581 capital_ya t
 E582 capital_ukrainian_ie t
-E590 inverted_exclamation_mark t
-E591 inverted_question_mark t
+E590 inverted_! t
+E591 inverted_? t
 E592 € f
 E593 franc t
 E594 ... t

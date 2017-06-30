@@ -6,11 +6,6 @@ import java.util.List;
 
 public class G1MParser {
 		
-	public final int TYPE_PROG = 0;
-	public final int TYPE_LIST = 1;
-	public final int TYPE_MAT = 2;
-	public final int TYPE_PICT = 3;
-	public final int TYPE_CAPT = 4;
 	
 	String path;
 	CasioString fileContent;
@@ -57,15 +52,13 @@ public class G1MParser {
 		int type = part.charAt(36);
 		switch (type) {
 			case 0x01:
-				return TYPE_PROG;
-			case 0x05:
-				return TYPE_LIST;
+				return BIDE.TYPE_PROG;
 			case 0x07:
-				return TYPE_PICT;
+				return BIDE.TYPE_PICT;
 			case 0x0A:
-				return TYPE_CAPT;
+				return BIDE.TYPE_CAPT;
 			default:
-				BIDE.error("Unknown type "+type);
+				System.out.println("Ignoring unknown type 0x0"+Integer.toHexString(type));
 				return -1;
 		}
 	}

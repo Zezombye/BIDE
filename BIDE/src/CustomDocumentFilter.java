@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
@@ -19,6 +20,8 @@ public class CustomDocumentFilter extends DocumentFilter {
     private AttributeSet blackAttributeSet = styleContext.addAttribute(styleContext.getEmptySet(), StyleConstants.Foreground, Color.BLACK);
     public JTextPane textPane;
     public ColorationPattern[] regexes;
+    
+    public boolean isTooLaggy = false;
     
     public CustomDocumentFilter(JTextPane jtp, ColorationPattern[] regexes) {
     	this.textPane = jtp;
@@ -55,15 +58,29 @@ public class CustomDocumentFilter extends DocumentFilter {
      */
     private void handleTextChanged()
     {
-    	long time = System.currentTimeMillis();
-        updateTextStyles();
-        System.out.println("Colored in " + (System.currentTimeMillis()-time) + "ms");
+    	if (!isTooLaggy) {
+    		updateTextStyles();
+    	}
         /*SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
             	
             }
         });*/
+    }
+    
+    public void testForLag() {
+    	long time = System.currentTimeMillis();
+        updateTextStyles();
+        time = System.currentTimeMillis()-time;
+        if (time > 100) {
+        	this.isTooLaggy = true;
+        	SimpleAttributeSet sas = new SimpleAttributeSet();
+        	StyleConstants.setForeground(sas, Color.BLACK);
+        	styledDocument.setCharacterAttributes(0, textPane.getText().length(), sas, false);
+        	System.out.println("Disabled coloration on program \""+textPane.getText().substring(15, textPane.getText().indexOf("\n"))+"\", too laggy ("+time+"ms)");
+        }
+        //System.out.println("Test lag in " + time + "ms");
     }
 
 
@@ -77,12 +94,11 @@ public class CustomDocumentFilter extends DocumentFilter {
     	SimpleAttributeSet sas = new SimpleAttributeSet();
         for (int i = 0; i < regexes.length; i++) {
         	StyleConstants.setForeground(sas, regexes[i].color);
-        	StyleConstants.setBold(sas, regexes[i].isBold);
+        	//StyleConstants.setBold(sas, regexes[i].isBold);
             Matcher matcher = regexes[i].pattern.matcher(textPaneText);
             while (matcher.find()) {
                 // Change the color of recognized tokens
-                styledDocument.setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), 
-                		sas, false);
+                styledDocument.setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), sas, false);
             }
         }
     }

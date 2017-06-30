@@ -13,12 +13,6 @@ import java.util.List;
 
 public class G1MWrapper {
 	
-	public final int TYPE_PROG = 0;
-	public final int TYPE_LIST = 1;
-	public final int TYPE_MAT = 2;
-	public final int TYPE_PICT = 3;
-	public final int TYPE_CAPT = 4;
-	
 	public List<CasioString> parts = new ArrayList<CasioString>();
 	
 	public void addPart(CasioString part, CasioString partName, int type) {
@@ -77,18 +71,14 @@ public class G1MWrapper {
 	
 	public int getPartID(int partType) {
 		switch (partType) {
-			case TYPE_PROG:
+			case BIDE.TYPE_PROG:
 				return 0x01;
-			case TYPE_LIST:
-				return 0x05;
-			case TYPE_MAT:
-				return 0x06;
-			case TYPE_PICT:
+			case BIDE.TYPE_PICT:
 				return 0x07;
-			case TYPE_CAPT:
+			case BIDE.TYPE_CAPT:
 				return 0x0A;
 			default:
-				BIDE.error("Unknown part "+ partType);
+				BIDE.error("Unknown part type "+ partType);
 				return -1;
 		}
 	}
@@ -99,7 +89,7 @@ public class G1MWrapper {
 		String partTypeStr = "";
 		String partDir = "";
 		switch (partType) {
-			case TYPE_PROG:
+			case BIDE.TYPE_PROG:
 				partTypeStr = "PROGRAM";
 				partDir = "system";
 				break;

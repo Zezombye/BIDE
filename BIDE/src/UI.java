@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
@@ -14,25 +15,19 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.text.AbstractDocument;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
-import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.TabSet;
 import javax.swing.text.TabStop;
 
+
+import javax.swing.*;
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicButtonUI;
+import java.awt.*;
+import java.awt.event.*;
 public class UI {
 	
 	JFrame window = new JFrame();
@@ -99,7 +94,7 @@ public class UI {
 
 			@Override
 			public String getDescription() {
-				return "Basic Casio files (.g[12][mr], .bide)";
+				return "Basic Casio files (.g1m, .g2m, .g1r, .g2r, .bide)";
 			}
 		});
 		//window.setUndecorated(true);
@@ -107,38 +102,8 @@ public class UI {
 		JMenuBar menuBar = new JMenuBar();
 		//menuBar.setMargin(new Insets(5, 10, 5, 10));
 		//menuBar.setFloatable(false);
-		JButton open = null;
-		try {
-			open = new JButton(new ImageIcon(ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/openFile.png"))));
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		open.setBorder(BorderFactory.createEmptyBorder(2, 5, 0, 5));
-		open.setContentAreaFilled(false);
-		open.setFocusPainted(false);
-		/*open.addMouseListener(new MouseListener() {
-			
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-
-				
-			}
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-			}
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-			}
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-			}
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-			}
-		});*/
-		
+		ToolbarButton open = new ToolbarButton("openFile.png");
 		open.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				jfc.setSelectedFile(new File(BIDE.pathToG1M));
@@ -147,7 +112,6 @@ public class UI {
 				if (jfc.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
 					input = jfc.getSelectedFile();
 				}
-				//Object input = JOptionPane.showInputDialog(window, "Entrez le chemin du fichier .g1m : ", "BIDE", JOptionPane.PLAIN_MESSAGE, null, null, BIDE.pathToG1M);
 				
 			    if (input != null) {
 			    	BIDE.pathToG1M = input.getPath();
@@ -158,8 +122,15 @@ public class UI {
 						    try {
 						    	progs = BIDE.readFromG1M(BIDE.pathToG1M);
 						    	BIDE.pathToSavedG1M = "";
+						    	jtp.removeAll();
+					    		for (int i = 0; i < progs.size(); i++) {
+					    			jtp.addTab(progs.get(i).substring(15, progs.get(i).indexOf("\n")), new Program(progs.get(i)));
+					    			jtp.setTabComponentAt(i, new ButtonTabComponent(jtp));
+					    		}
+					    		for (int i = 0; i < jtp.getTabCount(); i++) {
+					    			((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(i)).textPane.getDocument()).getDocumentFilter()).testForLag();
+							    }
 						    } catch (NullPointerException e) {
-						    	e.printStackTrace();
 						    } catch (NoSuchFileException e) {
 						    	BIDE.error("The file at \"" + BIDE.pathToG1M + "\" does not exist.");
 						    } catch (AccessDeniedException e) {
@@ -167,44 +138,22 @@ public class UI {
 						    } catch (IOException e) {
 								e.printStackTrace();
 							}
-						    jtp.removeAll();
-				    		for (int i = 0; i < progs.size(); i++) {
-				    			jtp.addTab(progs.get(i).substring(15, progs.get(i).indexOf("\n")), new Program(progs.get(i)));
-				    			//Update textpanes for the syntax coloration to be correct
-				    			((Program)jtp.getComponentAt(i)).textPane.setText(((Program)jtp.getComponentAt(i)).textPane.getText());
-				    		}
+						    
 				    	}
 				    }).start();
-				    getTextPane().setCaretPosition(0);
+				    try {
+				    	getTextPane().setCaretPosition(0);
+				    } catch (NullPointerException e) {}
 			    }
 			}
 		});
-		
-		JButton save = null;
-		try {
-			save = new JButton(new ImageIcon(ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/saveFile.png"))));
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		save.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
-		save.setContentAreaFilled(false);
-		save.setFocusPainted(false);
+		ToolbarButton save = new ToolbarButton("saveFile.png");
 		save.addActionListener(new ActionListener() {
-			/*@Override public void menuCanceled(MenuEvent arg0) {}
-			@Override public void menuDeselected(MenuEvent arg0) {}
-
-			@Override
-			public void menuSelected(MenuEvent arg0) {
-				
-			}*/
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if (BIDE.pathToSavedG1M.isEmpty()) {
-					BIDE.pathToSavedG1M = BIDE.pathToG1M.substring(0, BIDE.pathToG1M.length()-3) + "bide";
+					BIDE.pathToSavedG1M = BIDE.pathToG1M.substring(0, BIDE.pathToG1M.lastIndexOf(".")) + ".bide";
 				}
-				
-			
-			
 				new Thread(new Runnable() {
 			    	public void run() {
 			    		
@@ -229,13 +178,35 @@ public class UI {
 						}
 			    	}
 				}).start();
-				
-				
+			}
+		});
+		
+		ToolbarButton newProg = new ToolbarButton("newProg.png");
+		newProg.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				createNewTab(BIDE.TYPE_PROG);
+			}
+		});
+		
+		ToolbarButton newPict = new ToolbarButton("newPict.png");
+		newPict.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				createNewTab(BIDE.TYPE_PICT);
+			}
+		});
+		
+		ToolbarButton newCapt = new ToolbarButton("newCapt.png");
+		newCapt.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				createNewTab(BIDE.TYPE_CAPT);
 			}
 		});
 		
 		menuBar.add(open);
 		menuBar.add(save);
+		menuBar.add(newProg);
+		menuBar.add(newPict);
+		menuBar.add(newCapt);
 		menuBar.setPreferredSize(new Dimension(100, 25));
 		//menuBar.add(save);
 		window.add(menuBar, BorderLayout.NORTH);
@@ -253,4 +224,122 @@ public class UI {
 		return ((Program)this.jtp.getSelectedComponent()).textPane;
 	}
 	
+	public void createNewTab(int type) {
+		String content = "";
+		String name = "";
+		if (type == BIDE.TYPE_PROG) {
+			name = JOptionPane.showInputDialog(BIDE.ui.window, "Program name:", "New program", JOptionPane.QUESTION_MESSAGE);
+			content = "#Program name: "+name+"\n#Password: <no password>\n";
+		} else if (type == BIDE.TYPE_PICT) {
+			name = "PICT"+JOptionPane.showInputDialog(BIDE.ui.window, "Picture number:", "New picture", JOptionPane.QUESTION_MESSAGE);
+			content = "#Picture name: "+name+"\n";
+		} else if (type == BIDE.TYPE_CAPT) {
+			name = "CAPT"+JOptionPane.showInputDialog(BIDE.ui.window, "Capture number:", "New capture", JOptionPane.QUESTION_MESSAGE);
+			content = "#Capture name: "+name+"\n";
+		}
+		jtp.addTab(name, new Program(content));
+		jtp.setTabComponentAt(jtp.getTabCount()-1, new ButtonTabComponent(jtp));
+		((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(jtp.getTabCount()-1)).textPane.getDocument()).getDocumentFilter()).testForLag();
+	}
+	
+}
+
+class ToolbarButton extends JButton {
+	public ToolbarButton(String iconName) {
+		super();
+		try {
+			this.setIcon(new ImageIcon(ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/"+iconName))));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		this.setBorder(BorderFactory.createEmptyBorder(2, 5, 0, 0));
+		this.setContentAreaFilled(false);
+		this.setFocusPainted(false);
+	}
+}
+
+class ButtonTabComponent extends JPanel {
+    private final JTabbedPane pane;
+
+    public ButtonTabComponent(final JTabbedPane pane) {
+        //unset default FlowLayout' gaps
+        super(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        if (pane == null) {
+            throw new NullPointerException("TabbedPane is null");
+        }
+        this.pane = pane;
+        setOpaque(false);
+        
+        //make JLabel read titles from JTabbedPane
+        JLabel label = new JLabel() {
+            public String getText() {
+                int i = pane.indexOfTabComponent(ButtonTabComponent.this);
+                if (i != -1) {
+                    return pane.getTitleAt(i);
+                }
+                return null;
+            }
+        };
+
+        add(label);
+        //add more space between the label and the button
+        //label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+        //tab button
+        JButton button = new TabButton();
+        add(button);
+        //add more space to the top of the component
+        //setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
+    }
+
+    private class TabButton extends JButton implements ActionListener {
+        public TabButton() {
+            int size = 17;
+            setPreferredSize(new Dimension(size, size));
+            //setToolTipText("close this tab");
+            //Make the button looks the same for all Laf's
+            setUI(new BasicButtonUI());
+            //Make it transparent
+            setContentAreaFilled(false);
+            //No need to be focusable
+            setFocusable(false);
+            //setBorder(BorderFactory.createEtchedBorder());
+            setBorderPainted(false);
+            setRolloverEnabled(true);
+            //Close the proper tab by clicking the button
+            addActionListener(this);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            int i = pane.indexOfTabComponent(ButtonTabComponent.this);
+            if (i != -1) {
+            	int option = JOptionPane.showConfirmDialog(BIDE.ui.window, "Are you sure to close this tab?", "BIDE", JOptionPane.YES_NO_OPTION);
+                if (option == JOptionPane.YES_OPTION) {
+                	pane.remove(i);
+                }
+            }
+        }
+
+        //we don't want to update UI for this button
+        public void updateUI() {
+        }
+
+        //paint the cross
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g.create();
+            //shift the image for pressed buttons
+            /*if (getModel().isPressed()) {
+                g2.translate(1, 1);
+            }*/
+            g2.setStroke(new BasicStroke(2));
+            g2.setColor(Color.GRAY);
+            if (getModel().isRollover()) {
+                g2.setColor(Color.BLACK);
+            }
+            int delta = 5;
+            g2.drawLine(delta, delta, getWidth() - delta - 1, getHeight() - delta - 1);
+            g2.drawLine(getWidth() - delta - 1, delta, delta, getHeight() - delta - 1);
+            g2.dispose();
+        }
+    }
 }

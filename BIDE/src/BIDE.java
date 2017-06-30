@@ -19,6 +19,10 @@ public class BIDE {
 	public static String pathToSavedG1M = "";
 	public static UI ui = new UI();
 	
+	public final static int TYPE_PROG = 0;
+	public final static int TYPE_PICT = 3;
+	public final static int TYPE_CAPT = 4;
+	
 	public static void main(String[] args) {
 		
 		pathToG1M += "/desktop/clonelab.g1m";
@@ -61,7 +65,7 @@ public class BIDE {
 		g1mparser.divideG1MIntoParts();
 		for (int h = 0; h < g1mparser.parts.size(); h++) {
 			
-			if (g1mparser.getPartType(g1mparser.parts.get(h)) == g1mparser.TYPE_PROG) {
+			if (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PROG) {
 				
 				System.out.println("Found basic program");
 				String progName = casioToAscii(g1mparser.getPartName(g1mparser.parts.get(h)));
@@ -89,42 +93,46 @@ public class BIDE {
 		
 		System.out.println("Saving to \""+destPath+"\"...");
 		
-		String[] lines = ui.getTextPane().getText().split("\\n|\\r|\\r\\n");
 		G1MWrapper g1mwrapper = new G1MWrapper();
 		
 		List<AsciiProg> parts = new ArrayList<AsciiProg>();
 		//Parse text file
 		String line;
-		AsciiProg currentPart = new AsciiProg("","","", 0);
+		AsciiProg currentPart = new AsciiProg("","","");
 		/*try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(progPath)));
 			
 			while ((line = br.readLine()) != null) {*/
-		for (int i = 0; i < lines.length; i++) {
-			line = lines[i];
-			if (line.startsWith("#")) {
-				if (line.startsWith("#Program name: ")) {
-					currentPart = new AsciiProg("","","", i);
+		for (int h = 0; h < ui.jtp.getTabCount(); h++) {
+			
+			String[] lines = ((Program)ui.jtp.getComponentAt(h)).textPane.getText().split("\\n|\\r|\\r\\n");
+			currentPart = new AsciiProg("","","");
+			
+			for (int i = 0; i < lines.length; i++) {
+				line = lines[i];
+				
+				if (i == 0 && line.startsWith("#Program name: ")) {
 					currentPart.name = line.substring(15);
 					
-				} else if (line.startsWith("#Password: ")) {
+				} else if (i == 1 && line.startsWith("#Password: ")) {
 					if (!line.substring(11).equals("<no password>")) {
 						currentPart.password = line.substring(11);
 					}
-				} else if (line.equals("#End of program")) {
-					parts.add(currentPart);
-				} else if (line.equals("#")) {
-					continue;
 				} else {
-					error("Unknown preprocessor directive " + line, i+1);
+					if (line.endsWith("Then") || line.endsWith("Else")) {
+						line += " ";
+					}
+					currentPart.content += line + "\n";
 				}
-			} else {
-				if (line.endsWith("Then") || line.endsWith("Else")) {
-					line += " ";
-				}
-				currentPart.content += line + "\n";
 			}
+			if (currentPart.name.isEmpty()) {
+				error("Couldn't find the name of the program \""+ui.jtp.getTitleAt(h) + "\", make sure to include the directive \"#Program name: <name>\" at the beginning.");
+				return;
+			}
+			parts.add(currentPart);
+			
 		}
+		
 			/*}
 			br.close();
 		    
@@ -134,27 +142,29 @@ public class BIDE {
 		//System.out.println(asciiParts);
 		
 		if (parts.size() == 0) {
-			System.out.println("No programs detected! Make sure to include the directives (see tutorial).");
+			error("No programs detected!");
 			return;
 		}
 		//Add each part (program) of the ascii file
 		byte[] padding = {0,0,0,0,0,0,0,0};
 		for (int i = 0; i < parts.size(); i++) {
-			CasioString password = new CasioString(asciiToCasio(parts.get(i).password, true, parts.get(i).lineStart));
+			CasioString password = new CasioString(asciiToCasio(parts.get(i).password, true, parts.get(i).name+".password"));
 			if (password.length() > 8) {
-				password = password.substring(0, 8);
+				error("Program \""+parts.get(i).name+"\" has a password too long (8 characters max)!");
+				return;
 			}
 			password.add(Arrays.copyOfRange(padding, 0, 8-password.length()));
-			CasioString name = new CasioString(asciiToCasio(parts.get(i).name, true, parts.get(i).lineStart+1));
+			CasioString name = new CasioString(asciiToCasio(parts.get(i).name, true, parts.get(i).name+".name"));
 			if (name.length() > 8) {
-				name = name.substring(0, 8);
+				error("Program \""+parts.get(i).name+"\" has a name too long (8 characters max)!");
+				return;
 			}
 			name.add(Arrays.copyOfRange(padding, 0, 8-name.length()));
-			CasioString part = new CasioString(password); 
+			CasioString part = new CasioString(password);
 			part.add(new byte[]{0,0});
-			part.add(asciiToCasio(parts.get(i).content, false, parts.get(i).lineStart+2));
+			part.add(asciiToCasio(parts.get(i).content, false, parts.get(i).name));
 			part.add(Arrays.copyOfRange(padding, 0, 4-part.length()%4));
-			g1mwrapper.addPart(part, name, g1mwrapper.TYPE_PROG);
+			g1mwrapper.addPart(part, name, BIDE.TYPE_PROG);
 		}
 		
 		g1mwrapper.generateG1M(destPath);
@@ -162,7 +172,7 @@ public class BIDE {
 		
 	}
 	
-	public static CasioString asciiToCasio(String content, boolean allowUnknownOpcodes, int lineStart) {
+	public static CasioString asciiToCasio(String content, boolean allowUnknownOpcodes, String progName) {
 		CasioString result = new CasioString();
 		
 		
@@ -173,9 +183,7 @@ public class BIDE {
 		content = content.replaceAll("Then \\n", "Then ");
 		
 		String[] lines = content.split("\\n|\\r|\\r\\n");
-		
-		
-		
+				
 		for (int h = 0; h < lines.length; h++) {
 			
 			boolean currentPosIsString = false;
@@ -232,9 +240,16 @@ public class BIDE {
 				}
 				
 				if (!foundMatch) {
-					if (!allowUnknownOpcodes && !currentPosIsString && !currentPosIsComment) {
+					if ((!allowUnknownOpcodes && !currentPosIsString && !currentPosIsComment) || lines[h].charAt(i) == '&') {
 						if (lines[h].charAt(i) != ' ') {
-							error("line " + (h+lineStart+1) + ", col " + (i+1) + ": The char '" + lines[h].charAt(i) + 
+							if (progName.endsWith("password")) {
+								i += 11;
+								h -= 1;
+							} else if (progName.endsWith("name")) {
+								i += 15;
+								h -= 2;
+							}
+							error("program \"" + progName+"\", line " + (h+1+2) + ", col " + (i+1) + ": The char '" + lines[h].charAt(i) + 
 									"' shouldn't be here, BIDE did not recognize that opcode. Check the spelling and case.");
 							return null;
 						}
@@ -248,7 +263,7 @@ public class BIDE {
 			
 			//add line feed
 			if (h < lines.length-1) {
-				//result.add(0x0D);
+				result.add(0x0D);
 			}
 			
 		}
@@ -347,6 +362,18 @@ public class BIDE {
 				continue;
 			}
 			
+			//Test for ascii opcodes such as ->, =>
+			if ((hex.equalsIgnoreCase("3D") || hex.equalsIgnoreCase("3E")) && i > 0) { //'=' or '>'
+				short c = content.charAt(i-1);
+				if (hex.equalsIgnoreCase("3D") && (c == '!' || c == '>' || c == '<')) { //!= >= <=
+					currentLine += "&=;";
+					continue;
+				} else if (hex.equalsIgnoreCase("3E") && (c == 0x99 || c == '=')) { //-> =>
+					currentLine += "&>;";
+					continue;
+				}
+				
+			}
 			
 			//System.out.println("Testing for opcode " + hex);
 			for (int j = 0; j < opcodes.size(); j++) {
