@@ -129,6 +129,9 @@ public class UI {
 					    		}
 					    		for (int i = 0; i < jtp.getTabCount(); i++) {
 					    			((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(i)).textPane.getDocument()).getDocumentFilter()).testForLag();
+					    			if (progs.get(i).startsWith("#Capture") || progs.get(i).startsWith("#Picture")) {
+					    				((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(i)).textPane.getDocument()).getDocumentFilter()).pictMode = true;
+					    			}
 							    }
 						    } catch (NullPointerException e) {
 						    } catch (NoSuchFileException e) {
@@ -230,14 +233,32 @@ public class UI {
 		if (type == BIDE.TYPE_PROG) {
 			name = JOptionPane.showInputDialog(BIDE.ui.window, "Program name:", "New program", JOptionPane.QUESTION_MESSAGE);
 			content = "#Program name: "+name+"\n#Password: <no password>\n";
-		} else if (type == BIDE.TYPE_PICT) {
-			name = "PICT"+JOptionPane.showInputDialog(BIDE.ui.window, "Picture number:", "New picture", JOptionPane.QUESTION_MESSAGE);
-			content = "#Picture name: "+name+"\n";
-		} else if (type == BIDE.TYPE_CAPT) {
-			name = "CAPT"+JOptionPane.showInputDialog(BIDE.ui.window, "Capture number:", "New capture", JOptionPane.QUESTION_MESSAGE);
-			content = "#Capture name: "+name+"\n";
+		} else if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
+			if (type == BIDE.TYPE_PICT) {
+				name = "PICT"+JOptionPane.showInputDialog(BIDE.ui.window, "Picture number:", "New picture", JOptionPane.QUESTION_MESSAGE);
+				content = "#Picture name: "+name+"\n";
+			} else {
+				name = "CAPT"+JOptionPane.showInputDialog(BIDE.ui.window, "Capture number:", "New capture", JOptionPane.QUESTION_MESSAGE);
+				content = "#Capture name: "+name+"\n";
+			}
+			content += BIDE.pictTutorial;
+			String asciiResult = "";
+			String pipes128times = "";
+			String spaces128times = "";
+			for (int i = 0; i < 128; i++) {
+				pipes128times += "═";
+				spaces128times += " ";
+			}
+			content += "╔" + pipes128times + "╗\n";
+			for (int i = 0; i < 32; i++) {
+				content += "║" + spaces128times + "║\n";
+			}
+			content += "╚" + pipes128times + "╝";
 		}
 		jtp.addTab(name, new Program(content));
+		if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
+			((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(jtp.getTabCount()-1)).textPane.getDocument()).getDocumentFilter()).pictMode = true;
+		}
 		jtp.setTabComponentAt(jtp.getTabCount()-1, new ButtonTabComponent(jtp));
 		((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(jtp.getTabCount()-1)).textPane.getDocument()).getDocumentFilter()).testForLag();
 	}

@@ -64,7 +64,7 @@ class FixedJTextPane extends JTextPane {
         int tabWidth = charWidth * charactersPerTab;
 //	      int tabWidth = 100;
 
-        TabStop[] tabs = new TabStop[5];
+        TabStop[] tabs = new TabStop[50];
 
         for (int j = 0; j < tabs.length; j++)
         {

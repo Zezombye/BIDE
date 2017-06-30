@@ -21,6 +21,7 @@ public class CustomDocumentFilter extends DocumentFilter {
     public JTextPane textPane;
     public ColorationPattern[] regexes;
     
+    public boolean pictMode = false;
     public boolean isTooLaggy = false;
     
     public CustomDocumentFilter(JTextPane jtp, ColorationPattern[] regexes) {
@@ -45,10 +46,19 @@ public class CustomDocumentFilter extends DocumentFilter {
 
     @Override
     public void replace(final FilterBypass fb, final int offs, final int length, final String str, final AttributeSet a) throws BadLocationException {
-        if (str.equals("=>"))
-            super.replace(fb, offs, length, "t", a);
-        else
+    	if (pictMode) {
+            if (str.equals("'")) {
+                super.replace(fb, offs, length, "▀", a);
+            } else if (str.equals(",")) {
+                super.replace(fb, offs, length, "▄", a);
+            } else if (str.equals(":")) {
+                super.replace(fb, offs, length, "█", a);
+            } else {
+                super.replace(fb, offs, length, str, a);
+            }
+    	} else {
             super.replace(fb, offs, length, str, a);
+    	}
         
         handleTextChanged();
     }

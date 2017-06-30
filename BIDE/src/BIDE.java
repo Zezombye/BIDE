@@ -23,6 +23,11 @@ public class BIDE {
 	public final static int TYPE_PICT = 3;
 	public final static int TYPE_CAPT = 4;
 	
+	public final static String pictTutorial = 
+			"'To edit the picture, use the characters ' , :\n"
+			+ "'which make ▀ ▄ █ respectively.\n"
+			+ "'Make sure not to edit the border!\n";
+	
 	public static void main(String[] args) {
 		
 		pathToG1M += "/desktop/clonelab.g1m";
@@ -83,6 +88,53 @@ public class BIDE {
 				}
 				
 				progs.add("#Program name: "+progName+"\n#Password: " + progPw + "\n"+ progContent);
+			} else if (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PICT || g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_CAPT) {
+				System.out.println("Found picture/capture");
+				String name = casioToAscii(g1mparser.getPartName(g1mparser.parts.get(h)));
+				System.out.println("Name = "+name);
+				//TODO: see if the second part of pictures is important or not
+				CasioString content = g1mparser.getPartContent(g1mparser.parts.get(h)).substring(0, 0x400);
+				//Convert from binary to bitmap
+				String binary = "";
+				for (int i = 0; i < 0x400; i++) {
+					int mask = 0b10000000;
+					for (int j = 0; j < 8; j++) {
+						binary += ((content.charAt(i)&mask) != 0 ? "1" : "0");
+						mask >>= 1;
+					}
+				}
+				if (binary.length() != 0x400*8) {
+					error("Picture isn't 64*128? ("+binary.length()+") px");
+				}
+				String asciiResult = "";
+				String pipes128times = "";
+				for (int i = 0; i < 128; i++) {
+					pipes128times += "═";
+				}
+				asciiResult += "╔" + pipes128times + "╗\n";
+				for (int i = 0; i < 32; i++) {
+					asciiResult += "║";
+					for (int j = 0; j < 128; j++) {
+						char pixel = binary.charAt(i*2*128 + j%128);
+						char pixel2 = binary.charAt((i*2+1)*128 + j%128);
+						if (pixel == '0' && pixel2 == '0') {
+							asciiResult += " ";
+						} else if (pixel == '0' && pixel2 == '1') {
+							asciiResult += "▄";
+						} else if (pixel == '1' && pixel2 == '0') {
+							asciiResult += "▀";
+						} else if (pixel == '1' && pixel2 == '1') {
+							asciiResult += "█";
+						}
+					}
+					asciiResult += "║\n";
+				}
+				asciiResult += "╚" + pipes128times + "╝";
+				if (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PICT) {
+					progs.add("#Picture name: "+name+"\n" + pictTutorial + asciiResult);
+				} else {
+					progs.add("#Capture name: "+name+"\n" + pictTutorial + asciiResult);
+				}
 			}
 		}
 		System.out.println("Finished reading from g1m");
