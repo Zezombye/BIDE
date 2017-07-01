@@ -1,5 +1,11 @@
+import java.awt.TextArea;
+import java.io.IOException;
 import java.io.OutputStream;
- 
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.JTextArea;
  
 /**
@@ -8,19 +14,31 @@ import javax.swing.JTextArea;
  *
  */
 public class CustomOutputStream extends OutputStream {
-    private JTextArea textArea;
-     
-    public CustomOutputStream(JTextArea textArea) {
-        this.textArea = textArea;
+	private JTextArea output;
+    private ArrayList<Byte> bytes = new ArrayList<>();
+
+    public CustomOutputStream(JTextArea ta) {
+        this.output = ta;
     }
-     
+
     @Override
-    public void write(int b) {
-        // redirects data to the text area
-        textArea.append(String.valueOf((char)b));
-        // scrolls the text area to the end of data
-        textArea.setCaretPosition(textArea.getDocument().getLength());
-        //This is insanely laggy
-        //textArea.update(textArea.getGraphics());
+    public void write(int i) throws IOException {
+        bytes.add((byte)i);
+
+        byte[] array = new byte[bytes.size()];
+        int q = 0;
+        for (Byte current : bytes) {
+            array[q] = current;
+            q++;
+        }
+        try {
+            output.setText(new String(array, "UTF-8"));
+            output.setCaretPosition(output.getText().length());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+
     }
+
 }

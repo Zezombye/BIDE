@@ -37,7 +37,6 @@ public class UI {
 	
 	public void createAndDisplayUI() {
 		
-		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
@@ -45,7 +44,7 @@ public class UI {
 		}
 		
 		window = new JFrame();
-		window.setTitle("BIDE");
+		window.setTitle("BIDE v2.0");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setSize(800, 600);
 		window.setLocationRelativeTo(null);
@@ -94,7 +93,7 @@ public class UI {
 
 			@Override
 			public String getDescription() {
-				return "Basic Casio files (.g1m, .g2m, .g1r, .g2r, .bide)";
+				return "Basic Casio files (.g1m, .g2m, .g1r, .g2r)";
 			}
 		});
 		//window.setUndecorated(true);
@@ -115,6 +114,7 @@ public class UI {
 				
 			    if (input != null) {
 			    	BIDE.pathToG1M = input.getPath();
+			    	BIDE.pathToSavedG1M = "";
 			    	new Thread(new Runnable() {
 				    	public void run() {
 
@@ -128,10 +128,10 @@ public class UI {
 					    			jtp.setTabComponentAt(i, new ButtonTabComponent(jtp));
 					    		}
 					    		for (int i = 0; i < jtp.getTabCount(); i++) {
-					    			((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(i)).textPane.getDocument()).getDocumentFilter()).testForLag();
 					    			if (progs.get(i).startsWith("#Capture") || progs.get(i).startsWith("#Picture")) {
-					    				((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(i)).textPane.getDocument()).getDocumentFilter()).pictMode = true;
+					    				((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(i)).textPane.getDocument()).getDocumentFilter()).setPictMode(true);
 					    			}
+					    			((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(i)).textPane.getDocument()).getDocumentFilter()).testForLag();
 							    }
 						    } catch (NullPointerException e) {
 						    } catch (NoSuchFileException e) {
@@ -155,7 +155,7 @@ public class UI {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if (BIDE.pathToSavedG1M.isEmpty()) {
-					BIDE.pathToSavedG1M = BIDE.pathToG1M.substring(0, BIDE.pathToG1M.lastIndexOf(".")) + ".bide";
+					BIDE.pathToSavedG1M = BIDE.pathToG1M;
 				}
 				new Thread(new Runnable() {
 			    	public void run() {
@@ -167,6 +167,7 @@ public class UI {
 						}
 						
 						if (input != null) {
+							BIDE.pathToSavedG1M = input.getAbsolutePath();
 							try {
 								BIDE.writeToG1M(input.getPath());
 							} catch (NullPointerException e) {
@@ -236,28 +237,36 @@ public class UI {
 		} else if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
 			if (type == BIDE.TYPE_PICT) {
 				name = "PICT"+JOptionPane.showInputDialog(BIDE.ui.window, "Picture number:", "New picture", JOptionPane.QUESTION_MESSAGE);
-				content = "#Picture name: "+name+"\n";
+				content = "#Picture name: "+name+"\n#Size: 0x800";
 			} else {
 				name = "CAPT"+JOptionPane.showInputDialog(BIDE.ui.window, "Capture number:", "New capture", JOptionPane.QUESTION_MESSAGE);
 				content = "#Capture name: "+name+"\n";
 			}
 			content += BIDE.pictTutorial;
-			String asciiResult = "";
-			String pipes128times = "";
 			String spaces128times = "";
 			for (int i = 0; i < 128; i++) {
-				pipes128times += "═";
 				spaces128times += " ";
 			}
-			content += "╔" + pipes128times + "╗\n";
-			for (int i = 0; i < 32; i++) {
-				content += "║" + spaces128times + "║\n";
+			for (int h = 0; h < (type == BIDE.TYPE_PICT ? 2 : 1); h++) {
+				if (h == 1) {
+					content += BIDE.pictWarning;
+				}
+				for (int i = 0; i < 130; i++) {
+					content += "▄";
+				}
+				content += "\n";
+				for (int i = 0; i < 32; i++) {
+					content += "█" + spaces128times + "█\n";
+				}
+				for (int i = 0; i < 130; i++) {
+					content += "▀";
+				}
 			}
-			content += "╚" + pipes128times + "╝";
+				
 		}
 		jtp.addTab(name, new Program(content));
 		if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
-			((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(jtp.getTabCount()-1)).textPane.getDocument()).getDocumentFilter()).pictMode = true;
+			((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(jtp.getTabCount()-1)).textPane.getDocument()).getDocumentFilter()).setPictMode(true);
 		}
 		jtp.setTabComponentAt(jtp.getTabCount()-1, new ButtonTabComponent(jtp));
 		((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(jtp.getTabCount()-1)).textPane.getDocument()).getDocumentFilter()).testForLag();
@@ -333,7 +342,7 @@ class ButtonTabComponent extends JPanel {
         public void actionPerformed(ActionEvent e) {
             int i = pane.indexOfTabComponent(ButtonTabComponent.this);
             if (i != -1) {
-            	int option = JOptionPane.showConfirmDialog(BIDE.ui.window, "Are you sure to close this tab?", "BIDE", JOptionPane.YES_NO_OPTION);
+            	int option = JOptionPane.showConfirmDialog(BIDE.ui.window, "Are you sure you want to close this tab?", "BIDE", JOptionPane.YES_NO_OPTION);
                 if (option == JOptionPane.YES_OPTION) {
                 	pane.remove(i);
                 }

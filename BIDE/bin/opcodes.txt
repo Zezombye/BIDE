@@ -36,6 +36,7 @@ F x10^ t
 2F ascii_/ t
 3D = t
 3E > t
+5E ascii_^ t
 80 Pol( f
 81 sin  f
 82 cos  f
@@ -73,7 +74,7 @@ A3 tanh  f
 A4 oct t
 A5 e^ f
 A6 Int  f
-A7 Not  f
+A7 bitwiseNot t
 A8 ^ f
 A9 * f
 AA or f

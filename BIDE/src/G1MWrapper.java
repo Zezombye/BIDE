@@ -34,10 +34,12 @@ public class G1MWrapper {
 		}
 		//System.out.println(sizeString);
 		//Subheader
-		CasioString subheader = getSubHeaderIDAndDir(type);
+		CasioString subheader = getSubHeaderIDAndDir(type, partName.toString());
 		subheader.add(partName);
 		subheader.add(Arrays.copyOfRange(padding, 0, 8-partName.length()));
-		subheader.add(getPartID(type));
+		int id = getPartID(type);
+		if (id < 0) return;
+		subheader.add(id);
 		subheader.add(sizeString);
 		subheader.add(new byte[]{0,0,0});
 		part.add(0, subheader);
@@ -85,7 +87,7 @@ public class G1MWrapper {
 	
 	//Not really necessary to use CasioStrings here
 	//Only special bytes are 0 and 1
-	public CasioString getSubHeaderIDAndDir(int partType) {
+	public CasioString getSubHeaderIDAndDir(int partType, String partName) {
 		String partTypeStr = "";
 		String partDir = "";
 		switch (partType) {
@@ -93,8 +95,17 @@ public class G1MWrapper {
 				partTypeStr = "PROGRAM";
 				partDir = "system";
 				break;
+			case BIDE.TYPE_PICT:
+				partTypeStr = "PICTURE "+partName.substring(4);
+				partDir = "main";
+				break;
+			case BIDE.TYPE_CAPT:
+				partTypeStr = "CAPT "+partName.substring(4);
+				partDir = "@REV2";
+				break;
 			default:
 				BIDE.error("Unknown part ID " + partType);
+				return null;
 		}
 		
 		//padding

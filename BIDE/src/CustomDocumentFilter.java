@@ -1,4 +1,6 @@
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,14 +21,14 @@ public class CustomDocumentFilter extends DocumentFilter {
     private StyleContext styleContext = StyleContext.getDefaultStyleContext();
     private AttributeSet blackAttributeSet = styleContext.addAttribute(styleContext.getEmptySet(), StyleConstants.Foreground, Color.BLACK);
     public JTextPane textPane;
-    public ColorationPattern[] regexes;
+    public ArrayList<ColorationPattern> regexes = null;
     
-    public boolean pictMode = false;
+    private boolean pictMode = false;
     public boolean isTooLaggy = false;
     
     public CustomDocumentFilter(JTextPane jtp, ColorationPattern[] regexes) {
     	this.textPane = jtp;
-    	this.regexes = regexes;
+    	this.regexes = new ArrayList<ColorationPattern>(Arrays.asList(regexes));
     	styledDocument = textPane.getStyledDocument();
     }
     
@@ -43,7 +45,15 @@ public class CustomDocumentFilter extends DocumentFilter {
 
         handleTextChanged();
     }
-
+    
+    public void setPictMode(boolean b) {
+    	this.pictMode = b;
+    	if (b) {
+        	Color borderColor = Color.GRAY;
+        	this.regexes.add(new ColorationPattern("(▀{130})|(▄{130})|(█(?=\\n))|((?<=\\n)█)", borderColor, false));
+        	this.textPane.setCaretColor(new Color(0, 128, 255));
+    	}
+    }
     @Override
     public void replace(final FilterBypass fb, final int offs, final int length, final String str, final AttributeSet a) throws BadLocationException {
     	if (pictMode) {
@@ -71,12 +81,6 @@ public class CustomDocumentFilter extends DocumentFilter {
     	if (!isTooLaggy) {
     		updateTextStyles();
     	}
-        /*SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-            	
-            }
-        });*/
     }
     
     public void testForLag() {
@@ -94,18 +98,17 @@ public class CustomDocumentFilter extends DocumentFilter {
     }
 
 
-    private void updateTextStyles()
-    {
+    private void updateTextStyles() {
         // Clear existing styles
         styledDocument.setCharacterAttributes(0, textPane.getText().length(), blackAttributeSet, true);
 
         // Look for tokens and highlight them
     	String textPaneText = textPane.getText();
     	SimpleAttributeSet sas = new SimpleAttributeSet();
-        for (int i = 0; i < regexes.length; i++) {
-        	StyleConstants.setForeground(sas, regexes[i].color);
+        for (int i = 0; i < regexes.size(); i++) {
+        	StyleConstants.setForeground(sas, regexes.get(i).color);
         	//StyleConstants.setBold(sas, regexes[i].isBold);
-            Matcher matcher = regexes[i].pattern.matcher(textPaneText);
+            Matcher matcher = regexes.get(i).pattern.matcher(textPaneText);
             while (matcher.find()) {
                 // Change the color of recognized tokens
                 styledDocument.setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), sas, false);
