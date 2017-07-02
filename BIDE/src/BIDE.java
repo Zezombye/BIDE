@@ -73,15 +73,15 @@ public class BIDE {
 			if (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PROG) {
 				
 				System.out.println("Found basic program");
-				String progName = casioToAscii(g1mparser.getPartName(g1mparser.parts.get(h)));
-				String progPw = casioToAscii(g1mparser.parts.get(h).substring(44, 52));
+				String progName = casioToAscii(g1mparser.getPartName(g1mparser.parts.get(h)), false);
+				String progPw = casioToAscii(g1mparser.parts.get(h).substring(44, 52), false);
 
 				if (progPw.isEmpty()) {
 					progPw = "<no password>";
 				}
 				System.out.println("Name = " + progName + ", password = " + progPw);
 				
-				String progContent = casioToAscii(g1mparser.getPartContent(g1mparser.parts.get(h)).substring(10));
+				String progContent = casioToAscii(g1mparser.getPartContent(g1mparser.parts.get(h)).substring(10), true);
 				
 				if (progName == null || progPw == null || progContent == null) {
 					return null;
@@ -90,7 +90,7 @@ public class BIDE {
 				progs.add("#Program name: "+progName+"\n#Password: " + progPw + "\n"+ progContent);
 			} else if (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PICT || g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_CAPT) {
 				System.out.println("Found picture/capture");
-				String name = casioToAscii(g1mparser.getPartName(g1mparser.parts.get(h)));
+				String name = casioToAscii(g1mparser.getPartName(g1mparser.parts.get(h)), false);
 				System.out.println("Name = "+name);
 				//TODO: see if the second part of pictures is important or not
 				CasioString content = null;
@@ -168,7 +168,6 @@ public class BIDE {
 		
 		List<AsciiProg> parts = new ArrayList<AsciiProg>();
 		//Parse text file
-		String line;
 		AsciiProg currentPart = null;
 		/*try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(progPath)));
@@ -191,7 +190,7 @@ public class BIDE {
 			}
 			currentPart = new AsciiProg("","","", type);
 			currentPart.name = lines[0].substring(15);
-			System.out.println("Writing \""+currentPart.name+"\"");
+						
 			if (type == BIDE.TYPE_PROG && lines[1].startsWith("#Password: ")) {
 				if (!lines[1].substring(11).equals("<no password>")) {
 					currentPart.option = lines[1].substring(11);
@@ -235,6 +234,7 @@ public class BIDE {
 				error("Program \""+parts.get(i).name+"\" has a name too long (8 characters max)!");
 				return;
 			}
+			System.out.println("Parsing \""+parts.get(i).name+"\"");
 			if (parts.get(i).type == BIDE.TYPE_CAPT && !parts.get(i).name.startsWith("CAPT")) {
 				error("Capture \""+parts.get(i).name+"\"'s name should start with \"CAPT\"!");
 				return;
@@ -278,7 +278,6 @@ public class BIDE {
 			
 			g1mwrapper.addPart(part, name, parts.get(i).type);
 		}
-		
 		g1mwrapper.generateG1M(destPath);
 		System.out.println("Finished writing to g1m");
 		
@@ -339,8 +338,6 @@ public class BIDE {
 	public static CasioString asciiToCasio(String content, boolean allowUnknownOpcodes, String progName, int startLine) {
 		CasioString result = new CasioString();
 		
-		
-
 		//Optimise for less wasted space
 		content = content.replaceAll("Else \\n", "Else ");
 		content = content.replaceAll(":Then \\n", "\nThen ");
@@ -445,7 +442,7 @@ public class BIDE {
 		return result;
 	}
 	
-	public static String casioToAscii(CasioString content) {
+	public static String casioToAscii(CasioString content, boolean addSpaces) {
 		String allowedCharacters = " !#$%;@_abcdefghijklmnopqrstuvwxyz|";
 		
 		//Opcodes causing indentation
@@ -463,6 +460,11 @@ public class BIDE {
 			"f707", //Next
 			"f709", //WhileEnd
 			"f70b", //LpWhile
+		});
+		
+		//Opcodes with added spaces
+		List<String> opcodesSpaces = Arrays.asList(new String[] {
+			""
 		});
 		
 		List<String> lines = new ArrayList<String>();
@@ -575,6 +577,7 @@ public class BIDE {
 		
 		lines.add(currentLine);
 		
+		
 		StringBuilder strBuilder = new StringBuilder();
 		for (int i = 0; i < lines.size(); i++) {
 		   strBuilder.append(lines.get(i));
@@ -582,57 +585,6 @@ public class BIDE {
 		
 		return strBuilder.toString();
 	}
-	/*
-	public static void createG1M(String content, String progName) {
-		
-		//Convert ascii to casio
-		for (int i = 0; i < convTable.length/2; i++) {
-			//System.out.println(Integer.toHexString((char)convTable[2*i]));
-			//Split the character if multi
-			String casioChar = (char)(int)Integer.valueOf((String) convTable[2*i], 16) > 0xFF 
-					? (String) new String(new char[]{(char)(Integer.valueOf((String)convTable[2*i], 16)/0x100), (char)(Integer.valueOf((String)convTable[2*i], 16) % 0x100)})
-					: new String(new char[]{(char)(int)(Integer.valueOf((String)convTable[2*i], 16))});
-			content = content.replace((String)convTable[2*i+1], casioChar);
-			
-		}
-		//Padding
-		String padding = new String(new char[]{0, 0, 0, 0, 0, 0, 0, 0});
-		content += padding.substring(0, 4-content.length()%4);
-		
-		content = new String(new char[]{0,0,0,0,0,0,0,0,0,0}) + content;
-		
-		String sizeString = "";
-		for (int i = 0; i < 4; i++) {
-			sizeString += (char)(int)Integer.valueOf(new String("00000000".substring(
-					0, 8-Integer.toHexString(content.length()).length())
-					+Integer.toHexString(content.length())).substring(2*i, 2*i+2));
-		}
-		System.out.println(sizeString);
-		//Subheader
-		content = "PROGRAM" + new String(new char[]{0,0,0,0,0,0,0,0,0}) + new String(new char[]{0,0,0,1})
-				+ "system" + new String(new char[]{0,0}) + progName + padding.substring(0, 8-progName.length())
-				+ (char)1 + sizeString + new String(new char[]{0,0,0}) + content;
-		
-		//Header
-		String sizeString2 = "";
-		for (int i = 0; i < 4; i++) {
-			sizeString2 += (char)(int)Integer.valueOf(new String("00000000".substring(
-					0, 8-Integer.toHexString(content.length()+0x20).length())
-					+Integer.toHexString(content.length()+0x20)).substring(2*i, 2*i+2));
-		}
-		String header = "USBPower" + new String(new char[]{0x31, 0x00, 0x10, 0x00, 0x10, 0x00})
-				+(char)(sizeString2.charAt(3)+0x41) + (char)0x01 + sizeString2 + (char)((sizeString2.charAt(3)+0xB8)%0x100)
-				+new String(new char[]{1, 0xBD, 0xB6, 0xBB, 0xBA, 0xDF, 0x8F, 0x8D, 0x90, 0x98, 0, 1});
-		String header2 = new String();
-		for (int i = 0; i < header.length(); i++) {
-			System.out.println(Integer.toHexString(0xFF-header.charAt(i)));
-			header2 += (char)(0xFF-header.charAt(i));
-		}
-		header2 += (char)(0x90);
-		content = header2 + content;
-		
-		IO.writeToFile(new File("C:\\Users\\Catherine\\Desktop\\locate.g1m"), content, true);
-	}*/
 	
 	public static void getOpcodes() {
 		//String relativePath = IO.getRelativeFilePath("opcodes.txt");
@@ -640,7 +592,7 @@ public class BIDE {
 		int lineNb = 0;
 		try {
 			//BufferedReader br = new BufferedReader(new FileReader(new File(relativePath)));
-			BufferedReader br = new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/opcodes.txt")));
+			BufferedReader br = new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/opcodes.txt"), "UTF-8"));
 			String hex, ascii;
 			boolean escape = false;
 			
@@ -702,6 +654,15 @@ public class BIDE {
 				return o2.ascii.compareTo(o1.ascii);
 			}
 		});
+		
+		//Check for duplicates
+		for (int i = 0; i < opcodes.size(); i++) {
+			for (int j = i+1; j < opcodes.size(); j++) {
+				if (opcodes.get(i).ascii.equals(opcodes.get(j).ascii)) {
+					error("opcodes.txt", "Opcode 0x"+opcodes.get(i).hex + " conflicts with opcode 0x"+opcodes.get(j).hex + "!");
+				}
+			}
+		}
 	}
 	
 	public static List<Byte> byteArrayToList(byte[] b) {

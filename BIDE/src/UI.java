@@ -44,10 +44,15 @@ public class UI {
 		}
 		
 		window = new JFrame();
-		window.setTitle("BIDE v2.0");
+		window.setTitle("BIDE v2.2");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setSize(800, 600);
 		window.setLocationRelativeTo(null);
+		try {
+			window.setIconImage(ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/BIDEicon.png")));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		
 		//window.add(jsp);
 		window.add(jtp);
