@@ -1,12 +1,3 @@
-#
-#DO NOT EDIT THIS TAB, changes won't be saved!
-#
-#
-#DO NOT EDIT THIS TAB, changes won't be saved!
-#
-#
-#DO NOT EDIT THIS TAB, changes won't be saved!
-#
 #Opcode number in hex - ascii representation of the opcode - t/f (true/false): surround the ascii representation with '&' and ';' (can change)
 #Order opcodes by value of hex number (0x10 < 0xFF < 0x7F00)
 #Separate opcodes by a line feed only; no tabs, etc
@@ -282,7 +273,6 @@ FE prob_t( t
 7F54 angle t
 7F55 Ref  f
 7F56 Rref  f
-7F57 ▸ f
 7F57 to t
 7F60 Sim Coef f
 7F61 Ply Coef f
@@ -657,10 +647,13 @@ E59C ¥ f
 E59C yen t
 E59D § f
 E59D sect t
-E59E negative_c t
+E59E © f
+E59E copyright t
 E59F underlined_a t
+E5A0 ¬ f
 E5A0 logical_not t
-E5A1 negative_R t
+E5A1 ® f
+E5A1 registered t
 E5A2 underlined_o t
 E5A3 « f
 E5A3 << t
@@ -686,7 +679,7 @@ E5B2 bold_r t
 E5B3 bold_X t
 E5B4 bold_Y t
 E5B5 negative_B t
-E5B6 longer_negative_R t
+E5B6 negative_R t
 E5B7 negative_L t
 E5B8 negative_= t
 E5B9 negative_< t
@@ -749,6 +742,7 @@ E5DB _+ t
 E5DC ₋ f
 E5DC _- t
 E5DD ^* t
+E5DE ₙ f
 E5DE small_n t
 E5DF ^3_with_style t
 E5E0 ♠ f
@@ -1003,19 +997,25 @@ E694 ↔ f
 E694 left_right_arrow t
 E695 ↕ f
 E695 up_down_arrow t
+E696 ↖ f
 E696 top_left_arrow t
+E697 ↗ f
 E697 top_right_arrow t
+E698 ↘ f
 E698 bottom_left_arrow t
+E699 ↙ f
 E699 bottom_right_arrow t
-E69A ◄ f
+E69A ◀ f
 E69A left_black_triangle t
-E69B ► f
+E69B ▶ f
 E69B right_black_triangle t
 E69C ▲ f
 E69C up_black_triangle t
 E69D ▼ f
 E69D down_black_triangle t
+E69E ▸ f
 E69E right_small_black_triangle t
+E59F ▷ f
 E69F right_white_triangle t
 E6A0 divide_on_times t
 E6A1 left_lenticular_bracket t
@@ -1028,23 +1028,36 @@ E6A5 □ f
 E6A5 white_square t
 E6A6 ■ f
 E6A6 black_square t
+E6A7 ◇ f
 E6A7 white_diamond t
+E6A8 ◆ f
 E6A8 black_diamond t
+E6A9 ⊠ f
 E6A9 black_square_with_cross t
 E6AA ▪ f
 E6AA bullet_operator t
+E6AC △ f
 E6AC up_white_triangle t
+E6AD ▽ f
 E6AD down_white_triangle t
+E6AE ✖ f
+E6AE bold_cross f
+E6AF ◁ f
 E6AF left_white_triangle t
+E6B0 ≒ f
 E6B0 equal_with_dots t
 E6B1 ≈ f
 E6B1 approx_equal_to t
 E6B2 ≡ f
 E6B2 triple_equal t
+E6B3 ≢ f
 E6B3 not_triple_equal t
+E6B4 ≅ f
 E6B4 approx_triple_equal t
 E6B5 reversed_tilde t
+E6B6 ∝ f
 E6B6 proportional_to t
+E6B7 ∬ f
 E6B7 double_integral t
 E6B8 contour_integral t
 E6B9 ∂ f
@@ -1052,41 +1065,67 @@ E6B9 partial_differential t
 E6BB ∫ f
 E6BB integral t
 E6BC measured_angle t
+E6BD ∈ f
 E6BD element_of t
+E6BE ∋ f
 E6BE contains_as_member t
+E6BF ⊆ f
 E6BF subset_of_or_equal_to t
+E6C0 ⊇ f
 E6C0 superset_of_or_equal_to t
+E6C1 ⊂ f
 E6C1 subset_of t
+E6C2 ⊃ f
 E6C2 superset_of t
-E6C3 ∩ f
+E6C3 ∪ f
 E6C3 union t
+E6C4 ∩ f
 E6C4 intersection t
+E6C5 ∉ f
 E6C5 not_an_element_of t
+E6C6 ∌ f
 E6C6 does_not_contain_as_member t
+E6C7 ⊈ f
 E6C7 neither_a_subset_of_nor_equal_to t
+E6C8 ⊉ f
 E6C8 neither_a_superset_of_nor_equal_to t
+E6C9 ⊄ f
 E6C9 not_a_subset_of t
+E6CA ⊅ f
 E6CA not_a_superset_of t
-E6CB Ø f
+E6CB ∅ f
 E6CB empty_set t
 E6CC Ǝ f
 E6CC there_exists t
 E6CD ∟ f
 E6CD right_angle t
-E6CE /\ t
-E6CF \/ t
+E6CE ∨ f
+E6CE \/ t
+E6CF ∧ f
+E6CF /\ t
+E6D0 ∀ f
 E6D0 for_all t
+E6D1 ⊕ f
 E6D1 circled_+ t
+E6D2 ⊖ f
 E6D2 circled_- t
+E6D3 ⊗ f
 E6D3 circled_x t
+E6D4 ⊘ f
 E6D4 circled_/ t
+E6D5 ⊥ f
 E6D5 perpendicular_to t
-E6D6 between t
+E6D6 ⇔ f
+E6D6 left_right_double_arrow t
+E6D7 ‖ f
 E6D7 || t
 E6D8 ||_strike t
 E6D9 // t
+E6DA ∇ f
 E6DA shield t
+E6DB ∴ f
 E6DB dots_in_^ t
+E6DC ∵ f
 E6DC dots_in_v t
 E6DD prime t
 E6DE ″ f
@@ -1312,7 +1351,7 @@ F73C Bar f
 F73F DotG  f
 F740 1-Variable  f
 F741 2-Variable  f
-F742 LinearReg(ax+b) f
+F742 LinearReg(ax+b)  f
 F743 Med-MedLine  f
 F744 QuadReg  f
 F745 CubicReg  f
@@ -1363,10 +1402,12 @@ F777 Resid-List  f
 F778 BG-None f
 F779 BG-Pict  f
 F77A GridOff f
+F77C GridLine f
 F77D GridOn f
 F77E Exp(a*b^x) f
 F780 D Var  f
 F787 Q1Q3TypeStd f
+F788 VarRange f
 F789 Q1Q3TypeOnData f
 F78C SketchNormal  f
 F78D SketchThick  f
@@ -1450,21 +1491,30 @@ F903 ->Bin f
 F904 ->Oct f
 F905 ->DMS f
 F906 ->a+bi f
-F907 ->r_theta f
+F907 ->r∠θ f
+F907 ->r&angle;&theta; f
 F908 Real f
 F909 a+bi f
-F90A r_theta f
+F90A r∠θ f
+F90A r&angle;&theta;  f
 F90B EngOn f
 F90C EngOff f
 F910 Sel a0 f
 F911 Sel a1 f
+F912 cₙ f
 F912 c_n f
+F913 cₙ₊₁ f
 F913 c_(n+1) f
+F914 cₙ₊₂ f
 F914 c_(n+2) f
+F915 c₀ f
 F915 c0 f
+F916 c₁ f
 F916 c1 f
+F917 c₂ f
 F917 c2 f
 F918 cnStart f
+F919 IneqTypeIntsect f
 F919 IneqTypeAnd f
 F91B fn t
 F91C File  f
@@ -1480,6 +1530,7 @@ F927 DrawDistF  f
 F928 None f
 F929 StickLength f
 F92A StickHoriz f
+F92B IneqTypeUnion f
 F92B IneqTypeOr f
 F92C Graph X> f
 F92D Graph X< f
@@ -1499,6 +1550,7 @@ F93A StrLwr( f
 F93B StrInv( f
 F93C StrShift( f
 F93D StrRotate( f
+F93E ClrVct  f
 F93F Str  f
 F94A CrossP( f
 F94B DotP( f
@@ -1513,6 +1565,8 @@ F977 ColorLinkOnlyY f
 F978 ColorLinkOn f
 F979 ColorLinkOff f
 F97A ColorNormal  f
+F97B ERROR f
+F97C BLANK f
 F97D ColorClr  f
 F97E ColorLinkX&amp;Freq f
 F980 NormPD( f

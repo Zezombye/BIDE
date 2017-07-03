@@ -544,7 +544,9 @@ public class BIDE {
 			//Unindent
 			if (unindent.contains(hex) && indentLevel > 0) {
 				indentLevel--;
-				tabs = tabs.substring(1);
+				try {
+					tabs = tabs.substring(1);
+				} catch (StringIndexOutOfBoundsException e) {}
 			}
 			
 			//line feed
