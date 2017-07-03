@@ -23,37 +23,60 @@ import javax.swing.text.ViewFactory;
 
 public class Program extends JScrollPane {
 	
-	public FixedJTextPane textPane = new FixedJTextPane();
-	TextLineNumber tln = new TextLineNumber(textPane);
+	public FixedJTextPane textPane = null;
+	TextLineNumber tln = null; 
+	public String name = "";
+	public String option = "";
+	public String content = "";
+	public int type = 0;
 	
-	public Program(String content) {
+	public Program(String name, String option, String content, int type) {
+		this.name = name;
+		this.option = option;
+		this.textPane = new FixedJTextPane(type);
+		this.type = type;
+		this.content = content;
+		this.tln = new TextLineNumber(textPane);
 		this.setViewportView(textPane);
 		this.getVerticalScrollBar().setUnitIncrement(30);
 		this.setBorder(BorderFactory.createEmptyBorder());
 		this.setRowHeaderView(tln);
+		if (type == BIDE.TYPE_PROG) {
+			content = "#Program name: "+name+"\n#Password: "+option+"\n"+content;
+		} else if (type == BIDE.TYPE_PICT) {
+			content = "#Picture name: "+name+"\n#Size: 0x"+option+BIDE.pictTutorial+content;
+		} else if (type == BIDE.TYPE_CAPT) {
+			content = "#Capture name: "+name+"\n"+BIDE.pictTutorial+content;
+		}
 		textPane.setText(content);
+		tln.setFont(new Font("Courier New", Font.PLAIN, 13));
 		tln.setBorderGap(10);
 		tln.setCurrentLineForeground(null);
 	}
 }
 
 class FixedJTextPane extends JTextPane {
-
-	Font font = new Font("Courier new", Font.PLAIN, 13);
 	
-	public FixedJTextPane() {
+	public FixedJTextPane(int type) {
         this.setEditorKit(new WrapEditorKit());
         //JScrollPane jsp = new JScrollPane(this);
         //jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         
-
+        
 		//this.setMaximumSize(this.getParent().getSize());
-		this.setFont(font);
+        if (type == BIDE.TYPE_CAPT || type == BIDE.TYPE_PICT) {
+        	this.setFont(BIDE.pictFont);
+        } else {
+        	this.setFont(BIDE.progFont);
+        }
 		this.setBackground(Color.WHITE);
 		this.setForeground(Color.BLACK);
 		this.setTabs(this, 4);
+		if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
+			this.setCaretColor(new Color(0, 128, 255));
+		}
 		//Syntax coloration
-		((AbstractDocument)this.getDocument()).setDocumentFilter(new CustomDocumentFilter(this, new SyntaxColoration().getColorationPatterns()));
+		((AbstractDocument)this.getDocument()).setDocumentFilter(new CustomDocumentFilter(this, new SyntaxColoration().getColorationPatterns(type), type));
     }
 	
 	//Of course java couldn't have a setTabSize() for JTextPane, it would be too easy.

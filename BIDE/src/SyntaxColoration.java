@@ -76,30 +76,49 @@ public class SyntaxColoration {
 	public final Color keywordColor = new Color(0,0,255); //blue
 	public final Color operatorColor = new Color(0, 128, 255); //light blue
 	public final Color variableColor = new Color(128, 0, 255); //purple
+	public final Color borderColor = Color.GRAY;
 	public final Color strColor = new Color(128, 128, 128); //gray
 	public final Color entityColor = new Color(255, 128, 0); //orange
 	public final Color commentColor = new Color(0, 128, 0); //dark green
 	public final Color preprocessorColor = new Color(128, 64, 0);
 	
-	public ColorationPattern[] getColorationPatterns() {
+	public ColorationPattern[] getColorationPatterns(int type) {
 		List<ColorationPattern> cps = new ArrayList<ColorationPattern>();
 	
-		//cps.add(new ColorationPattern(operators, false, operatorColor, false));
-		//cps.add(new ColorationPattern(keywords, true, keywordColor, true));
-		//cps.add(new ColorationPattern(keywords2, false, keywordColor, true));
-		//cps.add(new ColorationPattern(variables, true, variableColor, false));
-
-		//Comments
-		cps.add(new ColorationPattern("'.*?\\n", commentColor, false));
+		if (type == BIDE.TYPE_PROG) {
+			//cps.add(new ColorationPattern(operators, false, operatorColor, false));
+			//cps.add(new ColorationPattern(keywords, true, keywordColor, true));
+			//cps.add(new ColorationPattern(keywords2, false, keywordColor, true));
+			//cps.add(new ColorationPattern(variables, true, variableColor, false));
+		}
 		
-		//String
-		cps.add(new ColorationPattern("\"(\\\\.|[^\"\\n])*\"", strColor, false));
+		if (type == BIDE.TYPE_PROG || type == BIDE.TYPE_CAPT || type == BIDE.TYPE_PICT) {
+			//Comments
+			cps.add(new ColorationPattern("'.*?\\n", commentColor, false));
+		}
 		
-		//Entities
-		cps.add(new ColorationPattern("&.+?;", entityColor, false));
-		cps.add(new ColorationPattern(keywords3, false, entityColor, false));
-		cps.add(new ColorationPattern(operators2, false, entityColor, false));
-		cps.add(new ColorationPattern(variables2, false, entityColor, false));
+		if (type == BIDE.TYPE_PROG) {
+			//String
+			cps.add(new ColorationPattern("\"(\\\\.|[^\"\\n])*\"", strColor, false));
+		}
+		
+		if (type == BIDE.TYPE_PROG || type == BIDE.TYPE_OPCODE) {
+			//Entities
+			cps.add(new ColorationPattern("&.+?;", entityColor, false));
+			cps.add(new ColorationPattern(keywords3, false, entityColor, false));
+			cps.add(new ColorationPattern(operators2, false, entityColor, false));
+			cps.add(new ColorationPattern(variables2, false, entityColor, false));
+		}
+		
+		if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
+			cps.add(new ColorationPattern("(▀{130})|(▄{130})|(█(?=\\n))|((?<=\\n)█)", borderColor, false));
+		}
+		
+		if (type == BIDE.TYPE_OPCODE) {
+			//cps.add(new ColorationPattern("[^ -~]", commentColor, true));
+			//cps.add(new ColorationPattern("(?<=\\n)\\w+", variableColor, false));
+			//cps.add(new ColorationPattern("[tf](?=\\n)", keywordColor, false));
+		}
 		
 		
 		//Preprocessor

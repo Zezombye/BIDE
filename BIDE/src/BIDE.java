@@ -1,3 +1,6 @@
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -22,6 +25,10 @@ public class BIDE {
 	public final static int TYPE_PROG = 0;
 	public final static int TYPE_PICT = 3;
 	public final static int TYPE_CAPT = 4;
+	public final static int TYPE_OPCODE = 5;
+
+	public static Font progFont = new Font("DejaVu Sans Mono", Font.PLAIN, 12);
+	public static Font pictFont = new Font("Courier New", Font.PLAIN, 13);
 	
 	public final static String pictTutorial = 
 			"\n'To edit the picture, use the characters ' , :\n"
@@ -31,35 +38,23 @@ public class BIDE {
 			"\n'\n'DO NOT EDIT THE PICTURE BELOW, unless you are an advanced user!\n'\n";
 	public static void main(String[] args) {
 		
-		getOpcodes();
-				
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		try {
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, BIDE.class.getClass().getResourceAsStream("/droid-sans-mono.ttf")));
+		} catch (FontFormatException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		
 		ui.createAndDisplayUI();
-		
-		//System.out.println(readFromG1M("C:\\Users\\Catherine\\Desktop\\clonelab.g1m"));
-		//readFromG1M("C:\\Users\\Catherine\\Desktop\\iceslide.g1m");
-		/*} else {
-			writeToG1M("C:\\Users\\Catherine\\Desktop\\prog.bide", "C:\\Users\\Catherine\\Desktop\\bundle2.g1m");
-		}*/
-		
-		
-		
-		//Test stdout
-		/*while(true) {
-			System.out.println("test" + Math.random());
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}*/
-		
-		
-		//createG1M("prog.txt", destPath);
-		//B2C.main(new String[]{destPath, "TEST"});
+		getOpcodes();
+		System.out.println("Finished initialization");
 	}
 	
-	public static ArrayList<String> readFromG1M(String g1mpath) throws IOException {
-		ArrayList<String> progs = new ArrayList<String>();
+	public static ArrayList<Program> readFromG1M(String g1mpath) throws IOException {
+		ArrayList<Program> progs = new ArrayList<Program>();
 		System.out.println("Reading from g1m at " + g1mpath);
 		G1MParser g1mparser = new G1MParser(g1mpath);
 		g1mparser.readG1M();
@@ -72,14 +67,13 @@ public class BIDE {
 			
 			if (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PROG) {
 				
-				System.out.println("Found basic program");
 				String progName = casioToAscii(g1mparser.getPartName(g1mparser.parts.get(h)), false);
 				String progPw = casioToAscii(g1mparser.parts.get(h).substring(44, 52), false);
 
 				if (progPw.isEmpty()) {
 					progPw = "<no password>";
 				}
-				System.out.println("Name = " + progName + ", password = " + progPw);
+				System.out.println("Found program \"" + progName + "\"");
 				
 				String progContent = casioToAscii(g1mparser.getPartContent(g1mparser.parts.get(h)).substring(10), true);
 				
@@ -87,16 +81,16 @@ public class BIDE {
 					return null;
 				}
 				
-				progs.add("#Program name: "+progName+"\n#Password: " + progPw + "\n"+ progContent);
+				progs.add(new Program(progName, progPw, progContent, TYPE_PROG));
 			} else if (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PICT || g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_CAPT) {
-				System.out.println("Found picture/capture");
 				String name = casioToAscii(g1mparser.getPartName(g1mparser.parts.get(h)), false);
-				System.out.println("Name = "+name);
 				//TODO: see if the second part of pictures is important or not
 				CasioString content = null;
 				if (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PICT) {
+					System.out.println("Found picture \""+name+"\"");
 					content = g1mparser.getPartContent(g1mparser.parts.get(h));
 				} else {
+					System.out.println("Found capture \""+name+"\"");
 					//Captures have a width and height attribute, skip it
 					content = g1mparser.getPartContent(g1mparser.parts.get(h)).substring(4, 0x404);
 				}
@@ -150,13 +144,13 @@ public class BIDE {
 				}
 				
 				if (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PICT) {
-					progs.add("#Picture name: "+name+"\n#Size: 0x"+Integer.toHexString(content.length()) + pictTutorial + asciiResult);
+					progs.add(new Program(name, Integer.toHexString(content.length()), asciiResult, TYPE_PICT));
 				} else {
-					progs.add("#Capture name: "+name +"\n" + pictTutorial + asciiResult);
+					progs.add(new Program(name, "", asciiResult, TYPE_CAPT));
 				}
 			}
 		}
-		System.out.println("Finished reading from g1m");
+		System.out.println("Loading g1m...");
 		return progs;
 	}
 	
@@ -166,29 +160,32 @@ public class BIDE {
 		
 		G1MWrapper g1mwrapper = new G1MWrapper();
 		
-		List<AsciiProg> parts = new ArrayList<AsciiProg>();
+		List<Program> parts = new ArrayList<Program>();
 		//Parse text file
-		AsciiProg currentPart = null;
+		Program currentPart = null;
 		/*try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(progPath)));
 			
 			while ((line = br.readLine()) != null) {*/
 		for (int h = 0; h < ui.jtp.getTabCount(); h++) {
+			int type = ((Program)ui.jtp.getComponentAt(h)).type;
+			if (type == TYPE_OPCODE) {
+				continue;
+			}
 			
 			String[] lines = ((Program)ui.jtp.getComponentAt(h)).textPane.getText().split("\\n|\\r|\\r\\n");
-			int type = -1;
-			if (lines[0].startsWith("#Program name: ")) {
-				type = BIDE.TYPE_PROG;
-			} else if (lines[0].startsWith("#Capture name: ")) {
-				type = BIDE.TYPE_CAPT;
-			} else if (lines[0].startsWith("#Picture name: ")) {
-				type = BIDE.TYPE_PICT;
-			} else {
-				error("Couldn't find the name of the program \""+ui.jtp.getTitleAt(h) + "\", make sure to include the"
-						+ " directive \"#Program name: <name>\" at the beginning. Replace Program by Picture or Capture if necessary.");
-				return;
+
+			if (type == TYPE_PROG && !lines[0].startsWith("#Program name: ")) {
+				error("Program "+((Program)ui.jtp.getComponentAt(h)).name + " must include the directive \"#Program name: \" at the beginning!");
 			}
-			currentPart = new AsciiProg("","","", type);
+			if (type == TYPE_PICT && !lines[0].startsWith("#Picture name: ")) {
+				error("Picture "+((Program)ui.jtp.getComponentAt(h)).name + " must include the directive \"#Picture name: \" at the beginning!");
+			}
+			if (type == TYPE_CAPT && !lines[0].startsWith("#Capture name: ")) {
+				error("Capture "+((Program)ui.jtp.getComponentAt(h)).name + " must include the directive \"#Capture name: \" at the beginning!");
+			}
+			
+			currentPart = new Program("","","", type);
 			currentPart.name = lines[0].substring(15);
 						
 			if (type == BIDE.TYPE_PROG && lines[1].startsWith("#Password: ")) {
@@ -346,7 +343,7 @@ public class BIDE {
 		String[] lines = content.split("\\n|\\r|\\r\\n");
 				
 		for (int h = 0; h < lines.length; h++) {
-			
+
 			boolean currentPosIsString = false;
 			boolean escapeNextChar = false;
 			boolean currentPosIsComment = false;
@@ -464,7 +461,21 @@ public class BIDE {
 		
 		//Opcodes with added spaces
 		List<String> opcodesSpaces = Arrays.asList(new String[] {
-			""
+			"E", " -> ",
+			"10", " <= ",
+			"11", " != ",
+			"12", " >= ",
+			"13", " => ",
+			"2C", ", ",
+			"3A", " : ",
+			"3C", " < ",
+			"3D", " = ",
+			"3E", " > ",
+			"89", " + ",
+			"99", " - ",
+			"A8", " ^ ",
+			"A9", " * ",
+			"B9", " / ",
 		});
 		
 		List<String> lines = new ArrayList<String>();
@@ -473,6 +484,10 @@ public class BIDE {
 		int indentLevel = 0;
 		int currentIndentLevel = indentLevel;
 		boolean unindentCurrentLineAndIndentNext = false;
+
+		boolean currentPosIsString = false;
+		boolean escapeNextChar = false;
+		boolean currentPosIsComment = false;
 		
 		for (int i = 0; i < content.length(); i++) {
 			boolean isMultiByte = isMultibytePrefix((byte)content.charAt(i));
@@ -491,6 +506,34 @@ public class BIDE {
 				hex += (content.charAt(i+1) < 0x10 ? "0" : "") + Integer.toHexString(content.charAt(i+1));
 			}
 			
+			if (content.charAt(i) == '"' && !escapeNextChar) {
+				currentPosIsString = !currentPosIsString;
+			}
+			if (content.charAt(i) == '\\' && !escapeNextChar) {
+				escapeNextChar = true;
+			} else {
+				escapeNextChar = false;
+			}
+			if (content.charAt(i) == '\'' && !currentPosIsString) {
+				currentPosIsComment = true;
+			}
+			if (content.charAt(i) == '\r' && !currentPosIsString) {
+				currentPosIsComment = false;
+			}
+			
+			if (addSpaces && !currentPosIsString && !currentPosIsComment) {
+				boolean addedSpaces = false;
+				for (int j = 0; j < opcodesSpaces.size()/2; j++) {
+					if (opcodesSpaces.get(j*2).equalsIgnoreCase(hex)) {
+						currentLine += opcodesSpaces.get(j*2+1);
+						addedSpaces = true;
+						break;
+					}
+				}
+				if (addedSpaces) {
+					continue;
+				}
+			}
 			
 			//Indent
 			if (indent.contains(hex)) {
@@ -529,7 +572,7 @@ public class BIDE {
 					i += 2;
 				}
 				
-				lines.add(currentLine + (hex.equalsIgnoreCase("C") ? "&disp;" : "") + "\n");
+				lines.add(currentLine + (hex.equalsIgnoreCase("C") ? "◢" : "") + "\n");
 				
 				currentLine = "";
 				currentIndentLevel = indentLevel;

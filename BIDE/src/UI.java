@@ -6,12 +6,21 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 import javax.swing.text.AbstractDocument;
@@ -33,7 +42,6 @@ public class UI {
 	JFrame window = new JFrame();
 	JPanel sidebar = new JPanel();
 	JTabbedPane jtp = new JTabbedPane();
-	Font font = new Font("Courier new", Font.PLAIN, 13);
 	
 	public void createAndDisplayUI() {
 		
@@ -44,7 +52,7 @@ public class UI {
 		}
 		
 		window = new JFrame();
-		window.setTitle("BIDE v2.2");
+		window.setTitle("BIDE v2.2 by Zezombye");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setSize(800, 600);
 		window.setLocationRelativeTo(null);
@@ -56,7 +64,7 @@ public class UI {
 		
 		//window.add(jsp);
 		window.add(jtp);
-		jtp.setBorder(BorderFactory.createEmptyBorder());
+		//jtp.setBorder(BorderFactory.createEmptyBorder());
 		
 		//Because writing sidebar.getWidth() causes bugs...
 		int sidebarWidth = 350;	
@@ -69,7 +77,7 @@ public class UI {
 		System.setOut(printStream);
 		System.setErr(printStream);
 		stdout.setBackground(Color.ORANGE);
-		stdout.setFont(font);
+		stdout.setFont(BIDE.progFont);
 		stdout.setLineWrap(true);
 		JScrollPane jsp2 = new JScrollPane(stdout);
 		jsp2.setPreferredSize(new Dimension(sidebarWidth, 200));
@@ -87,7 +95,7 @@ public class UI {
 				}
 				try {
 					String extension = file.getPath().substring(file.getPath().lastIndexOf('.')).toLowerCase();
-					if (extension.equals(".bide") || extension.matches("\\.g[12][mr]")) {
+					if (extension.equals(".bide") || extension.matches("\\.g[123][mr]")) {
 						return true;
 					}
 				} catch (Exception e) {
@@ -98,7 +106,7 @@ public class UI {
 
 			@Override
 			public String getDescription() {
-				return "Basic Casio files (.g1m, .g2m, .g1r, .g2r)";
+				return "Basic Casio files (.g1m, .g2m, .g1r, .g2r, .g3m)";
 			}
 		});
 		//window.setUndecorated(true);
@@ -123,19 +131,21 @@ public class UI {
 			    	new Thread(new Runnable() {
 				    	public void run() {
 
-						    ArrayList<String> progs = new ArrayList<String>();
+						    ArrayList<Program> progs = new ArrayList<Program>();
 						    try {
 						    	progs = BIDE.readFromG1M(BIDE.pathToG1M);
 						    	BIDE.pathToSavedG1M = "";
 						    	jtp.removeAll();
 					    		for (int i = 0; i < progs.size(); i++) {
-					    			jtp.addTab(progs.get(i).substring(15, progs.get(i).indexOf("\n")), new Program(progs.get(i)));
+					    			jtp.addTab(progs.get(i).name, progs.get(i));
 					    			jtp.setTabComponentAt(i, new ButtonTabComponent(jtp));
+					    			try {
+										Thread.sleep(50);
+									} catch (InterruptedException e) {
+										e.printStackTrace();
+									}
 					    		}
 					    		for (int i = 0; i < jtp.getTabCount(); i++) {
-					    			if (progs.get(i).startsWith("#Capture") || progs.get(i).startsWith("#Picture")) {
-					    				((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(i)).textPane.getDocument()).getDocumentFilter()).setPictMode(true);
-					    			}
 					    			((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(i)).textPane.getDocument()).getDocumentFilter()).testForLag();
 							    }
 						    } catch (NullPointerException e) {
@@ -146,6 +156,10 @@ public class UI {
 						    } catch (IOException e) {
 								e.printStackTrace();
 							}
+						    if (progs != null && progs.size() != 0) {
+							    System.out.println("Finished loading g1m");
+						    	
+						    }
 						    
 				    	}
 				    }).start();
@@ -211,11 +225,19 @@ public class UI {
 			}
 		});
 		
+		ToolbarButton dispOpcodes = new ToolbarButton("opcodes.png");
+		dispOpcodes.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				createNewTab(BIDE.TYPE_OPCODE);
+			}
+		});
+		
 		menuBar.add(open);
 		menuBar.add(save);
 		menuBar.add(newProg);
 		menuBar.add(newPict);
 		menuBar.add(newCapt);
+		menuBar.add(dispOpcodes);
 		menuBar.setPreferredSize(new Dimension(100, 25));
 		//menuBar.add(save);
 		window.add(menuBar, BorderLayout.NORTH);
@@ -227,7 +249,6 @@ public class UI {
 		//window.setSize(window.getWidth()+1, window.getHeight()+1);
 		//window.setSize(window.getWidth()-1, window.getHeight()-1);
 		
-		System.out.println("Finished initializing UI");
 	}
 	public FixedJTextPane getTextPane() {
 		return ((Program)this.jtp.getSelectedComponent()).textPane;
@@ -235,19 +256,18 @@ public class UI {
 	
 	public void createNewTab(int type) {
 		String content = "";
+		String option = "";
 		String name = "";
 		if (type == BIDE.TYPE_PROG) {
 			name = JOptionPane.showInputDialog(BIDE.ui.window, "Program name:", "New program", JOptionPane.QUESTION_MESSAGE);
-			content = "#Program name: "+name+"\n#Password: <no password>\n";
+			option = "<no password>";
 		} else if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
 			if (type == BIDE.TYPE_PICT) {
 				name = "PICT"+JOptionPane.showInputDialog(BIDE.ui.window, "Picture number:", "New picture", JOptionPane.QUESTION_MESSAGE);
-				content = "#Picture name: "+name+"\n#Size: 0x800";
+				option = "800";
 			} else {
 				name = "CAPT"+JOptionPane.showInputDialog(BIDE.ui.window, "Capture number:", "New capture", JOptionPane.QUESTION_MESSAGE);
-				content = "#Capture name: "+name+"\n";
 			}
-			content += BIDE.pictTutorial;
 			String spaces128times = "";
 			for (int i = 0; i < 128; i++) {
 				spaces128times += " ";
@@ -268,15 +288,46 @@ public class UI {
 				}
 			}
 				
+		} else if (type == BIDE.TYPE_OPCODE) {
+			name = "Opcodes List";
+			content = "#\n#DO NOT EDIT THIS TAB, changes won't be saved!\n#\n";
+			try {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/opcodes.txt"), "UTF-8"));
+				String line = null;
+			    StringBuilder stringBuilder = new StringBuilder();
+
+			    try {
+			        while((line = reader.readLine()) != null) {
+			            stringBuilder.append(line);
+			            stringBuilder.append("\n");
+			        }
+
+			        content += stringBuilder.toString();
+			    } catch (IOException e) {
+					e.printStackTrace();
+				} finally {
+			        try {
+						reader.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+			    }
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+				
 		}
-		jtp.addTab(name, new Program(content));
-		if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
-			((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(jtp.getTabCount()-1)).textPane.getDocument()).getDocumentFilter()).setPictMode(true);
+		if (name == null || name.endsWith("null")) {
+			return;
 		}
+		jtp.addTab(name, new Program(name, option, content, type));
 		jtp.setTabComponentAt(jtp.getTabCount()-1, new ButtonTabComponent(jtp));
 		((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(jtp.getTabCount()-1)).textPane.getDocument()).getDocumentFilter()).testForLag();
+	    try {
+	    	getTextPane().setCaretPosition(0);
+	    } catch (NullPointerException e) {}
 	}
-	
+		
 }
 
 class ToolbarButton extends JButton {
