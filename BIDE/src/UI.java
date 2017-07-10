@@ -42,6 +42,7 @@ public class UI {
 	JFrame window = new JFrame();
 	JPanel sidebar = new JPanel();
 	JTabbedPane jtp = new JTabbedPane();
+	JFileChooser jfc;
 	
 	public void createAndDisplayUI() {
 		
@@ -50,9 +51,11 @@ public class UI {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		//jtp = new JTabbedPane();
+		jfc = new JFileChooser();
 		
 		window = new JFrame();
-		window.setTitle("BIDE v2.2 by Zezombye");
+		window.setTitle("BIDE v2.3 by Zezombye");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setSize(800, 600);
 		window.setLocationRelativeTo(null);
@@ -86,7 +89,6 @@ public class UI {
 		sidebar.add(jsp2);
 		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		
-		JFileChooser jfc = new JFileChooser();
 		jfc.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File file) {
@@ -106,7 +108,7 @@ public class UI {
 
 			@Override
 			public String getDescription() {
-				return "Basic Casio files (.g1m, .g2m, .g1r, .g2r, .g3m)";
+				return "Basic Casio files (.g1m, .g2m, .g1r, .g2r, .g3m, .bide)";
 			}
 		});
 		//window.setUndecorated(true);
@@ -118,89 +120,14 @@ public class UI {
 		open.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				jfc.setSelectedFile(new File(BIDE.pathToG1M));
-				
-				File input = null; 
-				if (jfc.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
-					input = jfc.getSelectedFile();
-				}
-				
-			    if (input != null) {
-			    	BIDE.pathToG1M = input.getPath();
-			    	BIDE.pathToSavedG1M = "";
-			    	new Thread(new Runnable() {
-				    	public void run() {
-
-						    ArrayList<Program> progs = new ArrayList<Program>();
-						    try {
-						    	progs = BIDE.readFromG1M(BIDE.pathToG1M);
-						    	BIDE.pathToSavedG1M = "";
-						    	jtp.removeAll();
-					    		for (int i = 0; i < progs.size(); i++) {
-					    			jtp.addTab(progs.get(i).name, progs.get(i));
-					    			jtp.setTabComponentAt(i, new ButtonTabComponent(jtp));
-					    			try {
-										Thread.sleep(50);
-									} catch (InterruptedException e) {
-										e.printStackTrace();
-									}
-					    		}
-					    		for (int i = 0; i < jtp.getTabCount(); i++) {
-					    			((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(i)).textPane.getDocument()).getDocumentFilter()).testForLag();
-							    }
-						    } catch (NullPointerException e) {
-						    } catch (NoSuchFileException e) {
-						    	BIDE.error("The file at \"" + BIDE.pathToG1M + "\" does not exist.");
-						    } catch (AccessDeniedException e) {
-						    	BIDE.error("BIDE is denied access to the file at \"" + BIDE.pathToG1M + "\"");
-						    } catch (IOException e) {
-								e.printStackTrace();
-							}
-						    if (progs != null && progs.size() != 0) {
-							    System.out.println("Finished loading g1m");
-						    	
-						    }
-						    
-				    	}
-				    }).start();
-				    try {
-				    	getTextPane().setCaretPosition(0);
-				    } catch (NullPointerException e) {}
-			    }
+				openFile();
 			}
 		});
 		ToolbarButton save = new ToolbarButton("saveFile.png");
 		save.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (BIDE.pathToSavedG1M.isEmpty()) {
-					BIDE.pathToSavedG1M = BIDE.pathToG1M;
-				}
-				new Thread(new Runnable() {
-			    	public void run() {
-			    		
-			    		jfc.setSelectedFile(new File(BIDE.pathToSavedG1M));
-			    		File input = null;
-						if (jfc.showSaveDialog(window) == JFileChooser.APPROVE_OPTION) {
-							input = jfc.getSelectedFile();
-						}
-						
-						if (input != null) {
-							BIDE.pathToSavedG1M = input.getAbsolutePath();
-							try {
-								BIDE.writeToG1M(input.getPath());
-							} catch (NullPointerException e) {
-								
-							} catch (NoSuchFileException e) {
-						    	BIDE.error("The file at \"" + BIDE.pathToSavedG1M + "\" does not exist.");
-						    } catch (AccessDeniedException e) {
-						    	BIDE.error("BIDE is denied access to the file at \"" + BIDE.pathToSavedG1M + "\"");
-						    } catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-			    	}
-				}).start();
+				saveFile();
 			}
 		});
 		
@@ -237,11 +164,48 @@ public class UI {
 		menuBar.add(newProg);
 		menuBar.add(newPict);
 		menuBar.add(newCapt);
-		menuBar.add(dispOpcodes);
+		//menuBar.add(dispOpcodes);
+		
 		menuBar.setPreferredSize(new Dimension(100, 25));
 		//menuBar.add(save);
 		window.add(menuBar, BorderLayout.NORTH);
 		
+		JMenuBar menuBar2 = new JMenuBar();
+		JMenu openMenu = new JMenu("Open");
+		menuBar2.add(openMenu);
+		JMenuItem importFile = new JMenuItem("Open Basic Casio file");
+		importFile.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent e) {
+				openFile();
+			}
+		});
+		openMenu.add(importFile);
+		JMenu saveMenu = new JMenu("Save");
+		menuBar2.add(saveMenu);
+		JMenuItem saveg1m = new JMenuItem("Save to g1m");
+		saveg1m.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent e) {
+				saveFile();
+			}
+		});
+		saveMenu.add(saveg1m);
+		JMenuItem saveTxt = new JMenuItem("Save to .bide file");
+		saveTxt.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent e) {
+				saveFile();
+			}
+		});
+		saveMenu.add(saveTxt);
+		JMenu toolsMenu = new JMenu("Tools");
+		menuBar2.add(toolsMenu);
+		JMenuItem showOpcodes = new JMenuItem("Show list of opcodes");
+		showOpcodes.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				createNewTab(BIDE.TYPE_OPCODE);
+			}
+		});
+		toolsMenu.add(showOpcodes);
+		window.setJMenuBar(menuBar2);
 
 		window.setVisible(true);
 		//Because window.repaint() does not work...
@@ -323,9 +287,90 @@ public class UI {
 		jtp.addTab(name, new Program(name, option, content, type));
 		jtp.setTabComponentAt(jtp.getTabCount()-1, new ButtonTabComponent(jtp));
 		((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(jtp.getTabCount()-1)).textPane.getDocument()).getDocumentFilter()).testForLag();
-	    try {
-	    	getTextPane().setCaretPosition(0);
-	    } catch (NullPointerException e) {}
+		jtp.setSelectedIndex(jtp.getTabCount()-1);
+	    getTextPane().setCaretPosition(0);
+	}
+	
+	public void openFile() {
+    	jfc.setCurrentDirectory(new File(BIDE.pathToG1M));
+		
+		File input = null; 
+		if (jfc.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
+			input = jfc.getSelectedFile();
+		}
+		
+	    if (input != null) {
+	    	BIDE.pathToG1M = input.getPath();
+	    	BIDE.pathToSavedG1M = "";
+	    	new Thread(new Runnable() {
+		    	public void run() {
+
+				    ArrayList<Program> progs = new ArrayList<Program>();
+				    try {
+				    	progs = BIDE.readFromG1M(BIDE.pathToG1M);
+				    	BIDE.pathToSavedG1M = "";
+				    	jtp.removeAll();
+			    		for (int i = 0; i < progs.size(); i++) {
+			    			jtp.addTab(progs.get(i).name, progs.get(i));
+			    			jtp.setTabComponentAt(i, new ButtonTabComponent(jtp));
+			    			try {
+								Thread.sleep(50);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+			    		}
+			    		for (int i = 0; i < jtp.getTabCount(); i++) {
+			    			((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(i)).textPane.getDocument()).getDocumentFilter()).testForLag();
+					    }
+				    } catch (NoSuchFileException e) {
+				    	BIDE.error("The file at \"" + BIDE.pathToG1M + "\" does not exist.");
+				    } catch (AccessDeniedException e) {
+				    	BIDE.error("BIDE is denied access to the file at \"" + BIDE.pathToG1M + "\"");
+				    } catch (IOException e) {
+						e.printStackTrace();
+					}
+				    if (progs != null && progs.size() != 0) {
+					    System.out.println("Finished loading g1m");
+				    	
+				    }
+				    
+		    	}
+		    }).start();
+		    try {
+		    	getTextPane().setCaretPosition(0);
+		    } catch (NullPointerException e) {}
+	    }
+    }
+	
+	public void saveFile() {
+		if (BIDE.pathToSavedG1M.isEmpty()) {
+			BIDE.pathToSavedG1M = BIDE.pathToG1M;
+		}
+		new Thread(new Runnable() {
+	    	public void run() {
+	    		
+	    		jfc.setSelectedFile(new File(BIDE.pathToSavedG1M));
+	    		File input = null;
+				if (jfc.showSaveDialog(window) == JFileChooser.APPROVE_OPTION) {
+					input = jfc.getSelectedFile();
+				}
+				
+				if (input != null) {
+					BIDE.pathToSavedG1M = input.getAbsolutePath();
+					try {
+						BIDE.writeToG1M(input.getPath());
+					} catch (NullPointerException e) {
+						
+					} catch (NoSuchFileException e) {
+				    	BIDE.error("The file at \"" + BIDE.pathToSavedG1M + "\" does not exist.");
+				    } catch (AccessDeniedException e) {
+				    	BIDE.error("BIDE is denied access to the file at \"" + BIDE.pathToSavedG1M + "\"");
+				    } catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+	    	}
+		}).start();
 	}
 		
 }
@@ -428,4 +473,6 @@ class ButtonTabComponent extends JPanel {
             g2.dispose();
         }
     }
+    
+    
 }

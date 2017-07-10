@@ -69,6 +69,7 @@ public class G1MWrapper {
 		}
 		content.add(0, header2);
 		IO.writeToFile(new File(destPath), content.getContent(), true);
+		new AutoImport().autoImport(destPath);
 	}
 	
 	public int getPartID(int partType) {

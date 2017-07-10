@@ -83,14 +83,14 @@ public class CustomDocumentFilter extends DocumentFilter {
     	if (type == BIDE.TYPE_OPCODE) {
     		return;
     	}
-        if (time > 100) {
+        if (time > 10000) {
         	this.isTooLaggy = true;
         	SimpleAttributeSet sas = new SimpleAttributeSet();
         	StyleConstants.setForeground(sas, Color.BLACK);
         	styledDocument.setCharacterAttributes(0, textPane.getText().length(), sas, false);
         	System.out.println("Disabled coloration on program \""+textPane.getText().substring(15, textPane.getText().indexOf("\n"))+"\", too laggy ("+time+"ms)");
         }
-        //System.out.println("Test lag in " + time + "ms");
+        System.out.println("Test lag in " + time + "ms");
     }
 
 

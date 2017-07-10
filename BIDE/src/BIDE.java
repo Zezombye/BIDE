@@ -36,20 +36,24 @@ public class BIDE {
 			+ "'Make sure not to edit the border!\n";
 	public final static String pictWarning = 
 			"\n'\n'DO NOT EDIT THE PICTURE BELOW, unless you are an advanced user!\n'\n";
+	
+	static Options options = new Options();
 	public static void main(String[] args) {
 		
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		/*GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		try {
 			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, BIDE.class.getClass().getResourceAsStream("/droid-sans-mono.ttf")));
 		} catch (FontFormatException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-
+		}*/
+		options.initProperties();
+		options.loadProperties();
 		
 		ui.createAndDisplayUI();
 		getOpcodes();
+		//new AutoImport().autoImport("C:\\Users\\Catherine\\Desktop\\PUISS4.g1m");
 		System.out.println("Finished initialization");
 	}
 	
@@ -156,6 +160,7 @@ public class BIDE {
 	
 	public static void writeToG1M(String destPath) throws IOException {
 		
+		long time = System.currentTimeMillis();
 		System.out.println("Saving to \""+destPath+"\"...");
 		
 		G1MWrapper g1mwrapper = new G1MWrapper();
@@ -276,7 +281,7 @@ public class BIDE {
 			g1mwrapper.addPart(part, name, parts.get(i).type);
 		}
 		g1mwrapper.generateG1M(destPath);
-		System.out.println("Finished writing to g1m");
+		System.out.println("Finished writing to g1m in "+(System.currentTimeMillis()-time)+"ms");
 		
 	}
 	
@@ -461,21 +466,21 @@ public class BIDE {
 		
 		//Opcodes with added spaces
 		List<String> opcodesSpaces = Arrays.asList(new String[] {
-			"E", " -> ",
-			"10", " <= ",
-			"11", " != ",
-			"12", " >= ",
-			"13", " => ",
-			"2C", ", ",
-			"3A", " : ",
-			"3C", " < ",
-			"3D", " = ",
-			"3E", " > ",
-			"89", " + ",
-			"99", " - ",
-			"A8", " ^ ",
-			"A9", " * ",
-			"B9", " / ",
+			"E", options.getProperty("spacesFor->"), " -> ",
+			"10", options.getProperty("spacesFor<="), " <= ",
+			"11", options.getProperty("spacesFor!="), " != ",
+			"12", options.getProperty("spacesFor>="), " >= ",
+			"13", options.getProperty("spacesFor=>"), " => ",
+			"2C", options.getProperty("spacesFor,"), ", ",
+			"3A", options.getProperty("spacesFor:"), " : ",
+			"3C", options.getProperty("spacesFor<"), " < ",
+			"3D", options.getProperty("spacesFor="), " = ",
+			"3E", options.getProperty("spacesFor>"), " > ",
+			"89", options.getProperty("spacesFor+"), " + ",
+			"99", options.getProperty("spacesFor-"), " - ",
+			"A8", options.getProperty("spacesFor^"), " ^ ",
+			"A9", options.getProperty("spacesFor*"), " * ",
+			"B9", options.getProperty("spacesFor/"), " / ",
 		});
 		
 		List<String> lines = new ArrayList<String>();
@@ -523,9 +528,15 @@ public class BIDE {
 			
 			if (addSpaces && !currentPosIsString && !currentPosIsComment) {
 				boolean addedSpaces = false;
-				for (int j = 0; j < opcodesSpaces.size()/2; j++) {
-					if (opcodesSpaces.get(j*2).equalsIgnoreCase(hex)) {
-						currentLine += opcodesSpaces.get(j*2+1);
+				for (int j = 0; j < opcodesSpaces.size()/3; j++) {
+					if (opcodesSpaces.get(j*3+1).equals("true") && opcodesSpaces.get(j*3).equalsIgnoreCase(hex)) {
+						
+						//Check for unary operators, which are there if there is another operator (and space) before it
+						if (currentLine.length() > 1 && currentLine.charAt(currentLine.length()-1) == ' ' && (opcodesSpaces.get(j*3+2).equals(" + ")||opcodesSpaces.get(j*3+2).equals(" - "))) {
+							currentLine += opcodesSpaces.get(j*3+2).trim();
+						} else {
+							currentLine += opcodesSpaces.get(j*3+2);
+						}
 						addedSpaces = true;
 						break;
 					}
@@ -582,16 +593,23 @@ public class BIDE {
 			}
 			
 			//Test for ascii opcodes such as ->, =>
-			if ((hex.equalsIgnoreCase("3D") || hex.equalsIgnoreCase("3E")) && i > 0) { //'=' or '>'
+			if ((hex.equalsIgnoreCase("3D") || hex.equalsIgnoreCase("99")) && i > 0) { //'=' or '-'
 				short c = content.charAt(i-1);
 				if (hex.equalsIgnoreCase("3D") && (c == '!' || c == '>' || c == '<')) { //!= >= <=
 					currentLine += "&=;";
 					continue;
-				} else if (hex.equalsIgnoreCase("3E") && (c == 0x99 || c == '=')) { //-> =>
-					currentLine += "&>;";
-					continue;
 				}
-				
+				if (i < content.length()-1) {
+					c = content.charAt(i+1);
+					if (hex.equalsIgnoreCase("99") && i < content.length()-1 && (c == '>' || c == 0x12)) { //-> ->=
+						currentLine += "&-;";
+						continue;
+					}
+					if (hex.equalsIgnoreCase("3D") && i < content.length()-1 && (c == '>' || c == 0x12)) { //=> =>=
+						currentLine += "&=;";
+						continue;
+					}
+				}
 			}
 			
 			//System.out.println("Testing for opcode " + hex);
@@ -664,6 +682,11 @@ public class BIDE {
 					ascii = "&" + ascii + ";";
 				}
 				opcodes.add(new Opcode(hex, ascii));
+				
+				//Check for correct order
+				if (opcodes.size() > 1 && Integer.parseInt(opcodes.get(opcodes.size()-1).hex, 16) < Integer.parseInt(opcodes.get(opcodes.size()-2).hex, 16)) {
+					error("opcodes.txt", lineNb, "Opcodes must be ascending!");
+				}
 				
 				//This is to allow removal of trailing whitespace when converting ascii->casio
 				//opcodes.add(new Opcode(hex, ascii.replaceAll(" +?$", "")));

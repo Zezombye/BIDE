@@ -86,10 +86,10 @@ public class SyntaxColoration {
 		List<ColorationPattern> cps = new ArrayList<ColorationPattern>();
 	
 		if (type == BIDE.TYPE_PROG) {
-			//cps.add(new ColorationPattern(operators, false, operatorColor, false));
-			//cps.add(new ColorationPattern(keywords, true, keywordColor, true));
-			//cps.add(new ColorationPattern(keywords2, false, keywordColor, true));
-			//cps.add(new ColorationPattern(variables, true, variableColor, false));
+			cps.add(new ColorationPattern(operators, false, operatorColor, false));
+			cps.add(new ColorationPattern(keywords, true, keywordColor, true));
+			cps.add(new ColorationPattern(keywords2, false, keywordColor, true));
+			cps.add(new ColorationPattern(variables, true, variableColor, false));
 		}
 		
 		if (type == BIDE.TYPE_PROG || type == BIDE.TYPE_CAPT || type == BIDE.TYPE_PICT) {
