@@ -1,3 +1,4 @@
+package zezombye.BIDE;
 //Taken from B2C
 
 import java.io.BufferedReader;
@@ -6,7 +7,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
@@ -36,6 +39,20 @@ public class IO {
 			}
 			out.write(result);
 			out.close();
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
+	}
+	
+	//Only use this for non-casio strings (ascii text)!
+	public static void writeStrToFile(File file, String content, boolean deleteFile) {
+		try {
+			if (deleteFile) {
+				file.delete();
+			}
+			Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+			writer.write(content);
+			writer.close();
 		} catch (IOException e2) {
 			e2.printStackTrace();
 		}

@@ -1,3 +1,4 @@
+package zezombye.BIDE;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
@@ -7,6 +8,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,18 +17,24 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rtextarea.RTextScrollPane;
+
 public class BIDE {
 	
 	public static List<Opcode> opcodes = new ArrayList<Opcode>();
 	
 	public static String pathToG1M = System.getProperty("user.home")+"/desktop/";
 	public static String pathToSavedG1M = "";
+	public static final String pathToOptions = System.getProperty("user.home")+"/BIDE/options.txt";
 	public static UI ui = new UI();
 	
 	public final static int TYPE_PROG = 0;
 	public final static int TYPE_PICT = 3;
 	public final static int TYPE_CAPT = 4;
 	public final static int TYPE_OPCODE = 5;
+	public final static int TYPE_OPTIONS = 6;
 
 	public static Font progFont = new Font("DejaVu Sans Mono", Font.PLAIN, 12);
 	public static Font pictFont = new Font("Courier New", Font.PLAIN, 13);
@@ -50,11 +59,103 @@ public class BIDE {
 		}*/
 		options.initProperties();
 		options.loadProperties();
-		
-		ui.createAndDisplayUI();
 		getOpcodes();
-		//new AutoImport().autoImport("C:\\Users\\Catherine\\Desktop\\PUISS4.g1m");
-		System.out.println("Finished initialization");
+		System.out.println(Arrays.toString(args));
+		if (args.length > 0) {
+			//CLI
+			if (args[0].equals("--compile")) {
+				String pathToG1M = args[1];
+				ArrayList<Program> progs = new ArrayList<Program>();
+				for (int i = 2; i < args.length; i++) {
+					try {
+						progs.addAll(readFromTxt(args[i]));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				try {
+					writeToG1M(pathToG1M, progs);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else if (args[0].equals("--decompile")) {
+				String pathToG1M = args[1];
+				String pathToDest = args[2];
+				if (!pathToDest.endsWith(System.getProperty("file.separator"))) {
+					pathToDest += System.getProperty("file.separator");
+				}
+				try {
+					ArrayList<Program> progs = readFromG1M(pathToG1M);
+					
+					for (int i = 0; i < progs.size(); i++) {
+						//Disallowed chars: <>:"/\|?*
+						String name = progs.get(i).name.replaceAll("<|>|:|\"|\\/|\\\\|\\||\\?|\\*", "_");
+						IO.writeStrToFile(new File(pathToDest+name+".bide"), progs.get(i).content, true);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		} else {
+			ui.createAndDisplayUI();
+			ui.jtp.addTab("test", new Program("test1", "", "testcontent", TYPE_PROG));
+			((Program)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
+			//new AutoImport().autoImport("C:\\Users\\Catherine\\Desktop\\PUISS4.g1m");
+			System.out.println("Finished initialization");
+		}
+		
+		
+		
+	}
+	
+	public static ArrayList<Program> readFromTxt(String txtPath) throws IOException {
+		byte[] encoded = Files.readAllBytes(Paths.get(txtPath));
+		String content = new String(encoded, "UTF-8");
+		
+		ArrayList<Program> progs = new ArrayList<Program>();
+		
+		String[] progsTxt = content.split("#End of part\\n");
+		for (int i = 0; i < progsTxt.length; i++) {
+			int type;
+			if (progsTxt[i].startsWith("#Program")) {
+				type = TYPE_PROG;
+			} else if (progsTxt[i].startsWith("#Picture")) {
+				type = TYPE_PICT;
+			} else if (progsTxt[i].startsWith("#Capture")) {
+				type = TYPE_CAPT;
+			} else {
+				BIDE.error("Could not find the type of part "+i+" at "+txtPath);
+				return null;
+			}
+			
+			String name = progsTxt[i].substring(15, progsTxt[i].indexOf('\n'));
+			
+			//Get 2nd line, which is option
+			/*String option = progsTxt[i].substring(progsTxt[i].indexOf('\n'), progsTxt[i].substring(progsTxt[i].indexOf('\n')).indexOf('\n'));
+			if (type == BIDE.TYPE_PROG && option.startsWith("#Password: ")) {
+				if (!option.substring(11).equals("<no password>")) {
+					option = option.substring(11);
+				} else {
+					option = "";
+				}
+			}
+			if (type == BIDE.TYPE_PICT) {
+				if (option.startsWith("#Size: 0x")) {
+					option = option.substring(9);
+					try {
+						Integer.parseInt(option, 16);
+					} catch (NumberFormatException e) {
+						error(name, "Invalid picture size!");
+					}
+				} else {
+					error(name, "Picture size undefined!");
+				}
+			}*/
+			progs.add(new Program(name, "", progsTxt[i], type));
+		}
+		return progs;
+		
 	}
 	
 	public static ArrayList<Program> readFromG1M(String g1mpath) throws IOException {
@@ -159,27 +260,18 @@ public class BIDE {
 	}
 	
 	public static void writeToG1M(String destPath) throws IOException {
-		
-		long time = System.currentTimeMillis();
-		System.out.println("Saving to \""+destPath+"\"...");
-		
-		G1MWrapper g1mwrapper = new G1MWrapper();
-		
+		//Parse programs from UI
 		List<Program> parts = new ArrayList<Program>();
 		//Parse text file
-		Program currentPart = null;
-		/*try {
-			BufferedReader br = new BufferedReader(new FileReader(new File(progPath)));
-			
-			while ((line = br.readLine()) != null) {*/
 		for (int h = 0; h < ui.jtp.getTabCount(); h++) {
 			int type = ((Program)ui.jtp.getComponentAt(h)).type;
-			if (type == TYPE_OPCODE) {
+			if (type == TYPE_OPCODE || type == TYPE_OPTIONS) {
 				continue;
 			}
 			
 			String[] lines = ((Program)ui.jtp.getComponentAt(h)).textPane.getText().split("\\n|\\r|\\r\\n");
 
+			
 			if (type == TYPE_PROG && !lines[0].startsWith("#Program name: ")) {
 				error("Program "+((Program)ui.jtp.getComponentAt(h)).name + " must include the directive \"#Program name: \" at the beginning!");
 			}
@@ -189,8 +281,35 @@ public class BIDE {
 			if (type == TYPE_CAPT && !lines[0].startsWith("#Capture name: ")) {
 				error("Capture "+((Program)ui.jtp.getComponentAt(h)).name + " must include the directive \"#Capture name: \" at the beginning!");
 			}
+			parts.add(new Program("", "", ((Program)ui.jtp.getComponentAt(h)).textPane.getText(), type));
+			//System.out.println("Program text="+((Program)ui.jtp.getComponentAt(h)).textPane.getText());
+		}
+		writeToG1M(destPath, parts);
+	}
+	
+	public static void writeToG1M(String destPath, List<Program> parts) throws IOException {
+		
+		long time = System.currentTimeMillis();
+		System.out.println("Saving to \""+destPath+"\"...");
+		
+		G1MWrapper g1mwrapper = new G1MWrapper();
+		//Parse text file
+		Program currentPart = null;
+		/*try {
+			BufferedReader br = new BufferedReader(new FileReader(new File(progPath)));
 			
-			currentPart = new Program("","","", type);
+			while ((line = br.readLine()) != null) {*/
+		for (int h = 0; h < parts.size(); h++) {
+			int type = parts.get(h).type;
+			if (type == TYPE_OPCODE || type == TYPE_OPTIONS) {
+				continue;
+			}
+			
+			currentPart = new Program("", "", "", parts.get(h).type);
+			currentPart.content = "";
+			String[] lines = parts.get(h).content.split("\\n|\\r|\\r\\n");
+			//System.out.println(lines[0]);
+			
 			currentPart.name = lines[0].substring(15);
 						
 			if (type == BIDE.TYPE_PROG && lines[1].startsWith("#Password: ")) {
@@ -210,7 +329,6 @@ public class BIDE {
 					error(currentPart.name, "Picture size undefined!");
 				}
 			}
-			
 			for (int i = 0; i < lines.length; i++) {
 				if (lines[i].endsWith("Then") || lines[i].endsWith("Else")) {
 					lines[i] += " ";
@@ -219,7 +337,7 @@ public class BIDE {
 					currentPart.content += lines[i] + "\n";
 				}
 			}
-			parts.add(currentPart);
+			parts.set(h, currentPart);
 			
 		}
 		
@@ -283,6 +401,16 @@ public class BIDE {
 		g1mwrapper.generateG1M(destPath);
 		System.out.println("Finished writing to g1m in "+(System.currentTimeMillis()-time)+"ms");
 		
+	}
+	
+	public static void writeToTxt(String destPath) {
+		System.out.println("Saving to "+destPath+"...");
+		String result = "";
+		for (int h = 0; h < ui.jtp.getTabCount(); h++) {
+			result += ((Program)ui.jtp.getComponentAt(h)).textPane.getText() + "\n#End of part\n";
+		}
+		IO.writeStrToFile(new File(destPath), result, true);
+		System.out.println("Done!");
 	}
 	
 	public static CasioString asciiToPict(String content, String progName, int startLine, String pictSize) {

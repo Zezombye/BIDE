@@ -1,3 +1,4 @@
+package zezombye.BIDE;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -19,7 +20,7 @@ public class Options {
 	
 	public void saveProperties() {
 		try {
-			options.store(new FileWriter(new File(System.getProperty("user.home")+"/BIDE/options.txt")), "");
+			options.store(new FileWriter(new File(BIDE.pathToOptions)), "");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

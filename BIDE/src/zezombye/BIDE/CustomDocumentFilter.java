@@ -1,3 +1,4 @@
+package zezombye.BIDE;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,7 +76,7 @@ public class CustomDocumentFilter extends DocumentFilter {
     	}
     }
     
-    public void testForLag() {
+    /*public void testForLag() {
     	long time = System.currentTimeMillis();
         updateTextStyles();
         time = System.currentTimeMillis()-time;
@@ -91,7 +92,7 @@ public class CustomDocumentFilter extends DocumentFilter {
         	System.out.println("Disabled coloration on program \""+textPane.getText().substring(15, textPane.getText().indexOf("\n"))+"\", too laggy ("+time+"ms)");
         }
         System.out.println("Test lag in " + time + "ms");
-    }
+    }*/
 
 
     private void updateTextStyles() {

@@ -1,3 +1,4 @@
+package zezombye.BIDE;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -8,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -55,7 +58,7 @@ public class UI {
 		jfc = new JFileChooser();
 		
 		window = new JFrame();
-		window.setTitle("BIDE v2.3 by Zezombye");
+		window.setTitle("BIDE v3.0 (beta) by Zezombye");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setSize(800, 600);
 		window.setLocationRelativeTo(null);
@@ -205,6 +208,13 @@ public class UI {
 			}
 		});
 		toolsMenu.add(showOpcodes);
+		JMenuItem showOptions = new JMenuItem("Show options");
+		showOptions.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				createNewTab(BIDE.TYPE_OPTIONS);
+			}
+		});
+		toolsMenu.add(showOptions);
 		window.setJMenuBar(menuBar2);
 
 		window.setVisible(true);
@@ -214,7 +224,7 @@ public class UI {
 		//window.setSize(window.getWidth()-1, window.getHeight()-1);
 		
 	}
-	public FixedJTextPane getTextPane() {
+	public ProgramTextPane getTextPane() {
 		return ((Program)this.jtp.getSelectedComponent()).textPane;
 	}
 	
@@ -279,14 +289,43 @@ public class UI {
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
-				
+		
+		} else if (type == BIDE.TYPE_OPTIONS) {
+			name = "Options";
+			try {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(System.getProperty("user.home")+"/BIDE/options.txt"))));
+				String line = null;
+			    StringBuilder stringBuilder = new StringBuilder();
+
+			    try {
+			        while((line = reader.readLine()) != null) {
+			            stringBuilder.append(line);
+			            stringBuilder.append("\n");
+			        }
+
+			        content += stringBuilder.toString();
+			    } catch (IOException e) {
+					e.printStackTrace();
+				} finally {
+			        try {
+						reader.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+			    }
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+			}
+		
+		} else {
+			BIDE.error("Unknown type "+type);
 		}
 		if (name == null || name.endsWith("null")) {
 			return;
 		}
 		jtp.addTab(name, new Program(name, option, content, type));
 		jtp.setTabComponentAt(jtp.getTabCount()-1, new ButtonTabComponent(jtp));
-		((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(jtp.getTabCount()-1)).textPane.getDocument()).getDocumentFilter()).testForLag();
+		//((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(jtp.getTabCount()-1)).textPane.getDocument()).getDocumentFilter()).testForLag();
 		jtp.setSelectedIndex(jtp.getTabCount()-1);
 	    getTextPane().setCaretPosition(0);
 	}
@@ -304,10 +343,13 @@ public class UI {
 	    	BIDE.pathToSavedG1M = "";
 	    	new Thread(new Runnable() {
 		    	public void run() {
-
 				    ArrayList<Program> progs = new ArrayList<Program>();
 				    try {
-				    	progs = BIDE.readFromG1M(BIDE.pathToG1M);
+				    	if (BIDE.pathToG1M.endsWith(".bide")) {
+				    		progs = BIDE.readFromTxt(BIDE.pathToG1M);
+				    	} else {
+				    		progs = BIDE.readFromG1M(BIDE.pathToG1M);
+				    	}
 				    	BIDE.pathToSavedG1M = "";
 				    	jtp.removeAll();
 			    		for (int i = 0; i < progs.size(); i++) {
@@ -319,9 +361,8 @@ public class UI {
 								e.printStackTrace();
 							}
 			    		}
-			    		for (int i = 0; i < jtp.getTabCount(); i++) {
-			    			((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(i)).textPane.getDocument()).getDocumentFilter()).testForLag();
-					    }
+				    } catch (NullPointerException e) {
+				    	//e.printStackTrace();
 				    } catch (NoSuchFileException e) {
 				    	BIDE.error("The file at \"" + BIDE.pathToG1M + "\" does not exist.");
 				    } catch (AccessDeniedException e) {
@@ -358,9 +399,13 @@ public class UI {
 				if (input != null) {
 					BIDE.pathToSavedG1M = input.getAbsolutePath();
 					try {
-						BIDE.writeToG1M(input.getPath());
+						if (BIDE.pathToSavedG1M.endsWith(".bide")) {
+							BIDE.writeToTxt(input.getPath());
+						} else {
+							BIDE.writeToG1M(input.getPath());
+						}
 					} catch (NullPointerException e) {
-						
+						//e.printStackTrace();
 					} catch (NoSuchFileException e) {
 				    	BIDE.error("The file at \"" + BIDE.pathToSavedG1M + "\" does not exist.");
 				    } catch (AccessDeniedException e) {

@@ -1,3 +1,4 @@
+package zezombye.BIDE;
 import java.awt.AWTException;
 import java.awt.Rectangle;
 import java.awt.Robot;
@@ -38,22 +39,26 @@ public class AutoImport {
     int emuSleep = 50; //optimal sleep time between keypresses for the emulator
     Robot robot;
     BufferedImage confirmation, memMenu, complete;
-
-	public void autoImport(String path) {
-		try {
-			confirmation = ImageIO.read(new File("C:\\Users\\Catherine\\Desktop\\confirmation.png"));
-			complete = ImageIO.read(new File("C:\\Users\\Catherine\\Desktop\\complete.png"));
-			memMenu = ImageIO.read(new File("C:\\Users\\Catherine\\Desktop\\memMenu.png"));
+    
+    public void init() {
+    	try {
+			confirmation = ImageIO.read(BIDE.class.getClass().getResourceAsStream("images/confirmation.png"));
+			complete = ImageIO.read(BIDE.class.getClass().getResourceAsStream("images/complete.png"));
+			memMenu = ImageIO.read(BIDE.class.getClass().getResourceAsStream("images/memMenu.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		//menu = ImageIO.read(new File("C:\\Users\\Catherine\\Desktop\\menu.png"));
 		try {
 			robot = new Robot();
 		} catch (AWTException e) {
 			e.printStackTrace();
 		}
-		long time = System.currentTimeMillis();
+    }
+    
+	public void autoImport(String path) {
+		emulatorHWND = null;
+		//menu = ImageIO.read(new File("C:\\Users\\Catherine\\Desktop\\menu.png"));
+		//long time = System.currentTimeMillis();
 		ArrayList<String> titles = enumWindows();
 		if (titles.contains("Ouvrir")) {
 			BIDE.error("There is another window titled \"Ouvrir\"");

@@ -1,3 +1,4 @@
+package zezombye.BIDE;
 import java.awt.TextArea;
 import java.io.IOException;
 import java.io.OutputStream;

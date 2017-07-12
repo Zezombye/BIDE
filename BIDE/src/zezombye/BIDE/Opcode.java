@@ -1,3 +1,4 @@
+package zezombye.BIDE;
 
 public class Opcode {
 	String hex;
