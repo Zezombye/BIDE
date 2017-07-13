@@ -2,10 +2,10 @@ package zezombye.BIDE;
 
 public class Opcode {
 	String hex;
-	String ascii;
+	String text;
 	
-	public Opcode(String hex, String ascii) {
+	public Opcode(String hex, String text) {
 		this.hex = hex;
-		this.ascii = ascii;
+		this.text = text;
 	}
 }

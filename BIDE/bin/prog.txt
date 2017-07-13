@@ -1,2 +1,0 @@
-Program name: TEST
-2AB(3+4)C(5A+4)^3

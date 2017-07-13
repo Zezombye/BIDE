@@ -6,6 +6,7 @@ import java.awt.FontMetrics;
 import java.util.Arrays;
 
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.text.AbstractDocument;
@@ -26,9 +27,9 @@ import javax.swing.text.ViewFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
-public class Program extends RTextScrollPane {
+public class Program {
 	
-	public ProgramTextPane textPane = null;
+	public JComponent comp;
 	public String name = "";
 	public String option = "";
 	public String content = "";
@@ -36,23 +37,12 @@ public class Program extends RTextScrollPane {
 	
 	//Warning: do not use name, option or content to retrieve informations because they may have changed!
 	//For example, if the user modifies the content to modify the name, that change will not be reflected in name (nor in content).
-	
-	
-	
 	public Program(String name, String option, String content, int type) {
-		this(name, option, content, type, new ProgramTextPane(type));
-	}
-	
-	public Program(String name, String option, String content, int type, ProgramTextPane ptp) {
-		super(ptp);
 		this.name = name;
 		this.option = option;
-		this.textPane = ptp;
 		this.type = type;
 		//this.setViewportView(textPane);
 		//this.setViewportView(new RSyntaxTextArea());
-		this.getVerticalScrollBar().setUnitIncrement(30);
-		this.setBorder(BorderFactory.createEmptyBorder());
 		//Check if content is missing headers
 		if (!content.startsWith("#")) {
 			if (type == BIDE.TYPE_PROG) {
@@ -65,6 +55,28 @@ public class Program extends RTextScrollPane {
 		}
 		this.content = content;
 		
-		textPane.setText(content);
+		//if (!BIDE.isCLI) {
+			ProgramTextPane textPane = new ProgramTextPane(type);
+			textPane.setText(content);
+			if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
+				this.comp = new PictEditor(type);
+			} else {
+				this.comp = new ProgScrollPane(textPane, type);
+				((JScrollPane)comp).getVerticalScrollBar().setUnitIncrement(30);
+				comp.setBorder(BorderFactory.createEmptyBorder());
+			}
+		//}
+	}
+}
+
+class ProgScrollPane extends RTextScrollPane {
+	
+	ProgramTextPane textPane;
+	int type;
+	
+	public ProgScrollPane(ProgramTextPane textPane, int type) {
+		super(textPane);
+		this.textPane = textPane;
+		this.type = type;
 	}
 }

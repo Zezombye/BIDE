@@ -1,10 +1,14 @@
 package zezombye.BIDE;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class Options {
 	
@@ -12,19 +16,23 @@ public class Options {
 	
 	public void loadProperties() {
 		try {
-			options.load(new FileInputStream(new File(System.getProperty("user.home")+"/BIDE/options.txt")));
+			options.load(new FileInputStream(new File(BIDE.pathToOptions)));
+		} catch (FileNotFoundException e) {
+			System.out.println("No options.txt file found, creating it at "+BIDE.pathToOptions);
+			initProperties();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void saveProperties() {
+	//Not needed
+	/*public void saveProperties() {
 		try {
 			options.store(new FileWriter(new File(BIDE.pathToOptions)), "");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 	public String getProperty(String prop) {
 		if (options.getProperty(prop) == null) {
@@ -38,22 +46,8 @@ public class Options {
 	}
 	
 	public void initProperties() {
-		
-		options.setProperty("spacesFor->", "true");
-		options.setProperty("spacesFor<=", "true");
-		options.setProperty("spacesFor!=", "true");
-		options.setProperty("spacesFor>=", "true");
-		options.setProperty("spacesFor=>", "true");
-		options.setProperty("spacesFor,", "true");
-		options.setProperty("spacesFor:", "true");
-		options.setProperty("spacesFor<", "true");
-		options.setProperty("spacesFor=", "true");
-		options.setProperty("spacesFor>", "true");
-		options.setProperty("spacesFor+", "true");
-		options.setProperty("spacesFor-", "true");
-		options.setProperty("spacesFor^", "true");
-		options.setProperty("spacesFor*", "true");
-		options.setProperty("spacesFor/", "true");
-		saveProperties();
+		IO.writeStrToFile(new File(BIDE.pathToOptions),
+				new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/options.txt"))).lines().collect(Collectors.joining("\n")), true);
+		loadProperties();
 	}
 }

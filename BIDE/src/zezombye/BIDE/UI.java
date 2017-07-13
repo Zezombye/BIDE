@@ -58,7 +58,7 @@ public class UI {
 		jfc = new JFileChooser();
 		
 		window = new JFrame();
-		window.setTitle("BIDE v3.0 (beta) by Zezombye");
+		window.setTitle("BIDE v3.0 by Zezombye");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setSize(800, 600);
 		window.setLocationRelativeTo(null);
@@ -215,6 +215,12 @@ public class UI {
 			}
 		});
 		toolsMenu.add(showOptions);
+		JMenuItem takeEmuScreenshot = new JMenuItem("Take emulator screenshot");
+		takeEmuScreenshot.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				BIDE.autoImport.storeEmuScreenshot();
+			}
+		});
 		window.setJMenuBar(menuBar2);
 
 		window.setVisible(true);
@@ -225,7 +231,11 @@ public class UI {
 		
 	}
 	public ProgramTextPane getTextPane() {
-		return ((Program)this.jtp.getSelectedComponent()).textPane;
+		try {
+			return ((ProgScrollPane)this.jtp.getSelectedComponent()).textPane;
+		} catch (ClassCastException e) {
+			return null;
+		}
 	}
 	
 	public void createNewTab(int type) {
@@ -323,11 +333,15 @@ public class UI {
 		if (name == null || name.endsWith("null")) {
 			return;
 		}
-		jtp.addTab(name, new Program(name, option, content, type));
+		jtp.addTab(name, new Program(name, option, content, type).comp);
 		jtp.setTabComponentAt(jtp.getTabCount()-1, new ButtonTabComponent(jtp));
 		//((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(jtp.getTabCount()-1)).textPane.getDocument()).getDocumentFilter()).testForLag();
 		jtp.setSelectedIndex(jtp.getTabCount()-1);
-	    getTextPane().setCaretPosition(0);
+	    try {
+	    	getTextPane().setCaretPosition(0);
+	    } catch (NullPointerException e) {
+	    	//if (BIDE.debug) e.printStackTrace();
+	    }
 	}
 	
 	public void openFile() {
@@ -353,7 +367,7 @@ public class UI {
 				    	BIDE.pathToSavedG1M = "";
 				    	jtp.removeAll();
 			    		for (int i = 0; i < progs.size(); i++) {
-			    			jtp.addTab(progs.get(i).name, progs.get(i));
+			    			jtp.addTab(progs.get(i).name, progs.get(i).comp);
 			    			jtp.setTabComponentAt(i, new ButtonTabComponent(jtp));
 			    			try {
 								Thread.sleep(50);
@@ -362,7 +376,7 @@ public class UI {
 							}
 			    		}
 				    } catch (NullPointerException e) {
-				    	//e.printStackTrace();
+				    	if (BIDE.debug) e.printStackTrace();
 				    } catch (NoSuchFileException e) {
 				    	BIDE.error("The file at \"" + BIDE.pathToG1M + "\" does not exist.");
 				    } catch (AccessDeniedException e) {
@@ -377,9 +391,12 @@ public class UI {
 				    
 		    	}
 		    }).start();
+	    	
 		    try {
 		    	getTextPane().setCaretPosition(0);
-		    } catch (NullPointerException e) {}
+		    } catch (NullPointerException e) {
+		    	if (BIDE.debug) e.printStackTrace();
+		    }
 	    }
     }
 	
@@ -405,7 +422,7 @@ public class UI {
 							BIDE.writeToG1M(input.getPath());
 						}
 					} catch (NullPointerException e) {
-						//e.printStackTrace();
+						if (BIDE.debug) e.printStackTrace();
 					} catch (NoSuchFileException e) {
 				    	BIDE.error("The file at \"" + BIDE.pathToSavedG1M + "\" does not exist.");
 				    } catch (AccessDeniedException e) {

@@ -36,6 +36,8 @@ public class BIDE {
 	public final static int TYPE_OPCODE = 5;
 	public final static int TYPE_OPTIONS = 6;
 
+	public final static boolean debug = true;
+	
 	public static Font progFont = new Font("DejaVu Sans Mono", Font.PLAIN, 12);
 	public static Font pictFont = new Font("Courier New", Font.PLAIN, 13);
 	
@@ -47,6 +49,10 @@ public class BIDE {
 			"\n'\n'DO NOT EDIT THE PICTURE BELOW, unless you are an advanced user!\n'\n";
 	
 	static Options options = new Options();
+	public static boolean isCLI = false;
+	
+	public static AutoImport autoImport;
+	
 	public static void main(String[] args) {
 		
 		/*GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -57,12 +63,13 @@ public class BIDE {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}*/
-		options.initProperties();
+		//options.initProperties();
 		options.loadProperties();
 		getOpcodes();
 		System.out.println(Arrays.toString(args));
 		if (args.length > 0) {
 			//CLI
+			isCLI = true;
 			if (args[0].equals("--compile")) {
 				String pathToG1M = args[1];
 				ArrayList<Program> progs = new ArrayList<Program>();
@@ -98,9 +105,12 @@ public class BIDE {
 			}
 			
 		} else {
+			if (options.getProperty("useEmulator").equals("true")) {
+				autoImport = new AutoImport();
+			}
 			ui.createAndDisplayUI();
-			ui.jtp.addTab("test", new Program("test1", "", "testcontent", TYPE_PROG));
-			((Program)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
+			ui.jtp.addTab("test", new Program("test1", "", "testcontent", TYPE_PICT).comp);
+			//((ProgScrollPane)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
 			//new AutoImport().autoImport("C:\\Users\\Catherine\\Desktop\\PUISS4.g1m");
 			System.out.println("Finished initialization");
 		}
@@ -264,24 +274,24 @@ public class BIDE {
 		List<Program> parts = new ArrayList<Program>();
 		//Parse text file
 		for (int h = 0; h < ui.jtp.getTabCount(); h++) {
-			int type = ((Program)ui.jtp.getComponentAt(h)).type;
+			int type = ((ProgScrollPane)ui.jtp.getComponentAt(h)).type;
 			if (type == TYPE_OPCODE || type == TYPE_OPTIONS) {
 				continue;
 			}
 			
-			String[] lines = ((Program)ui.jtp.getComponentAt(h)).textPane.getText().split("\\n|\\r|\\r\\n");
+			String[] lines = ((ProgScrollPane)ui.jtp.getComponentAt(h)).textPane.getText().split("\\n|\\r|\\r\\n");
 
 			
 			if (type == TYPE_PROG && !lines[0].startsWith("#Program name: ")) {
-				error("Program "+((Program)ui.jtp.getComponentAt(h)).name + " must include the directive \"#Program name: \" at the beginning!");
+				error("Program "+ ui.jtp.getComponentAt(h).getName() + " must include the directive \"#Program name: \" at the beginning!");
 			}
 			if (type == TYPE_PICT && !lines[0].startsWith("#Picture name: ")) {
-				error("Picture "+((Program)ui.jtp.getComponentAt(h)).name + " must include the directive \"#Picture name: \" at the beginning!");
+				error("Picture "+ ui.jtp.getComponentAt(h).getName() + " must include the directive \"#Picture name: \" at the beginning!");
 			}
 			if (type == TYPE_CAPT && !lines[0].startsWith("#Capture name: ")) {
-				error("Capture "+((Program)ui.jtp.getComponentAt(h)).name + " must include the directive \"#Capture name: \" at the beginning!");
+				error("Capture "+ ui.jtp.getComponentAt(h).getName() + " must include the directive \"#Capture name: \" at the beginning!");
 			}
-			parts.add(new Program("", "", ((Program)ui.jtp.getComponentAt(h)).textPane.getText(), type));
+			parts.add(new Program("", "", ((ProgScrollPane)ui.jtp.getComponentAt(h)).textPane.getText(), type));
 			//System.out.println("Program text="+((Program)ui.jtp.getComponentAt(h)).textPane.getText());
 		}
 		writeToG1M(destPath, parts);
@@ -407,7 +417,7 @@ public class BIDE {
 		System.out.println("Saving to "+destPath+"...");
 		String result = "";
 		for (int h = 0; h < ui.jtp.getTabCount(); h++) {
-			result += ((Program)ui.jtp.getComponentAt(h)).textPane.getText() + "\n#End of part\n";
+			result += ((ProgScrollPane)ui.jtp.getComponentAt(h)).textPane.getText() + "\n#End of part\n";
 		}
 		IO.writeStrToFile(new File(destPath), result, true);
 		System.out.println("Done!");
@@ -518,16 +528,16 @@ public class BIDE {
 					
 					//If string, skip opcodes that are not entities/characters in order to avoid FA-124ing
 					if (allowUnknownOpcodes || currentPosIsString || currentPosIsComment) {
-						if (opcodes.get(j).ascii.length() != 1 && !opcodes.get(j).ascii.startsWith("&")
-								&& !opcodes.get(j).ascii.equals("->")
-								&& !opcodes.get(j).ascii.equals("=>")
-								&& !opcodes.get(j).ascii.equals("!=")
-								&& !opcodes.get(j).ascii.equals(">=")
-								&& !opcodes.get(j).ascii.equals("<=")) {
+						if (opcodes.get(j).text.length() != 1 && !opcodes.get(j).text.startsWith("&")
+								&& !opcodes.get(j).text.equals("->")
+								&& !opcodes.get(j).text.equals("=>")
+								&& !opcodes.get(j).text.equals("!=")
+								&& !opcodes.get(j).text.equals(">=")
+								&& !opcodes.get(j).text.equals("<=")) {
 							continue;
 						}
 					}
-					if (lines[h].startsWith(opcodes.get(j).ascii, i)) {
+					if (lines[h].startsWith(opcodes.get(j).text, i)) {
 						foundMatch = true;
 						
 						if (opcodes.get(j).hex.length() > 2) {
@@ -536,7 +546,7 @@ public class BIDE {
 						} else if (opcodes.get(j).hex.length() > 0) {
 							result.add(Integer.parseInt(opcodes.get(j).hex, 16));
 						}
-						i += opcodes.get(j).ascii.length()-1;
+						i += opcodes.get(j).text.length()-1;
 						break;
 					}
 				}
@@ -743,7 +753,7 @@ public class BIDE {
 			//System.out.println("Testing for opcode " + hex);
 			for (int j = 0; j < opcodes.size(); j++) {
 				if (hex.equalsIgnoreCase(opcodes.get(j).hex)) {
-					currentLine += opcodes.get(j).ascii;
+					currentLine += opcodes.get(j).text;
 					foundMatch = true;
 					//System.out.println("Matches opcode " + opcodes.get(j).ascii);
 					break;
@@ -784,7 +794,7 @@ public class BIDE {
 		try {
 			//BufferedReader br = new BufferedReader(new FileReader(new File(relativePath)));
 			BufferedReader br = new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/opcodes.txt"), "UTF-8"));
-			String hex, ascii;
+			String hex, text;
 			boolean escape = false;
 			
 			while ((line = br.readLine()) != null) {
@@ -798,7 +808,7 @@ public class BIDE {
 				} catch (NumberFormatException e) {
 					error("opcodes.txt", lineNb, "Could not parse hex string \"" + hex + "\"");
 				}
-				ascii = line.substring(line.indexOf(' ')+1, line.lastIndexOf(' '));
+				text = line.substring(line.indexOf(' ')+1, line.lastIndexOf(' '));
 				if (line.substring(line.length()-2, line.length()).equals(" f")) {
 					escape = false;
 				} else if (line.substring(line.length()-2, line.length()).equals(" t")) {
@@ -807,9 +817,13 @@ public class BIDE {
 					error("opcodes.txt", lineNb, "Unknown boolean \"" + line.substring(line.length()-2, line.length()) + "\"");
 				}
 				if (escape) {
-					ascii = "&" + ascii + ";";
+					text = "&" + text + ";";
 				}
-				opcodes.add(new Opcode(hex, ascii));
+				
+				if (options.getProperty("allowUnicode").equals("true") || text.matches("([ -~])+")) {
+					opcodes.add(new Opcode(hex, text));
+				}
+				
 				
 				//Check for correct order
 				if (opcodes.size() > 1 && Integer.parseInt(opcodes.get(opcodes.size()-1).hex, 16) < Integer.parseInt(opcodes.get(opcodes.size()-2).hex, 16)) {
@@ -847,14 +861,14 @@ public class BIDE {
 		Collections.sort(opcodes, new Comparator<Opcode>() {
 			@Override
 			public int compare(Opcode o1, Opcode o2) {
-				return o2.ascii.compareTo(o1.ascii);
+				return o2.text.compareTo(o1.text);
 			}
 		});
 		
 		//Check for duplicates
 		for (int i = 0; i < opcodes.size(); i++) {
 			for (int j = i+1; j < opcodes.size(); j++) {
-				if (opcodes.get(i).ascii.equals(opcodes.get(j).ascii)) {
+				if (opcodes.get(i).text.equals(opcodes.get(j).text)) {
 					error("opcodes.txt", "Opcode 0x"+opcodes.get(i).hex + " conflicts with opcode 0x"+opcodes.get(j).hex + "!");
 				}
 			}

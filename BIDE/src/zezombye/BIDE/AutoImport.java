@@ -39,12 +39,13 @@ public class AutoImport {
     int emuSleep = 50; //optimal sleep time between keypresses for the emulator
     Robot robot;
     BufferedImage confirmation, memMenu, complete;
+    int screenX, screenY, screenWidth, screenHeight;
     
-    public void init() {
+    public AutoImport() {
     	try {
-			confirmation = ImageIO.read(BIDE.class.getClass().getResourceAsStream("images/confirmation.png"));
-			complete = ImageIO.read(BIDE.class.getClass().getResourceAsStream("images/complete.png"));
-			memMenu = ImageIO.read(BIDE.class.getClass().getResourceAsStream("images/memMenu.png"));
+			confirmation = ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/confirmation.png"));
+			complete = ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/complete.png"));
+			memMenu = ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/memMenu.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -53,6 +54,10 @@ public class AutoImport {
 		} catch (AWTException e) {
 			e.printStackTrace();
 		}
+		screenX = Integer.parseInt(BIDE.options.getProperty("screenX"));
+		screenY = Integer.parseInt(BIDE.options.getProperty("screenY"));
+		screenWidth = Integer.parseInt(BIDE.options.getProperty("screenWidth"));
+		screenHeight = Integer.parseInt(BIDE.options.getProperty("screenHeight"));
     }
     
 	public void autoImport(String path) {
@@ -150,16 +155,34 @@ public class AutoImport {
 		RECT dimensionsOfWindow = new RECT();
 		user32.GetWindowRect(emulatorHWND, dimensionsOfWindow);
 		Rectangle screen = dimensionsOfWindow.toRectangle();
-		screen.x += 49;
-		screen.y += 189;
-		screen.width = 256;
-		screen.height = 128;
+		screen.x += screenX;
+		screen.y += screenY;
+		screen.width = screenWidth;
+		screen.height = screenHeight;
         return robot.createScreenCapture(screen);
+	}
+	
+	public BufferedImage getEmuScreenshot() {
+		RECT dimensionsOfWindow = new RECT();
+		user32.GetWindowRect(emulatorHWND, dimensionsOfWindow);
+		Rectangle screen = dimensionsOfWindow.toRectangle();
+        return robot.createScreenCapture(screen);
+	}
+	
+	//storeEmuScreenshot() takes a screenshot of the whole emulator, while storeEmuScreen() only takes a screenshot of the calculator screen.
+	public void storeEmuScreenshot() {
+		try {
+			ImageIO.write(getEmuScreenshot(), "png", new File(System.getProperty("user.home")+"/emulator.png"));
+			System.out.println("Saved emulator screenshot at "+System.getProperty("user.home")+"/emulator.png");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void storeEmuScreen() {
 		try {
-			ImageIO.write(getEmuScreen(), "png", new File("C:/Users/Catherine/Desktop/open.png"));
+			ImageIO.write(getEmuScreen(), "png", new File(System.getProperty("user.home")+"/open.png"));
+			System.out.println("Saved calculator screenshot at " + System.getProperty("user.home")+"/open.png");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -257,8 +280,6 @@ public class AutoImport {
 		ArrayList<String> titles = new ArrayList<String>();
 		user32.EnumWindows(new WNDENUMPROC() {
 			
-	        int count = 0;
-
 	        public boolean callback(HWND hWnd, Pointer arg1) {
 	            byte[] windowText = new byte[512];
 	            user32.GetWindowTextA(hWnd, windowText, 512);

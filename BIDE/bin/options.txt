@@ -1,0 +1,55 @@
+#BIDE Options
+#Note that you must restart BIDE to take the changes in account.
+
+#If you don't want unicode for some reason, set to false
+allowUnicode=true
+
+#If you don't want auto-completion, set to false
+autocomplete=true
+
+#Whether to put spaces on operators when importing a g1m
+#Note that unary operators don't have spaces, so "3*-5" -> "3 * -5"
+#^
+spacesFor^=true
+#/
+spacesFor/=true
+#-
+spacesFor-=true
+#,
+spacesFor,=true
+#+
+spacesFor+=true
+#<=
+spacesFor<\==true
+#*
+spacesFor*=true
+#>
+spacesFor>=true
+#->
+spacesFor->=true
+#=
+spacesFor\==true
+#<
+spacesFor<=true
+#>=
+spacesFor>\==true
+#:
+spacesFor\:=true
+#!=
+spacesFor\!\==true
+#=>
+spacesFor\=>=true
+
+#Set to true if, when saving to g1m, you want to test the g1m on the emulator
+#Note that it requires the Manager PLUS emulator.
+useEmulator=false
+
+#If BIDE can't find the emulator screen, you may need to set the dimensions manually.
+#To do that, take a screenshot of the emulator (Tools->Take emulator screenshot).
+#Then, go in Paint and note the coordinates of the top left corner of the screen.
+screenX=49
+screenY=189
+
+#If you set the emulator screen size to something other than 2, modify these dimensions
+screenWidth=256
+screenHeight=128
