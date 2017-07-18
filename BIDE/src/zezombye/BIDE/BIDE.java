@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
-
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -35,10 +34,9 @@ public class BIDE {
 	public final static int TYPE_CAPT = 4;
 	public final static int TYPE_OPCODE = 5;
 	public final static int TYPE_OPTIONS = 6;
-
 	public final static boolean debug = true;
-	
-	public static Font progFont = new Font("DejaVu Sans Mono", Font.PLAIN, 12);
+	//public static Font progFont = new Font("DejaVu Sans Mono", Font.PLAIN, 12);
+	public static Font progFont = new Font("Casio Graph", Font.PLAIN, 14);
 	public static Font pictFont = new Font("Courier New", Font.PLAIN, 13);
 	
 	public final static String pictTutorial = 
@@ -54,17 +52,23 @@ public class BIDE {
 	public static AutoImport autoImport;
 	
 	public static void main(String[] args) {
+		options.loadProperties();
 		
-		/*GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		try {
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, BIDE.class.getClass().getResourceAsStream("/droid-sans-mono.ttf")));
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, BIDE.class.getClass().getResourceAsStream("/Casio Graph.ttf")));
 		} catch (FontFormatException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}*/
+		}
+		
+		progFont = new Font(options.getProperty("progFontName"), Font.PLAIN, Integer.parseInt(options.getProperty("progFontSize")));
+		
+		//System.setProperty("awt.useSystemAAFontSettings","none");
+		//System.setProperty("swing.aatext", "false");
+		
 		//options.initProperties();
-		options.loadProperties();
 		getOpcodes();
 		System.out.println(Arrays.toString(args));
 		if (args.length > 0) {

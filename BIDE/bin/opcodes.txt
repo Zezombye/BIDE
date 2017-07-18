@@ -632,7 +632,8 @@ E594 … f
 E594 ... t
 E595 ‘ f
 E595 left_' t
-E596 ’ f
+#Same shape in casio font as '
+#E596 ’ f
 E596 right_' t
 E597 “ f
 E597 left_" t
@@ -906,7 +907,8 @@ E649 κ f
 E649 kappa t
 E64A λ f
 E64A lambda t
-E64B µ f
+#mu is visually similar to micro sign, and french keyboards input the micro sign
+#E64B µ f
 E64B mu t
 E64C ν f
 E64C nu t

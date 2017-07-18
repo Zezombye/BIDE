@@ -8,13 +8,16 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class PictEditor extends JPanel {
+public class PictPane extends JPanel {
 	
 	int type, size;
 	
 	JPanel namePanel = new JPanel();
+	JTextField namejtf = new JTextField();
+	JPanel sizePanel = new JPanel();
+	JTextField sizejtf = new JTextField();
 	
-	public PictEditor(int type) {
+	public PictPane(int type, int size) {
 		this.setLayout(null); //Layouts are pure evil, absolute is at least consistent
 		
 		this.add(namePanel);
@@ -24,6 +27,8 @@ public class PictEditor extends JPanel {
 		this.add(sizePanel, BorderLayout.WEST);
 		sizePanel.add(new JLabel("Size: 0x"));
 		sizePanel.add(new JTextField("800"));
+		this.type = type;
+		this.size = size;
 	}
 	
 	@Override protected void paintComponent(Graphics g) {

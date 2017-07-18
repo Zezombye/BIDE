@@ -59,7 +59,7 @@ public class Program {
 			ProgramTextPane textPane = new ProgramTextPane(type);
 			textPane.setText(content);
 			if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
-				this.comp = new PictEditor(type);
+				this.comp = new PictPane(type, 0);
 			} else {
 				this.comp = new ProgScrollPane(textPane, type);
 				((JScrollPane)comp).getVerticalScrollBar().setUnitIncrement(30);

@@ -7,6 +7,21 @@ allowUnicode=true
 #If you don't want auto-completion, set to false
 autocomplete=true
 
+#Font of programs. Warning: only change if you have a font that supports ALL the glyphs! (or disable unicode)
+progFontName=Casio Graph
+
+#It is advised to put a multiple of 7, else the pixels won't be of the same height
+progFontSize=14
+
+#Background color
+bgColor=FFFFFF
+
+#Text color
+textColor=000000
+
+#Selected line color
+hlColor=EEEEEE
+
 #Whether to put spaces on operators when importing a g1m
 #Note that unary operators don't have spaces, so "3*-5" -> "3 * -5"
 #^

@@ -1,7 +1,9 @@
 package zezombye.BIDE;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 
 import javax.swing.plaf.TextUI;
 import javax.swing.text.AbstractDocument;
@@ -67,6 +69,9 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		}
 		
 		this.setLineWrap(true);
+		this.setBackground(new Color(Integer.parseInt(BIDE.options.getProperty("bgColor"), 16)));
+		this.setForeground(new Color(Integer.parseInt(BIDE.options.getProperty("textColor"), 16)));
+		this.setCurrentLineHighlightColor(new Color(Integer.parseInt(BIDE.options.getProperty("hlColor"), 16)));
 		AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory)TokenMakerFactory.getDefaultInstance();
 		atmf.putMapping("test/BasicCasio", "zezombye.BIDE.SyntaxColoration");
 		this.setSyntaxEditingStyle("text/BasicCasio");
@@ -93,6 +98,12 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	    }
 		provider.setAutoActivationRules(true, null);
 		return provider;
+	}
+	
+	@Override
+	public void paintComponent(Graphics g) {
+		//((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+		super.paintComponent(g);
 	}
 	
 }
