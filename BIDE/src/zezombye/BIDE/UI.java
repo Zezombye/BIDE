@@ -83,7 +83,7 @@ public class UI {
 		System.setOut(printStream);
 		System.setErr(printStream);
 		stdout.setBackground(Color.ORANGE);
-		stdout.setFont(BIDE.progFont);
+		stdout.setFont(BIDE.dispFont);
 		stdout.setLineWrap(true);
 		JScrollPane jsp2 = new JScrollPane(stdout);
 		jsp2.setPreferredSize(new Dimension(sidebarWidth, 200));
@@ -215,12 +215,20 @@ public class UI {
 			}
 		});
 		toolsMenu.add(showOptions);
+		JMenuItem showChars = new JMenuItem("Show characters list");
+		showChars.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				createNewTab(BIDE.TYPE_CHARLIST);
+			}
+		});
+		toolsMenu.add(showChars);
 		JMenuItem takeEmuScreenshot = new JMenuItem("Take emulator screenshot");
 		takeEmuScreenshot.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
 				BIDE.autoImport.storeEmuScreenshot();
 			}
 		});
+		toolsMenu.add(takeEmuScreenshot);
 		window.setJMenuBar(menuBar2);
 
 		window.setVisible(true);
@@ -300,8 +308,36 @@ public class UI {
 				e.printStackTrace();
 			}
 		
+		} else if (type == BIDE.TYPE_CHARLIST) {
+			name = "All characters";
+			try {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/characters.txt"), "UTF-8"));
+				String line = null;
+			    StringBuilder stringBuilder = new StringBuilder();
+
+			    try {
+			        while((line = reader.readLine()) != null) {
+			            stringBuilder.append(line);
+			            stringBuilder.append("\n");
+			        }
+
+			        content += stringBuilder.toString();
+			    } catch (IOException e) {
+					e.printStackTrace();
+				} finally {
+			        try {
+						reader.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+			    }
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		
 		} else if (type == BIDE.TYPE_OPTIONS) {
 			name = "Options";
+			content = "\nTo edit options, go to "+BIDE.pathToOptions+"!\n\n";
 			try {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(System.getProperty("user.home")+"/BIDE/options.txt"))));
 				String line = null;

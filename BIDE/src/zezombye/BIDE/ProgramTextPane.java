@@ -1,5 +1,7 @@
 package zezombye.BIDE;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -11,7 +13,10 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.DocumentFilter.FilterBypass;
+import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.Segment;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
 import org.fife.ui.autocomplete.AutoCompletion;
 import org.fife.ui.autocomplete.BasicCompletion;
@@ -33,8 +38,10 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		super();
 		if (type == BIDE.TYPE_CAPT || type == BIDE.TYPE_PICT) {
         	this.setFont(BIDE.pictFont);
-        } else {
+        } else if (type == BIDE.TYPE_PROG || type == BIDE.TYPE_OPCODE || type == BIDE.TYPE_CHARLIST){
         	this.setFont(BIDE.progFont);
+        } else {
+        	this.setFont(BIDE.dispFont);
         }
 		this.setBackground(Color.WHITE);
 		this.setForeground(Color.BLACK);
@@ -46,7 +53,7 @@ public class ProgramTextPane extends RSyntaxTextArea {
 			this.setTextMode(RSyntaxTextArea.OVERWRITE_MODE);
 			//this.setCaretColor(new Color(0, 128, 255));
 			this.setCaretColor(Color.RED);
-			
+			this.setLineWrap(false);
 			((AbstractDocument)this.getDocument()).setDocumentFilter(new DocumentFilter() {
 				@Override
 			    public void replace(final FilterBypass fb, final int offs, final int length, final String str, final AttributeSet a) throws BadLocationException {
@@ -72,6 +79,7 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		this.setBackground(new Color(Integer.parseInt(BIDE.options.getProperty("bgColor"), 16)));
 		this.setForeground(new Color(Integer.parseInt(BIDE.options.getProperty("textColor"), 16)));
 		this.setCurrentLineHighlightColor(new Color(Integer.parseInt(BIDE.options.getProperty("hlColor"), 16)));
+		//this.getDocument().setParagraphAttributes(0, this.getDocument().getLength(), 1, true);
 		AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory)TokenMakerFactory.getDefaultInstance();
 		atmf.putMapping("test/BasicCasio", "zezombye.BIDE.SyntaxColoration");
 		this.setSyntaxEditingStyle("text/BasicCasio");

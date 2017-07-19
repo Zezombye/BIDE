@@ -34,10 +34,12 @@ public class BIDE {
 	public final static int TYPE_CAPT = 4;
 	public final static int TYPE_OPCODE = 5;
 	public final static int TYPE_OPTIONS = 6;
+	public final static int TYPE_CHARLIST = 7;
 	public final static boolean debug = true;
 	//public static Font progFont = new Font("DejaVu Sans Mono", Font.PLAIN, 12);
 	public static Font progFont = new Font("Casio Graph", Font.PLAIN, 14);
 	public static Font pictFont = new Font("Courier New", Font.PLAIN, 13);
+	public static Font dispFont = new Font("DejaVu Sans Mono", Font.PLAIN, 13);
 	
 	public final static String pictTutorial = 
 			"\n'To edit the picture, use the characters ' , :\n"
@@ -57,6 +59,7 @@ public class BIDE {
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		try {
 			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, BIDE.class.getClass().getResourceAsStream("/Casio Graph.ttf")));
+			//ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, BIDE.class.getClass().getResourceAsStream("/DejaVuAvecCasio.ttf")));
 		} catch (FontFormatException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -64,7 +67,8 @@ public class BIDE {
 		}
 		
 		progFont = new Font(options.getProperty("progFontName"), Font.PLAIN, Integer.parseInt(options.getProperty("progFontSize")));
-		
+		//progFont = progFont.deriveFont(30);
+		//System.out.println(progFont.getSize());
 		//System.setProperty("awt.useSystemAAFontSettings","none");
 		//System.setProperty("swing.aatext", "false");
 		
@@ -113,7 +117,8 @@ public class BIDE {
 				autoImport = new AutoImport();
 			}
 			ui.createAndDisplayUI();
-			ui.jtp.addTab("test", new Program("test1", "", "testcontent", TYPE_PICT).comp);
+			//ui.jtp.addTab("test", new Program("test1", "", "testcontent", TYPE_PICT).comp);
+			ui.jtp.addTab("test", new Program("test1", "", "Test font\nTest font 2", TYPE_PROG).comp);
 			//((ProgScrollPane)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
 			//new AutoImport().autoImport("C:\\Users\\Catherine\\Desktop\\PUISS4.g1m");
 			System.out.println("Finished initialization");
@@ -279,7 +284,7 @@ public class BIDE {
 		//Parse text file
 		for (int h = 0; h < ui.jtp.getTabCount(); h++) {
 			int type = ((ProgScrollPane)ui.jtp.getComponentAt(h)).type;
-			if (type == TYPE_OPCODE || type == TYPE_OPTIONS) {
+			if (type != TYPE_PROG && type != TYPE_PICT && type != TYPE_CAPT) {
 				continue;
 			}
 			
@@ -587,7 +592,7 @@ public class BIDE {
 	}
 	
 	public static String casioToAscii(CasioString content, boolean addSpaces) {
-		String allowedCharacters = " !#$%;@_abcdefghijklmnopqrstuvwxyz|";
+		String allowedCharacters = " !#$%;@_`abcdefghijklmnopqrstuvwxyz|";
 		
 		//Opcodes causing indentation
 		List<String> indent = Arrays.asList(new String[]{
