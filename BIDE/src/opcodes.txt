@@ -56,9 +56,11 @@ F x10^ t
 1F  f
 1F hexF t
 26 amp t
+2A  f
 2A ascii_* t
 2B ascii_+ t
 2D ascii_- t
+2F  f
 2F ascii_/ t
 3D = t
 5E ascii_^ t
@@ -72,6 +74,7 @@ F x10^ t
 86 sqrt t
 87 ﹣ f
 87 neg t
+88  f
 88 nPr t
 89 + f
 8A xnor f
@@ -94,6 +97,7 @@ F x10^ t
 #96 ∛ f
 96 cbrt t
 97 Abs  f
+98  f
 98 nCr t
 99 - f
 99 - t
@@ -446,10 +450,13 @@ FE prob_t( t
 7FED CellMean( f
 7FEE CellMedian( f
 7FEF CellIf( f
+7FF0  f
 7FF0 Y_graph t
+7FF1  f
 7FF1 r_graph t
 7FF2 Xt_graph t
 7FF3 Yt_graph t
+7FF4  f
 7FF4 X_graph t
 7FFB SSb f
 7FFC SSab f
@@ -708,13 +715,9 @@ E5AE 2_rectangles t
 E5AF cross t
 E5B0  f
 E5B0 bold_e t
-E5B1  f
 E5B1 bold_P t
-E5B2  f
 E5B2 bold_r t
-E5B3  f
 E5B3 bold_X t
-E5B4  f
 E5B4 bold_Y t
 E5B5  f
 E5B5 negative_B t
@@ -1016,7 +1019,6 @@ E669 и f
 E669 icy t
 E66A й f
 E66A jcy t
-E66B к f
 E66B kcy t
 E66C л f
 E66C lcy t
@@ -1035,7 +1037,6 @@ E674 у f
 E674 ucy t
 E675 ф f
 E675 fcy t
-E676 х f
 E676 khcy t
 E677 ц f
 E677 tscy t
@@ -1157,9 +1158,9 @@ E6C1 ⊂ f
 E6C1 subset_of t
 E6C2 ⊃ f
 E6C2 superset_of t
-E6C3 ⋃ f
+E6C3 ∪ f
 E6C3 union t
-E6C4 ⋂ f
+E6C4 ∩ f
 E6C4 intersection t
 E6C5 ∉ f
 E6C5 not_an_element_of t

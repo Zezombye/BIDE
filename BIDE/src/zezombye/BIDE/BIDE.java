@@ -37,10 +37,9 @@ public class BIDE {
 	public final static int TYPE_CHARLIST = 7;
 	public final static boolean debug = true;
 	//public static Font progFont = new Font("DejaVu Sans Mono", Font.PLAIN, 12);
-	public static Font progFont = new Font("Casio Graph", Font.PLAIN, 14);
-	public static Font pictFont = new Font("Courier New", Font.PLAIN, 13);
-	public static Font dispFont = new Font("DejaVu Sans Mono", Font.PLAIN, 13);
-	
+	public static Font progFont, pictFont, dispFont;
+	//public static Font dispFont = new Font("DejaVu Sans Mono", Font.PLAIN, 13);
+	 
 	public final static String pictTutorial = 
 			"\n'To edit the picture, use the characters ' , :\n"
 			+ "'which make ▀ ▄ █ respectively.\n"
@@ -56,17 +55,6 @@ public class BIDE {
 	public static void main(String[] args) {
 		options.loadProperties();
 		
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		try {
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, BIDE.class.getClass().getResourceAsStream("/Casio Graph.ttf")));
-			//ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, BIDE.class.getClass().getResourceAsStream("/DejaVuAvecCasio.ttf")));
-		} catch (FontFormatException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		progFont = new Font(options.getProperty("progFontName"), Font.PLAIN, Integer.parseInt(options.getProperty("progFontSize")));
 		//progFont = progFont.deriveFont(30);
 		//System.out.println(progFont.getSize());
 		//System.setProperty("awt.useSystemAAFontSettings","none");
@@ -113,12 +101,25 @@ public class BIDE {
 			}
 			
 		} else {
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			try {
+				ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, BIDE.class.getClass().getResourceAsStream("/Casio Graph.ttf")));
+				ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, BIDE.class.getClass().getResourceAsStream("/DejaVuAvecCasio.ttf")));
+			} catch (FontFormatException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			progFont = new Font(options.getProperty("progFontName"), Font.TRUETYPE_FONT, Integer.parseInt(options.getProperty("progFontSize")));
+			dispFont = progFont;
 			if (options.getProperty("useEmulator").equals("true")) {
 				autoImport = new AutoImport();
 			}
+			pictFont = new Font("DejaVu Avec Casio", Font.TRUETYPE_FONT, Integer.parseInt(options.getProperty("pictFontSize")));
 			ui.createAndDisplayUI();
 			//ui.jtp.addTab("test", new Program("test1", "", "testcontent", TYPE_PICT).comp);
-			ui.jtp.addTab("test", new Program("test1", "", "Test font\nTest font 2", TYPE_PROG).comp);
+			ui.createNewTab(TYPE_CHARLIST);
 			//((ProgScrollPane)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
 			//new AutoImport().autoImport("C:\\Users\\Catherine\\Desktop\\PUISS4.g1m");
 			System.out.println("Finished initialization");
@@ -308,16 +309,14 @@ public class BIDE {
 	
 	public static void writeToG1M(String destPath, List<Program> parts) throws IOException {
 		
+		
 		long time = System.currentTimeMillis();
 		System.out.println("Saving to \""+destPath+"\"...");
 		
 		G1MWrapper g1mwrapper = new G1MWrapper();
 		//Parse text file
 		Program currentPart = null;
-		/*try {
-			BufferedReader br = new BufferedReader(new FileReader(new File(progPath)));
-			
-			while ((line = br.readLine()) != null) {*/
+		ArrayList<Macro> macros = new ArrayList<Macro>();
 		for (int h = 0; h < parts.size(); h++) {
 			int type = parts.get(h).type;
 			if (type == TYPE_OPCODE || type == TYPE_OPTIONS) {
@@ -343,9 +342,11 @@ public class BIDE {
 						Integer.parseInt(currentPart.option, 16);
 					} catch (NumberFormatException e) {
 						error(currentPart.name, "Invalid picture size!");
+						return;
 					}
 				} else {
 					error(currentPart.name, "Picture size undefined!");
+					return;
 				}
 			}
 			for (int i = 0; i < lines.length; i++) {
@@ -354,6 +355,15 @@ public class BIDE {
 				}
 				if (!lines[i].startsWith("#")) {
 					currentPart.content += lines[i] + "\n";
+				}
+				if (lines[i].startsWith("#define ")) {
+					try {
+						macros.add(new Macro(lines[i].substring(8, lines[i].indexOf(' ', 8)), lines[i].substring(lines[i].indexOf(' ', 8))));
+					} catch (StringIndexOutOfBoundsException e) {
+						e.printStackTrace();
+						error(currentPart.name, i+1, "Invalid macro declaration!");
+						return;
+					}
 				}
 			}
 			parts.set(h, currentPart);
@@ -364,6 +374,7 @@ public class BIDE {
 			error("No programs detected!");
 			return;
 		}
+		System.out.println(macros.toString());
 		//Add each part (program) of the ascii file
 		byte[] padding = {0,0,0,0,0,0,0,0};
 		for (int i = 0; i < parts.size(); i++) {

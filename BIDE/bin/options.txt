@@ -8,10 +8,16 @@ allowUnicode=true
 autocomplete=true
 
 #Font of programs. Warning: only change if you have a font that supports ALL the glyphs! (or disable unicode)
-progFontName=Casio Graph
+#Default font: "DejaVu Avec Casio"
+#Casio font: "Casio Graph"
+progFontName=DejaVu Avec Casio
 
 #It is advised to put a multiple of 7, else the pixels won't be of the same height
+#For DejaVu Avec Casio, a minimum of 14 is required for all glyphs to display properly
 progFontSize=14
+
+#Picture font size, if you have a small screen it can help seeing the whole picture.
+pictFontSize=13
 
 #Background color
 bgColor=FFFFFF

@@ -135,7 +135,7 @@ public class SyntaxColoration extends AbstractTokenMaker {
 
 		return cps.toArray(new ColorationPattern[cps.size()]);
 	}*/
-
+	
 	@Override
 	public Token getTokenList(Segment text, int startTokenType, int startOffset) {
 		   resetTokenList();

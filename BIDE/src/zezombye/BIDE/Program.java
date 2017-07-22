@@ -78,5 +78,8 @@ class ProgScrollPane extends RTextScrollPane {
 		super(textPane);
 		this.textPane = textPane;
 		this.type = type;
+		if (type == BIDE.TYPE_CAPT || type == BIDE.TYPE_PICT) {
+			this.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		}
 	}
 }

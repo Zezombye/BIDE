@@ -47,9 +47,21 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		this.setForeground(Color.BLACK);
 		this.setCaretStyle(OVERWRITE_MODE, CaretStyle.UNDERLINE_STYLE);
 		this.setTabSize(4);
+		
+		
+		this.setLineWrap(true);
+		this.setBackground(new Color(Integer.parseInt(BIDE.options.getProperty("bgColor"), 16)));
+		this.setForeground(new Color(Integer.parseInt(BIDE.options.getProperty("textColor"), 16)));
+		this.setCurrentLineHighlightColor(new Color(Integer.parseInt(BIDE.options.getProperty("hlColor"), 16)));
+		//this.getDocument().setParagraphAttributes(0, this.getDocument().getLength(), 1, true);
+		AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory)TokenMakerFactory.getDefaultInstance();
+		atmf.putMapping("test/BasicCasio", "zezombye.BIDE.SyntaxColoration");
+		this.setSyntaxEditingStyle("text/BasicCasio");
+		//this.setSyntaxEditingStyle(SYNTAX_STYLE_JAVA);
+		
 		if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
 			//this.setCaretStyle(RSyntaxTextArea.OVERWRITE_MODE, CaretStyle.BLOCK_STYLE);
-			this.setCaretStyle(OVERWRITE_MODE, CaretStyle.UNDERLINE_STYLE);
+			this.setCaretStyle(OVERWRITE_MODE, CaretStyle.BLOCK_BORDER_STYLE);
 			this.setTextMode(RSyntaxTextArea.OVERWRITE_MODE);
 			//this.setCaretColor(new Color(0, 128, 255));
 			this.setCaretColor(Color.RED);
@@ -73,17 +85,9 @@ public class ProgramTextPane extends RSyntaxTextArea {
 			    }
 			});
 			
+		} else if (type == BIDE.TYPE_PROG) {
+			//((AbstractDocument)this.getDocument()).setDocumentFilter(new CustomDocumentFilter(this, new SyntaxColoration().getColorationPatterns(BIDE.TYPE_PROG), BIDE.TYPE_PROG));
 		}
-		
-		this.setLineWrap(true);
-		this.setBackground(new Color(Integer.parseInt(BIDE.options.getProperty("bgColor"), 16)));
-		this.setForeground(new Color(Integer.parseInt(BIDE.options.getProperty("textColor"), 16)));
-		this.setCurrentLineHighlightColor(new Color(Integer.parseInt(BIDE.options.getProperty("hlColor"), 16)));
-		//this.getDocument().setParagraphAttributes(0, this.getDocument().getLength(), 1, true);
-		AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory)TokenMakerFactory.getDefaultInstance();
-		atmf.putMapping("test/BasicCasio", "zezombye.BIDE.SyntaxColoration");
-		this.setSyntaxEditingStyle("text/BasicCasio");
-		//this.setSyntaxEditingStyle(SYNTAX_STYLE_JAVA);
 		
 		if (BIDE.options.getProperty("autocomplete").equals("true")) {
 			AutoCompletion ac = new AutoCompletion(getAutoComplete());
