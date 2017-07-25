@@ -8,4 +8,8 @@ public class Macro {
 		this.text = text;
 		this.replacement = replacement;
 	}
+	
+	@Override public String toString() {
+		return "defined "+text+" as "+replacement;
+	}
 }

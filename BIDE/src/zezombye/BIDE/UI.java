@@ -201,6 +201,13 @@ public class UI {
 		saveMenu.add(saveTxt);
 		JMenu toolsMenu = new JMenu("Tools");
 		menuBar2.add(toolsMenu);
+		JMenuItem multiDrawstat = new JMenuItem("Multi Drawstat Generator");
+		multiDrawstat.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				new MultiDrawstatGenerator();
+			}
+		});
+		toolsMenu.add(multiDrawstat);
 		JMenuItem showOpcodes = new JMenuItem("Show list of opcodes");
 		showOpcodes.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {

@@ -106,7 +106,9 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	    	}
 	    };
 	    for (int i = 0; i < BIDE.opcodes.size(); i++) {
-	    	provider.addCompletion(new BasicCompletion(provider, BIDE.opcodes.get(i).text));
+	    	if (BIDE.opcodes.get(i).text.length() > 1) {
+		    	provider.addCompletion(new BasicCompletion(provider, BIDE.opcodes.get(i).text));
+	    	}
 	    }
 		provider.setAutoActivationRules(true, null);
 		return provider;

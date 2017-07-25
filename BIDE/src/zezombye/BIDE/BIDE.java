@@ -135,7 +135,7 @@ public class BIDE {
 		
 		ArrayList<Program> progs = new ArrayList<Program>();
 		
-		String[] progsTxt = content.split("#End of part\\n");
+		String[] progsTxt = content.split("\\n#End of part\\n");
 		for (int i = 0; i < progsTxt.length; i++) {
 			int type;
 			if (progsTxt[i].startsWith("#Program")) {
@@ -353,18 +353,15 @@ public class BIDE {
 				if (lines[i].endsWith("Then") || lines[i].endsWith("Else")) {
 					lines[i] += " ";
 				}
-				if (!lines[i].startsWith("#")) {
-					currentPart.content += lines[i] + "\n";
-				}
 				if (lines[i].startsWith("#define ")) {
 					try {
-						macros.add(new Macro(lines[i].substring(8, lines[i].indexOf(' ', 8)), lines[i].substring(lines[i].indexOf(' ', 8))));
+						macros.add(new Macro(lines[i].substring(8, lines[i].indexOf(' ', 8)), lines[i].substring(lines[i].indexOf(' ', 8)+1)));
 					} catch (StringIndexOutOfBoundsException e) {
-						e.printStackTrace();
 						error(currentPart.name, i+1, "Invalid macro declaration!");
 						return;
 					}
 				}
+				currentPart.content += lines[i] + "\n";
 			}
 			parts.set(h, currentPart);
 			
@@ -379,7 +376,7 @@ public class BIDE {
 		byte[] padding = {0,0,0,0,0,0,0,0};
 		for (int i = 0; i < parts.size(); i++) {
 			
-			CasioString name = new CasioString(asciiToCasio(parts.get(i).name, true, parts.get(i).name+".name", 1));
+			CasioString name = new CasioString(asciiToCasio(parts.get(i).name, true, parts.get(i).name+".name", 1, macros));
 			if (name.length() > 8) {
 				error("Program \""+parts.get(i).name+"\" has a name too long (8 characters max)!");
 				return;
@@ -409,7 +406,7 @@ public class BIDE {
 			CasioString part = new CasioString("");
 			
 			if (parts.get(i).type == BIDE.TYPE_PROG) {
-				CasioString password = new CasioString(asciiToCasio(parts.get(i).option, true, parts.get(i).name+".password", 2));
+				CasioString password = new CasioString(asciiToCasio(parts.get(i).option, true, parts.get(i).name+".password", 2, macros));
 				if (password.length() > 8) {
 					error("Program \""+parts.get(i).name+"\" has a password too long (8 characters max)!");
 					return;
@@ -417,7 +414,7 @@ public class BIDE {
 				password.add(Arrays.copyOfRange(padding, 0, 8-password.length()));
 				part.add(password);
 				part.add(new byte[]{0,0});
-				part.add(asciiToCasio(parts.get(i).content, false, parts.get(i).name, 3));
+				part.add(asciiToCasio(parts.get(i).content, false, parts.get(i).name, 1, macros));
 				part.add(Arrays.copyOfRange(padding, 0, 4-part.length()%4));
 			} else if (parts.get(i).type == BIDE.TYPE_PICT){
 				part.add(asciiToPict(parts.get(i).content, parts.get(i).name, 3, parts.get(i).option));
@@ -495,7 +492,7 @@ public class BIDE {
 		
 	}
 	
-	public static CasioString asciiToCasio(String content, boolean allowUnknownOpcodes, String progName, int startLine) {
+	public static CasioString asciiToCasio(String content, boolean allowUnknownOpcodes, String progName, int startLine, ArrayList<Macro> macros) {
 		CasioString result = new CasioString();
 		
 		//Optimise for less wasted space
@@ -506,7 +503,9 @@ public class BIDE {
 		String[] lines = content.split("\\n|\\r|\\r\\n");
 				
 		for (int h = 0; h < lines.length; h++) {
-
+			if (lines[h].startsWith("#")) {
+				continue;
+			}
 			boolean currentPosIsString = false;
 			boolean escapeNextChar = false;
 			boolean currentPosIsComment = false;
@@ -544,6 +543,8 @@ public class BIDE {
 					continue;
 				}
 				
+				
+				
 				for (int j = 0; j < opcodes.size(); j++) {
 					
 					//If string, skip opcodes that are not entities/characters in order to avoid FA-124ing
@@ -572,7 +573,25 @@ public class BIDE {
 				}
 				
 				if (!foundMatch) {
-					if ((!allowUnknownOpcodes && !currentPosIsString && !currentPosIsComment) || lines[h].charAt(i) == '&') {
+					
+					//Test for macros
+					if (!allowUnknownOpcodes && !currentPosIsString && !currentPosIsComment) {
+						boolean foundMacro = false;
+						for (int j = 0; j < macros.size(); j++) {
+							if (lines[h].startsWith(macros.get(j).text, i)) {
+								lines[h] = lines[h].substring(0, i) + macros.get(j).replacement + lines[h].substring(i+macros.get(j).text.length());
+								foundMacro = true;
+								System.out.println(lines[h]);
+								break;
+							}
+						}
+						if (foundMacro) {
+							i--;
+							continue;
+						}
+					}
+				
+					if (!foundMatch && (!allowUnknownOpcodes && !currentPosIsString && !currentPosIsComment) || lines[h].charAt(i) == '&') {
 						if (lines[h].charAt(i) != ' ') {
 							if (progName.endsWith("password")) {
 								i += 11;
