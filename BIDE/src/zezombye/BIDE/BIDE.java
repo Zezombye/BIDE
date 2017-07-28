@@ -33,9 +33,9 @@ public class BIDE {
 	public final static int TYPE_PICT = 3;
 	public final static int TYPE_CAPT = 4;
 	public final static int TYPE_OPCODE = 5;
-	public final static int TYPE_OPTIONS = 6;
+	public final static int TYPE_COLORATION = 6;
 	public final static int TYPE_CHARLIST = 7;
-	public final static boolean debug = true;
+	public static boolean debug = false;
 	//public static Font progFont = new Font("DejaVu Sans Mono", Font.PLAIN, 12);
 	public static Font progFont, pictFont, dispFont;
 	//public static Font dispFont = new Font("DejaVu Sans Mono", Font.PLAIN, 13);
@@ -53,6 +53,13 @@ public class BIDE {
 	public static AutoImport autoImport;
 	
 	public static void main(String[] args) {
+		
+		if (args.length > 0 && args[0].equals("debug")) {
+			debug = true;
+			System.out.println("Debug activated");
+			args = new String[0];
+		}
+		
 		options.loadProperties();
 		
 		//progFont = progFont.deriveFont(30);
@@ -119,7 +126,7 @@ public class BIDE {
 			pictFont = new Font("DejaVu Avec Casio", Font.TRUETYPE_FONT, Integer.parseInt(options.getProperty("pictFontSize")));
 			ui.createAndDisplayUI();
 			//ui.jtp.addTab("test", new Program("test1", "", "testcontent", TYPE_PICT).comp);
-			ui.createNewTab(TYPE_CHARLIST);
+			//ui.createNewTab(TYPE_COLORATION);
 			//((ProgScrollPane)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
 			//new AutoImport().autoImport("C:\\Users\\Catherine\\Desktop\\PUISS4.g1m");
 			System.out.println("Finished initialization");
@@ -219,54 +226,7 @@ public class BIDE {
 					//Captures have a width and height attribute, skip it
 					content = g1mparser.getPartContent(g1mparser.parts.get(h)).substring(4, 0x404);
 				}
-				//Convert from binary to bitmap
-				String binary = "";
-				for (int i = 0; i < content.length(); i++) {
-					int mask = 0b10000000;
-					for (int j = 0; j < 8; j++) {
-						binary += ((content.charAt(i)&mask) != 0 ? "1" : "0");
-						mask >>= 1;
-					}
-				}
-				String asciiResult = "";
-				for (int g = 0; g < (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PICT ? 2 : 1); g++) {
-					if (g == 1) {
-						asciiResult += pictWarning;
-					}
-					for (int i = 0; i < 130; i++) {
-						asciiResult += "▄";
-					}
-					asciiResult += "\n";
-					for (int i = 0; i < 32; i++) {
-						asciiResult += "█";
-						for (int j = 0; j < 128; j++) {
-							char pixel, pixel2;
-							try {
-								pixel = binary.charAt(i*2*128 + j%128 + g*0x400*8);
-							} catch (IndexOutOfBoundsException e) {
-								pixel = '0';
-							}
-							try {
-								pixel2 = binary.charAt((i*2+1)*128 + j%128 + g*0x400*8);
-							} catch (IndexOutOfBoundsException e) {
-								pixel2 = '0';
-							}
-							if (pixel == '0' && pixel2 == '0') {
-								asciiResult += " ";
-							} else if (pixel == '0' && pixel2 == '1') {
-								asciiResult += "▄";
-							} else if (pixel == '1' && pixel2 == '0') {
-								asciiResult += "▀";
-							} else if (pixel == '1' && pixel2 == '1') {
-								asciiResult += "█";
-							}
-						}
-						asciiResult += "█\n";
-					}
-					for (int i = 0; i < 130; i++) {
-						asciiResult += "▀";
-					}
-				}
+				String asciiResult = pictToAscii(content, g1mparser.getPartType(g1mparser.parts.get(h)));
 				
 				if (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PICT) {
 					progs.add(new Program(name, Integer.toHexString(content.length()), asciiResult, TYPE_PICT));
@@ -319,7 +279,7 @@ public class BIDE {
 		ArrayList<Macro> macros = new ArrayList<Macro>();
 		for (int h = 0; h < parts.size(); h++) {
 			int type = parts.get(h).type;
-			if (type == TYPE_OPCODE || type == TYPE_OPTIONS) {
+			if (type == TYPE_OPCODE || type == TYPE_COLORATION) {
 				continue;
 			}
 			
@@ -438,6 +398,62 @@ public class BIDE {
 		}
 		IO.writeStrToFile(new File(destPath), result, true);
 		System.out.println("Done!");
+	}
+	
+	public static String pictToAscii(CasioString content, int type) {
+		//Convert from binary to string
+		String binary = "";
+		for (int i = 0; i < content.length(); i++) {
+			int mask = 0b10000000;
+			for (int j = 0; j < 8; j++) {
+				binary += ((content.charAt(i)&mask) != 0 ? "1" : "0");
+				mask >>= 1;
+			}
+		}
+		return pictToAscii(binary, type);
+	}
+	
+	public static String pictToAscii(String content, int type) {
+		String asciiResult = "";
+		for (int g = 0; g < (type == TYPE_PICT ? 2 : 1); g++) {
+			if (g == 1) {
+				asciiResult += pictWarning;
+			}
+			for (int i = 0; i < 130; i++) {
+				asciiResult += "▄";
+			}
+			asciiResult += "\n";
+			for (int i = 0; i < 32; i++) {
+				asciiResult += "█";
+				for (int j = 0; j < 128; j++) {
+					char pixel, pixel2;
+					try {
+						pixel = content.charAt(i*2*128 + j%128 + g*0x400*8);
+					} catch (IndexOutOfBoundsException e) {
+						pixel = '0';
+					}
+					try {
+						pixel2 = content.charAt((i*2+1)*128 + j%128 + g*0x400*8);
+					} catch (IndexOutOfBoundsException e) {
+						pixel2 = '0';
+					}
+					if (pixel == '0' && pixel2 == '0') {
+						asciiResult += " ";
+					} else if (pixel == '0' && pixel2 == '1') {
+						asciiResult += "▄";
+					} else if (pixel == '1' && pixel2 == '0') {
+						asciiResult += "▀";
+					} else if (pixel == '1' && pixel2 == '1') {
+						asciiResult += "█";
+					}
+				}
+				asciiResult += "█\n";
+			}
+			for (int i = 0; i < 130; i++) {
+				asciiResult += "▀";
+			}
+		}
+		return asciiResult;
 	}
 	
 	public static CasioString asciiToPict(String content, String progName, int startLine, String pictSize) {

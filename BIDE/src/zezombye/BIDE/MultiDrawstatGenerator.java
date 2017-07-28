@@ -12,14 +12,15 @@ import javax.swing.*;
 public class MultiDrawstatGenerator extends JFrame {
 	
 	public MultiDrawstatGenerator() {
-		JFrame multiDrawstat = new JFrame("drawstat");
+		JFrame multiDrawstat = new JFrame("Multi Drawstat Generator");
 		multiDrawstat.setSize(128*6+20, 500);
 		multiDrawstat.setLocationRelativeTo(null);
-		multiDrawstat.setAlwaysOnTop(true);
+		//multiDrawstat.setAlwaysOnTop(true);
 		multiDrawstat.setResizable(false);
 		multiDrawstat.setLayout(new FlowLayout());
 		DrawstatPanel dp = new DrawstatPanel();
 		JButton reset = new JButton("Reset all");
+		multiDrawstat.add(new JLabel("Warning: you HAVE to use ViewWindow 1,127,0,63,1,0,0,1,1!"));
 		reset.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
 				dp.clearScreen();
@@ -36,6 +37,7 @@ public class MultiDrawstatGenerator extends JFrame {
 				}
 			}
    		});
+		multiDrawstat.add(undo);
 		multiDrawstat.add(dp, BorderLayout.CENTER);
 		multiDrawstat.add(dp.result, BorderLayout.SOUTH);
 		multiDrawstat.setVisible(true);
@@ -63,9 +65,6 @@ class DrawstatPanel extends JPanel {
 		this.setSize(size);
 		this.setBackground(new Color(0xFFFFFF));
 		clearScreen();
-		//lines.add(new Line(0, 0, 1, 2));
-		lines.add(new Line(127, 63, 126, 61));
-		result.setText("test");
 		result.setEditable(false);
 		result.setPreferredSize(new Dimension(128*zoom, 30));
 		result.addMouseListener(new MouseListener() {

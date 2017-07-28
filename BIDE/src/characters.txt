@@ -20,6 +20,7 @@ abcdefghijklmnopqrstuvwxyz
 000B - 
 000C - ◢
 000E - ->
+000F - 
 0010 - <=
 0011 - !=
 0012 - >=

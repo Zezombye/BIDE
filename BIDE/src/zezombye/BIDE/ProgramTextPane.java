@@ -25,8 +25,11 @@ import org.fife.ui.autocomplete.DefaultCompletionProvider;
 import org.fife.ui.autocomplete.ShorthandCompletion;
 import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.Style;
+import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 import org.fife.ui.rsyntaxtextarea.Token;
 import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
+import org.fife.ui.rsyntaxtextarea.TokenTypes;
 import org.fife.ui.rtextarea.CaretStyle;
 import org.fife.ui.rtextarea.ConfigurableCaret;
 import org.fife.ui.rtextarea.RTextArea;
@@ -54,10 +57,37 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		this.setForeground(new Color(Integer.parseInt(BIDE.options.getProperty("textColor"), 16)));
 		this.setCurrentLineHighlightColor(new Color(Integer.parseInt(BIDE.options.getProperty("hlColor"), 16)));
 		//this.getDocument().setParagraphAttributes(0, this.getDocument().getLength(), 1, true);
-		AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory)TokenMakerFactory.getDefaultInstance();
+		/*AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory)TokenMakerFactory.getDefaultInstance();
 		atmf.putMapping("test/BasicCasio", "zezombye.BIDE.SyntaxColoration");
-		this.setSyntaxEditingStyle("text/BasicCasio");
-		//this.setSyntaxEditingStyle(SYNTAX_STYLE_JAVA);
+		this.setSyntaxEditingStyle("text/BasicCasio");*/
+		this.setSyntaxEditingStyle(SYNTAX_STYLE_JAVA);
+		
+		//Set colors
+		SyntaxScheme ss = (SyntaxScheme)this.getSyntaxScheme().clone();
+
+		final Color keywordColor = new Color(0,0,255); //blue
+		final Color operatorColor = new Color(0, 128, 255); //light blue
+		final Color variableColor = new Color(128, 0, 255); //purple
+		final Color borderColor = Color.GRAY;
+		final Color strColor = new Color(128, 128, 128); //gray
+		final Color entityColor = new Color(255, 128, 0); //orange
+		final Color commentColor = new Color(0, 128, 0); //dark green
+		final Color preprocessorColor = new Color(128, 64, 0);
+		
+		ss.setStyle(Token.RESERVED_WORD, new Style(keywordColor, this.getFont()));
+		ss.setStyle(Token.RESERVED_WORD_2, new Style(operatorColor));
+		ss.setStyle(Token.OPERATOR, new Style(operatorColor));
+		ss.setStyle(Token.VARIABLE, new Style(variableColor));
+		ss.setStyle(Token.LITERAL_STRING_DOUBLE_QUOTE, new Style(strColor));
+		ss.setStyle(Token.ERROR_STRING_DOUBLE, new Style(strColor));
+		ss.setStyle(Token.COMMENT_EOL, new Style(commentColor, this.getFont().deriveFont(Font.ITALIC)));
+		ss.setStyle(Token.MARKUP_ENTITY_REFERENCE, new Style(entityColor));
+		ss.setStyle(Token.PREPROCESSOR, new Style(preprocessorColor));
+		ss.setStyle(Token.FUNCTION, new Style(new Color(Integer.parseInt(BIDE.options.getProperty("textColor"), 16))));
+		
+		
+		
+		this.setSyntaxScheme(ss);
 		
 		if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
 			//this.setCaretStyle(RSyntaxTextArea.OVERWRITE_MODE, CaretStyle.BLOCK_STYLE);
@@ -102,7 +132,7 @@ public class ProgramTextPane extends RSyntaxTextArea {
 
 	    DefaultCompletionProvider provider = new DefaultCompletionProvider() {
 	    	@Override protected boolean isValidChar(char ch) {
-	    		return Character.isLetterOrDigit(ch) || ch=='_' || ch=='&';
+	    		return Character.isLetterOrDigit(ch) || ch=='_' || ch=='&' || ch=='-' || ch=='+';
 	    	}
 	    };
 	    for (int i = 0; i < BIDE.opcodes.size(); i++) {

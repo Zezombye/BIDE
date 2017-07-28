@@ -95,7 +95,7 @@ public class AutoImport {
     		return;
     	}
     	inputKey(KeyEvent.VK_F3, emuSleep);
-    	end = System.currentTimeMillis()+3000;
+    	end = System.currentTimeMillis()+5000;
     	while (!enumWindows().contains("Ouvrir")) {
     		 if (System.currentTimeMillis() < end) {
     			 BIDE.error("Couldn't open file system");

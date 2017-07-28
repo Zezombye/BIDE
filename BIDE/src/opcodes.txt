@@ -32,7 +32,8 @@ B exa t
 C ◢ f
 C disp t
 E -> f
-F x10^ t
+F  f
+F *10^ t
 10 <= f
 11 != f
 12 >= f

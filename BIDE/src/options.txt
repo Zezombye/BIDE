@@ -17,7 +17,7 @@ progFontName=DejaVu Avec Casio
 progFontSize=14
 
 #Picture font size, if you have a small screen it can help seeing the whole picture.
-pictFontSize=13
+pictFontSize=12
 
 #Background color
 bgColor=FFFFFF

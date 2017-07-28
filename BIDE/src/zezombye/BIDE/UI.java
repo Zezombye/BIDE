@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,7 +45,7 @@ public class UI {
 	
 	JFrame window = new JFrame();
 	JPanel sidebar = new JPanel();
-	JTabbedPane jtp = new JTabbedPane();
+	JTabbedPane jtp;
 	JFileChooser jfc;
 	
 	public void createAndDisplayUI() {
@@ -54,7 +55,14 @@ public class UI {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		//jtp = new JTabbedPane();
+		jtp = new JTabbedPane() {
+			@Override public void addTab(String name, Component comp) {
+				super.addTab(name, comp);
+				this.setTabComponentAt(jtp.getTabCount()-1, new ButtonTabComponent(jtp));
+				//this.getTabComponentAt(jtp.getTabCount()-1).setFont(BIDE.progFont); //doesn't work
+			}
+		};
+		//jtp.setFont(BIDE.progFont);
 		jfc = new JFileChooser();
 		
 		window = new JFrame();
@@ -103,9 +111,7 @@ public class UI {
 					if (extension.equals(".bide") || extension.matches("\\.g[123][mr]")) {
 						return true;
 					}
-				} catch (Exception e) {
-					
-				}
+				} catch (Exception e) {}
 				return false;
 			}
 
@@ -188,6 +194,9 @@ public class UI {
 		JMenuItem saveg1m = new JMenuItem("Save to g1m");
 		saveg1m.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent e) {
+				try {
+					BIDE.pathToSavedG1M = BIDE.pathToSavedG1M.substring(0, BIDE.pathToSavedG1M.lastIndexOf("."))+".g1m";
+				} catch (Exception e1) {}
 				saveFile();
 			}
 		});
@@ -195,6 +204,9 @@ public class UI {
 		JMenuItem saveTxt = new JMenuItem("Save to .bide file");
 		saveTxt.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent e) {
+				try {
+					BIDE.pathToSavedG1M = BIDE.pathToSavedG1M.substring(0, BIDE.pathToSavedG1M.lastIndexOf("."))+".bide";
+				} catch (Exception e1) {}
 				saveFile();
 			}
 		});
@@ -208,6 +220,24 @@ public class UI {
 			}
 		});
 		toolsMenu.add(multiDrawstat);
+		JMenuItem imgToPict = new JMenuItem("Convert image to picture");
+		imgToPict.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				importPict();
+			}
+		});
+		toolsMenu.add(imgToPict);
+		JMenuItem showOptions = new JMenuItem("Show/Edit options");
+		showOptions.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				try {
+					Desktop.getDesktop().open(new File(BIDE.pathToOptions));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		toolsMenu.add(showOptions);
 		JMenuItem showOpcodes = new JMenuItem("Show list of opcodes");
 		showOpcodes.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
@@ -215,13 +245,6 @@ public class UI {
 			}
 		});
 		toolsMenu.add(showOpcodes);
-		JMenuItem showOptions = new JMenuItem("Show options");
-		showOptions.addActionListener(new ActionListener() {
-			@Override public void actionPerformed(ActionEvent arg0) {
-				createNewTab(BIDE.TYPE_OPTIONS);
-			}
-		});
-		toolsMenu.add(showOptions);
 		JMenuItem showChars = new JMenuItem("Show characters list");
 		showChars.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
@@ -229,6 +252,13 @@ public class UI {
 			}
 		});
 		toolsMenu.add(showChars);
+		JMenuItem showColoration = new JMenuItem("Show syntax coloration test");
+		showColoration.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				createNewTab(BIDE.TYPE_COLORATION);
+			}
+		});
+		toolsMenu.add(showColoration);
 		JMenuItem takeEmuScreenshot = new JMenuItem("Take emulator screenshot");
 		takeEmuScreenshot.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
@@ -342,11 +372,10 @@ public class UI {
 				e.printStackTrace();
 			}
 		
-		} else if (type == BIDE.TYPE_OPTIONS) {
-			name = "Options";
-			content = "\nTo edit options, go to "+BIDE.pathToOptions+"!\n\n";
+		} else if (type == BIDE.TYPE_COLORATION) {
+			name = "Syntax coloration test";
 			try {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(System.getProperty("user.home")+"/BIDE/options.txt"))));
+				BufferedReader reader = new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/testColoration.txt"), "UTF-8"));
 				String line = null;
 			    StringBuilder stringBuilder = new StringBuilder();
 
@@ -366,7 +395,7 @@ public class UI {
 						e.printStackTrace();
 					}
 			    }
-			} catch (FileNotFoundException e1) {
+			} catch (UnsupportedEncodingException e1) {
 				e1.printStackTrace();
 			}
 		
@@ -377,7 +406,7 @@ public class UI {
 			return;
 		}
 		jtp.addTab(name, new Program(name, option, content, type).comp);
-		jtp.setTabComponentAt(jtp.getTabCount()-1, new ButtonTabComponent(jtp));
+		//jtp.setTabComponentAt(jtp.getTabCount()-1, new ButtonTabComponent(jtp));
 		//((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(jtp.getTabCount()-1)).textPane.getDocument()).getDocumentFilter()).testForLag();
 		jtp.setSelectedIndex(jtp.getTabCount()-1);
 	    try {
@@ -411,7 +440,7 @@ public class UI {
 				    	jtp.removeAll();
 			    		for (int i = 0; i < progs.size(); i++) {
 			    			jtp.addTab(progs.get(i).name, progs.get(i).comp);
-			    			jtp.setTabComponentAt(i, new ButtonTabComponent(jtp));
+			    			//jtp.setTabComponentAt(i, new ButtonTabComponent(jtp));
 			    			try {
 								Thread.sleep(50);
 							} catch (InterruptedException e) {
@@ -476,6 +505,62 @@ public class UI {
 				}
 	    	}
 		}).start();
+	}
+	
+	public void importPict() {
+		JFileChooser jfc = new JFileChooser();
+		jfc.setFileFilter(new FileFilter() {
+			@Override
+			public boolean accept(File file) {
+				if (file.isDirectory()) {
+					return true;
+				}
+				try {
+					String extension = file.getPath().substring(file.getPath().lastIndexOf('.')).toLowerCase();
+					if (extension.equals(".png") || extension.equals(".bmp")) {
+						return true;
+					}
+				} catch (Exception e) {}
+				return false;
+			}
+
+			@Override
+			public String getDescription() {
+				return "Image files (.png, .bmp)";
+			}
+		});
+		
+		File input = null; 
+		if (jfc.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
+			input = jfc.getSelectedFile();
+		}
+				
+	    if (input != null) {
+	    	try {
+				BufferedImage img = ImageIO.read(input);
+				if (img.getHeight() != 64 || img.getWidth() != 128) {
+					BIDE.error("Image must be 128*64!");
+					return;
+				}
+				String binary = "";
+				for (int j = 0; j < 64; j++) {
+					for (int i = 0; i < 128; i++) {
+						if (img.getRGB(i, j) == Color.WHITE.getRGB()) {
+							binary += "0";
+						} else {
+							binary += "1";
+							//System.out.println(img.getRGB(i, j));
+						}
+					}
+				}
+				//System.out.println(binary);
+				String ascii = BIDE.pictToAscii(binary, BIDE.TYPE_PICT);
+				String imgName = input.getName().substring(0, input.getName().lastIndexOf('.'));
+				this.jtp.addTab(imgName, new Program(imgName, "800", ascii, BIDE.TYPE_PICT).comp);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	    }
 	}
 		
 }

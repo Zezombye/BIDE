@@ -1,0 +1,47 @@
+#This is a syntax coloration test.
+#These lines should appear in preprocessor color, even with "strings", &entities; and 'comments.
+
+'This is a comment. It should appear in comment color, even with "strings", &entities; and #preprocessor.
+
+'These keywords should be colored the same.
+If Then Else IfEnd For To Step Next Do LpWhile While WhileEnd Return Stop Break Goto Lbl
+=> :
+&disp; ◢
+
+'These operators should be colored the same.
+~ + - * / ^ < > = != ?
+And Or Xor Not
+Optional: [] {} () ,
+
+&neg; &*10^; &_10; &sqrt; &cbrt; &nth_root;
+﹣  √
+
+'Variables
+List 14
+Mat A
+Str 20
+Ans &r; &theta; &pi; &i;  θ π 
+a0 a1 a2 anStart b0 b1 b2 bnStart c0 c1 c2 cnStart
+(optional, careful for opcodes like F-line) A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+
+"String with an &entity; inside that should be colored. Also, no 'comments or #preprocessor. Watch for \\\"backslashes.\\" This should not be colored.
+"This string should be colored, even though there is no closing quote.
+
+Careful: 'Comments can begin anywhere on the line,
+however #preprocessor cannot! This line should not be colored.
+
+The border should be colored:
+▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+█       ▄▄▄▄▄       ▄▄▄▄   ▄▄▄▄  ▄▄▄▄▄   ▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄▄   █
+█      █▀   ██▄    █▀   ██▀   ▀██▀   ██ ▄▀   ▀██▀          ██▀          ▀██          ▀██▀         ▀██▀      ▄   ▀██          ▀█  █
+█     ▄██▄  ▀███▄█▀▀▄   ██    ▄██    ▀▀███▄▄  ██    ▄▄▄▄▄▄███     ▄▄▄▄▄▄███    ▄▄     ██   ██  ██  ██▄    ▄▄██▄▄▄██▄▄█▄   ▀█▄██  █
+█     █      ████   ▄  ██▀    ██       █▀    ██▄    █████████   ▀▄█████████▀   ▀█    ▄██    ▄██▄    ██    ▀████████████    ▀█▀   █
+█    ▄▀▄              ▀██     ██     ▄       ██        ▀   ██     █████████         ▀▀███   █▀▀█    ██            █████▄    █▄   █
+█    █    ▄█   ▄█▄    ▄█▀    ██▀ ▄  ██▄      ██     ▄███▄▄▄██     █████████     █▄     ██           ▀██     ███▄▄▄██████     █   █
+█   █  ▄▄███  ▄██     ██     ██   ▀▀████▀▀▀▄ ██     ▀▀▀▀▀▀▀██           ▀██    ███     ██     ██    ▄██     █████ ▀█████▄    █▄  █
+█  █▀    ████████    ██▀    ▄██     ███▀   ▀███  █         ██   ▄    ▄   ██▄    ██     ██     ██     ██▄    ███▀   ██████     █  █
+█  ▀█████████████████████████████████████████████████████████████████████████████████████████████▄██▄████████       ███████████  █
+█    ▀████████  ▀▀█████████████████████▀█████████████████████████████████ █████████████████████████████████▀        ▀████████▀   █
+█      ▀█████▀     ▀█████▀▀████▀▀█████▀ ▀█████▀▀███████████▀ ████████████ █████▀▀██████▀█████▀ ████▀██████▀          █████▀▀     █
+█                                                                                                                                █
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀

@@ -47,7 +47,7 @@ public class SyntaxColoration extends AbstractTokenMaker {
 	
 	//Operators are colored before the keywords because they have no restrictions
 	public String[] operators = {
-		"~",
+		"~", "?",
 		"+", "-", "*", "/", "^",
 		//"[", "]",
 		//"{", "}",
