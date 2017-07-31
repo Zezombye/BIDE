@@ -36,7 +36,7 @@ public class Options {
 	
 	public String getProperty(String prop) {
 		if (options.getProperty(prop) == null) {
-			//BIDE.error("Could not find property "+prop);
+			BIDE.error("Could not find property "+prop);
 		}
 		return options.getProperty(prop);
 	}
@@ -46,8 +46,11 @@ public class Options {
 	}
 	
 	public void initProperties() {
-		IO.writeStrToFile(new File(BIDE.pathToOptions),
-				new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/options.txt"))).lines().collect(Collectors.joining("\n")), true);
-		loadProperties();
+		try {
+			IO.writeStrToFile(new File(BIDE.pathToOptions), new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/options.txt"))).lines().collect(Collectors.joining("\n")), true);
+			loadProperties();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

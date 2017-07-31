@@ -28,6 +28,17 @@ textColor=000000
 #Selected line color
 hlColor=EEEEEE
 
+#Syntax coloration
+keywordColor=0000FF
+operatorColor=0080FF
+variableColor=8000FF
+#Border coloration doesn't work
+#borderColor=808080
+strColor=808080
+entityColor=FF8000
+commentColor=008000
+preprocessorColor=804000
+
 #Whether to put spaces on operators when importing a g1m
 #Note that unary operators don't have spaces, so "3*-5" -> "3 * -5"
 #^
@@ -72,5 +83,6 @@ screenX=49
 screenY=189
 
 #If you set the emulator screen size to something other than 2, modify these dimensions
+#Note that you must also replace the reference images in the .jar.
 screenWidth=256
 screenHeight=128

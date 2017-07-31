@@ -95,7 +95,7 @@ public class AutoImport {
     		return;
     	}
     	inputKey(KeyEvent.VK_F3, emuSleep);
-    	end = System.currentTimeMillis()+5000;
+    	end = System.currentTimeMillis()+10000;
     	while (!enumWindows().contains("Ouvrir")) {
     		 if (System.currentTimeMillis() < end) {
     			 BIDE.error("Couldn't open file system");
@@ -103,7 +103,7 @@ public class AutoImport {
     		 }
     	}
     	try {
-			Thread.sleep(20);
+			Thread.sleep(50);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -111,7 +111,7 @@ public class AutoImport {
     	inputKey(KeyEvent.VK_ENTER, 0);
     	
     	//Wait for confirmation screen (copy to main mem/storage mem)
-    	end = System.currentTimeMillis()+5000;
+    	end = System.currentTimeMillis()+2000;
     	while (!testImgEquality(getEmuScreen(), confirmation) && System.currentTimeMillis() < end) {}
     	if (enumWindows().contains("Ouvrir")) {
     		BIDE.error("Aborting, unknown error");
@@ -295,7 +295,7 @@ public class AutoImport {
 	                
 	                return true;
 	            }*/
-	            if (wText.startsWith("fx-9860")) {
+	            if (wText.contains("Manager PLUS")) {
 	            	emulatorHWND = hWnd;
 	            }
 	            return true;

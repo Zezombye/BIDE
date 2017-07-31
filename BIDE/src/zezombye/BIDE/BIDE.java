@@ -69,6 +69,7 @@ public class BIDE {
 		
 		//options.initProperties();
 		getOpcodes();
+		
 		System.out.println(Arrays.toString(args));
 		if (args.length > 0) {
 			//CLI
@@ -108,6 +109,7 @@ public class BIDE {
 			}
 			
 		} else {
+			ProgramTextPane.initAutoComplete();
 			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 			try {
 				ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, BIDE.class.getClass().getResourceAsStream("/Casio Graph.ttf")));
@@ -331,7 +333,9 @@ public class BIDE {
 			error("No programs detected!");
 			return;
 		}
-		System.out.println(macros.toString());
+		if (BIDE.debug) {
+			System.out.println(macros.toString());
+		}
 		//Add each part (program) of the ascii file
 		byte[] padding = {0,0,0,0,0,0,0,0};
 		for (int i = 0; i < parts.size(); i++) {
@@ -396,7 +400,11 @@ public class BIDE {
 		for (int h = 0; h < ui.jtp.getTabCount(); h++) {
 			result += ((ProgScrollPane)ui.jtp.getComponentAt(h)).textPane.getText() + "\n#End of part\n";
 		}
-		IO.writeStrToFile(new File(destPath), result, true);
+		try {
+			IO.writeStrToFile(new File(destPath), result, true);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		System.out.println("Done!");
 	}
 	
@@ -463,7 +471,7 @@ public class BIDE {
 		String binary = "";
 		ArrayList<Byte> bytes = new ArrayList<Byte>();
 		for (int i = 0; i < lines.length; i++) {
-			if (lines[i].isEmpty() || lines[i].startsWith("'") || lines[i].startsWith("▀") || lines[i].startsWith("▄")) {
+			if (lines[i].isEmpty() || lines[i].startsWith("'") || lines[i].startsWith("#") || lines[i].startsWith("▀") || lines[i].startsWith("▄")) {
 				continue;
 			}
 			if (lines[i].length() != 130) {

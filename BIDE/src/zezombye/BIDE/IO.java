@@ -45,17 +45,14 @@ public class IO {
 	}
 	
 	//Only use this for non-casio strings (ascii text)!
-	public static void writeStrToFile(File file, String content, boolean deleteFile) {
-		try {
-			if (deleteFile) {
-				file.delete();
-			}
-			Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
-			writer.write(content);
-			writer.close();
-		} catch (IOException e2) {
-			e2.printStackTrace();
+	public static void writeStrToFile(File file, String content, boolean deleteFile) throws IOException {
+		if (deleteFile) {
+			file.delete();
 		}
+		file.getParentFile().mkdir();
+		Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+		writer.write(content);
+		writer.close();
 	}
 	
 	/*public static CasioString readFromRelativeFile(String fileName) {

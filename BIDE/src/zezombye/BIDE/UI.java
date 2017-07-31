@@ -66,7 +66,7 @@ public class UI {
 		jfc = new JFileChooser();
 		
 		window = new JFrame();
-		window.setTitle("BIDE v3.0 by Zezombye");
+		window.setTitle("BIDE v3.1 by Zezombye");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setSize(800, 600);
 		window.setLocationRelativeTo(null);
@@ -442,7 +442,7 @@ public class UI {
 			    			jtp.addTab(progs.get(i).name, progs.get(i).comp);
 			    			//jtp.setTabComponentAt(i, new ButtonTabComponent(jtp));
 			    			try {
-								Thread.sleep(50);
+								Thread.sleep(100);
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}

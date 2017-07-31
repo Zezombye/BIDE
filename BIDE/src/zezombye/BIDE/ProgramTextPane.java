@@ -6,6 +6,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import javax.swing.plaf.TextUI;
 import javax.swing.text.AbstractDocument;
@@ -36,6 +39,7 @@ import org.fife.ui.rtextarea.RTextArea;
 
 public class ProgramTextPane extends RSyntaxTextArea {
 	
+	public static CompletionProvider cp;
 	
 	public ProgramTextPane(int type) {
 		super();
@@ -65,14 +69,14 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		//Set colors
 		SyntaxScheme ss = (SyntaxScheme)this.getSyntaxScheme().clone();
 
-		final Color keywordColor = new Color(0,0,255); //blue
-		final Color operatorColor = new Color(0, 128, 255); //light blue
-		final Color variableColor = new Color(128, 0, 255); //purple
-		final Color borderColor = Color.GRAY;
-		final Color strColor = new Color(128, 128, 128); //gray
-		final Color entityColor = new Color(255, 128, 0); //orange
-		final Color commentColor = new Color(0, 128, 0); //dark green
-		final Color preprocessorColor = new Color(128, 64, 0);
+		final Color keywordColor = new Color(Integer.parseInt(BIDE.options.getProperty("keywordColor"), 16));
+		final Color operatorColor = new Color(Integer.parseInt(BIDE.options.getProperty("operatorColor"), 16));
+		final Color variableColor = new Color(Integer.parseInt(BIDE.options.getProperty("variableColor"), 16));
+		//final Color borderColor = new Color(Integer.parseInt(BIDE.options.getProperty("borderColor"), 16));
+		final Color strColor = new Color(Integer.parseInt(BIDE.options.getProperty("strColor"), 16));
+		final Color entityColor = new Color(Integer.parseInt(BIDE.options.getProperty("entityColor"), 16));
+		final Color commentColor = new Color(Integer.parseInt(BIDE.options.getProperty("commentColor"), 16));
+		final Color preprocessorColor = new Color(Integer.parseInt(BIDE.options.getProperty("preprocessorColor"), 16));
 		
 		ss.setStyle(Token.RESERVED_WORD, new Style(keywordColor, this.getFont()));
 		ss.setStyle(Token.RESERVED_WORD_2, new Style(operatorColor));
@@ -84,6 +88,7 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		ss.setStyle(Token.MARKUP_ENTITY_REFERENCE, new Style(entityColor));
 		ss.setStyle(Token.PREPROCESSOR, new Style(preprocessorColor));
 		ss.setStyle(Token.FUNCTION, new Style(new Color(Integer.parseInt(BIDE.options.getProperty("textColor"), 16))));
+		//ss.setStyle(Token.DATA_TYPE, new Style(borderColor));
 		
 		
 		
@@ -120,7 +125,7 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		}
 		
 		if (BIDE.options.getProperty("autocomplete").equals("true")) {
-			AutoCompletion ac = new AutoCompletion(getAutoComplete());
+			AutoCompletion ac = new AutoCompletion(cp);
 			ac.setAutoActivationEnabled(true);
 			ac.setAutoCompleteSingleChoices(false);
 			ac.setAutoActivationDelay(0);
@@ -128,20 +133,43 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		}
 	}
 	
-	public CompletionProvider getAutoComplete() {
+	public static void initAutoComplete() {
 
 	    DefaultCompletionProvider provider = new DefaultCompletionProvider() {
 	    	@Override protected boolean isValidChar(char ch) {
-	    		return Character.isLetterOrDigit(ch) || ch=='_' || ch=='&' || ch=='-' || ch=='+';
+	    		//return (ch >= 'A' && ch <= 'z') || ch == '&';
+	    		return Character.isLetter(ch) || ch == '&' || ch == '^' || ch == '_';
 	    	}
 	    };
-	    for (int i = 0; i < BIDE.opcodes.size(); i++) {
-	    	if (BIDE.opcodes.get(i).text.length() > 1) {
-		    	provider.addCompletion(new BasicCompletion(provider, BIDE.opcodes.get(i).text));
+	    provider.setAutoActivationRules(false, "&ABCDEFGHIJKLMNOPQRSTUVWXYZ^_abcdefghijklmnopqrstuvwxyz");
+	    ArrayList<Opcode> opcodes2 = new ArrayList<Opcode>(BIDE.opcodes);
+	    Collections.sort(opcodes2, new Comparator<Opcode>() {
+			@Override
+			public int compare(Opcode o1, Opcode o2) {
+				return o1.hex.compareTo(o2.hex);
+			}
+		});
+	    
+	    //System.out.println(opcodes2.toString());
+	    
+	    for (int i = 0; i < opcodes2.size(); i++) {
+	    	if (opcodes2.get(i).text.length() > 1 && opcodes2.get(i).text.matches("([ -~])+")) {
+	    		//Check if there is another opcode with the same hex value, but with unicode text
+	    		//Note that the unicode opcode is always before the ascii one
+	    		if (BIDE.options.getProperty("allowUnicode").equals("true") && opcodes2.get(i-1).hex.equals(opcodes2.get(i).hex)) {
+			    	provider.addCompletion(new ShorthandCompletion(provider, opcodes2.get(i).text, opcodes2.get(i-1).text));
+			    	
+			    //If opcode starts with a space, remove it, ex " Step " -> "Step "
+	    		} else if (opcodes2.get(i).text.startsWith(" ")) {
+			    	provider.addCompletion(new BasicCompletion(provider, opcodes2.get(i).text.replaceAll("^ +", "")));
+	    		} else {
+			    	provider.addCompletion(new BasicCompletion(provider, opcodes2.get(i).text));
+	    		}
 	    	}
 	    }
+	    
 		provider.setAutoActivationRules(true, null);
-		return provider;
+		cp = provider;
 	}
 	
 	@Override

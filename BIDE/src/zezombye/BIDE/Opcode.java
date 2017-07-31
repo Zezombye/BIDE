@@ -8,4 +8,8 @@ public class Opcode {
 		this.hex = hex;
 		this.text = text;
 	}
+	
+	@Override public String toString() {
+		return this.hex + " " + this.text;
+	}
 }
