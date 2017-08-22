@@ -47,6 +47,8 @@ public class UI {
 	JPanel sidebar = new JPanel();
 	JTabbedPane jtp;
 	JFileChooser jfc;
+	JTextArea stdout = new JTextArea();
+	PrintStream printStream;
 	
 	public void createAndDisplayUI() {
 		
@@ -66,7 +68,7 @@ public class UI {
 		jfc = new JFileChooser();
 		
 		window = new JFrame();
-		window.setTitle("BIDE v3.1 by Zezombye");
+		window.setTitle("BIDE v"+BIDE.VERSION+" by Zezombye");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setSize(800, 600);
 		window.setLocationRelativeTo(null);
@@ -85,9 +87,8 @@ public class UI {
 		sidebar.setPreferredSize(new Dimension(sidebarWidth, window.getHeight()));
 		//sidebar.setSize(new Dimension(200, window.getHeight()));
 		window.add(sidebar, BorderLayout.EAST);
-		JTextArea stdout = new JTextArea();
 		stdout.setWrapStyleWord(true);
-		PrintStream printStream = new PrintStream(new CustomOutputStream(stdout));
+		printStream = new PrintStream(new CustomOutputStream(stdout));
 		System.setOut(printStream);
 		System.setErr(printStream);
 		stdout.setBackground(Color.ORANGE);
@@ -125,14 +126,14 @@ public class UI {
 		JMenuBar menuBar = new JMenuBar();
 		//menuBar.setMargin(new Insets(5, 10, 5, 10));
 		//menuBar.setFloatable(false);
-		ToolbarButton open = new ToolbarButton("openFile.png");
+		ToolbarButton open = new ToolbarButton("openFile.png", "Open file");
 		open.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				openFile();
 			}
 		});
-		ToolbarButton save = new ToolbarButton("saveFile.png");
+		ToolbarButton save = new ToolbarButton("saveFile.png", "Save file");
 		save.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -140,33 +141,33 @@ public class UI {
 			}
 		});
 		
-		ToolbarButton newProg = new ToolbarButton("newProg.png");
+		ToolbarButton newProg = new ToolbarButton("newProg.png", "New Basic Casio program");
 		newProg.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
 				createNewTab(BIDE.TYPE_PROG);
 			}
 		});
 		
-		ToolbarButton newPict = new ToolbarButton("newPict.png");
+		ToolbarButton newPict = new ToolbarButton("newPict.png", "New Picture");
 		newPict.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
 				createNewTab(BIDE.TYPE_PICT);
 			}
 		});
 		
-		ToolbarButton newCapt = new ToolbarButton("newCapt.png");
+		ToolbarButton newCapt = new ToolbarButton("newCapt.png", "New Capture");
 		newCapt.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
 				createNewTab(BIDE.TYPE_CAPT);
 			}
 		});
 		
-		ToolbarButton dispOpcodes = new ToolbarButton("opcodes.png");
+		/*ToolbarButton dispOpcodes = new ToolbarButton("opcodes.png", "Show opcodes");
 		dispOpcodes.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
 				createNewTab(BIDE.TYPE_OPCODE);
 			}
-		});
+		});*/
 		
 		menuBar.add(open);
 		menuBar.add(save);
@@ -266,6 +267,24 @@ public class UI {
 			}
 		});
 		toolsMenu.add(takeEmuScreenshot);
+		JMenuItem takeEmuScreenScreenshot = new JMenuItem("Take emulator screen screenshot");
+		takeEmuScreenScreenshot.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				BIDE.autoImport.storeEmuScreen();
+			}
+		});
+		toolsMenu.add(takeEmuScreenScreenshot);
+		JMenuItem benchmark = new JMenuItem("Run benchmark");
+		benchmark.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				new Thread(new Runnable() {
+					public void run() {
+						BIDE.autoImport.benchmark();
+					}
+				}).start();
+			}
+		});
+		toolsMenu.add(benchmark);
 		window.setJMenuBar(menuBar2);
 
 		window.setVisible(true);
@@ -473,6 +492,8 @@ public class UI {
     }
 	
 	public void saveFile() {
+		printStream.flush();
+		stdout.setText("");
 		if (BIDE.pathToSavedG1M.isEmpty()) {
 			BIDE.pathToSavedG1M = BIDE.pathToG1M;
 		}
@@ -566,7 +587,7 @@ public class UI {
 }
 
 class ToolbarButton extends JButton {
-	public ToolbarButton(String iconName) {
+	public ToolbarButton(String iconName, String toolTip) {
 		super();
 		try {
 			this.setIcon(new ImageIcon(ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/"+iconName))));
@@ -576,6 +597,7 @@ class ToolbarButton extends JButton {
 		this.setBorder(BorderFactory.createEmptyBorder(2, 5, 0, 0));
 		this.setContentAreaFilled(false);
 		this.setFocusPainted(false);
+		this.setToolTipText(toolTip);
 	}
 }
 

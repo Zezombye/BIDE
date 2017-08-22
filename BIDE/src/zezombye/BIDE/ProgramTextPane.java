@@ -23,9 +23,11 @@ import javax.swing.text.StyleConstants;
 
 import org.fife.ui.autocomplete.AutoCompletion;
 import org.fife.ui.autocomplete.BasicCompletion;
+import org.fife.ui.autocomplete.CompletionCellRenderer;
 import org.fife.ui.autocomplete.CompletionProvider;
 import org.fife.ui.autocomplete.DefaultCompletionProvider;
 import org.fife.ui.autocomplete.ShorthandCompletion;
+import org.fife.ui.autocomplete.ParameterizedCompletion;
 import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.Style;
@@ -141,7 +143,10 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	    		return Character.isLetter(ch) || ch == '&' || ch == '^' || ch == '_';
 	    	}
 	    };
-	    provider.setAutoActivationRules(false, "&ABCDEFGHIJKLMNOPQRSTUVWXYZ^_abcdefghijklmnopqrstuvwxyz");
+	    CompletionCellRenderer ccr = new CompletionCellRenderer();
+	    ccr.setFont(new Font("Courier New", Font.PLAIN, 12));
+	    provider.setListCellRenderer(ccr);
+	    provider.setAutoActivationRules(true, "&");
 	    ArrayList<Opcode> opcodes2 = new ArrayList<Opcode>(BIDE.opcodes);
 	    Collections.sort(opcodes2, new Comparator<Opcode>() {
 			@Override

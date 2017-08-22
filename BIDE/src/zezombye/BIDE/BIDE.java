@@ -23,11 +23,14 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 public class BIDE {
 	
 	public static List<Opcode> opcodes = new ArrayList<Opcode>();
+	public static List<Macro> macros = new ArrayList<Macro>();
 	
 	public static String pathToG1M = System.getProperty("user.home")+"/desktop/";
 	public static String pathToSavedG1M = "";
 	public static final String pathToOptions = System.getProperty("user.home")+"/BIDE/options.txt";
 	public static UI ui = new UI();
+	
+	public final static String VERSION = "3.2";
 	
 	public final static int TYPE_PROG = 0;
 	public final static int TYPE_PICT = 3;
@@ -55,7 +58,8 @@ public class BIDE {
 	public static void main(String[] args) {
 		
 		if (args.length > 0 && args[0].equals("debug")) {
-			debug = true;
+			//TODO: change that
+			debug = false;
 			System.out.println("Debug activated");
 			args = new String[0];
 		}
@@ -69,6 +73,7 @@ public class BIDE {
 		
 		//options.initProperties();
 		getOpcodes();
+		initMacros();
 		
 		System.out.println(Arrays.toString(args));
 		if (args.length > 0) {
@@ -271,14 +276,15 @@ public class BIDE {
 	
 	public static void writeToG1M(String destPath, List<Program> parts) throws IOException {
 		
-		
 		long time = System.currentTimeMillis();
 		System.out.println("Saving to \""+destPath+"\"...");
 		
 		G1MWrapper g1mwrapper = new G1MWrapper();
 		//Parse text file
 		Program currentPart = null;
-		ArrayList<Macro> macros = new ArrayList<Macro>();
+		macros.clear();
+		
+		//ArrayList<Macro> macros = new ArrayList<Macro>();
 		for (int h = 0; h < parts.size(); h++) {
 			int type = parts.get(h).type;
 			if (type == TYPE_OPCODE || type == TYPE_COLORATION) {
@@ -328,7 +334,12 @@ public class BIDE {
 			parts.set(h, currentPart);
 			
 		}
-		
+		Collections.sort(macros, new Comparator<Macro>() {
+			@Override
+			public int compare(Macro o1, Macro o2) {
+				return o2.text.compareTo(o1.text);
+			}
+		});
 		if (parts.size() == 0) {
 			error("No programs detected!");
 			return;
@@ -341,11 +352,14 @@ public class BIDE {
 		for (int i = 0; i < parts.size(); i++) {
 			
 			CasioString name = new CasioString(asciiToCasio(parts.get(i).name, true, parts.get(i).name+".name", 1, macros));
+
+			//System.out.println("Parsing \""+parts.get(i).name+"\"");
+			
 			if (name.length() > 8) {
 				error("Program \""+parts.get(i).name+"\" has a name too long (8 characters max)!");
 				return;
 			}
-			System.out.println("Parsing \""+parts.get(i).name+"\"");
+						
 			if (parts.get(i).type == BIDE.TYPE_CAPT && !parts.get(i).name.startsWith("CAPT")) {
 				error("Capture \""+parts.get(i).name+"\"'s name should start with \"CAPT\"!");
 				return;
@@ -516,7 +530,7 @@ public class BIDE {
 		
 	}
 	
-	public static CasioString asciiToCasio(String content, boolean allowUnknownOpcodes, String progName, int startLine, ArrayList<Macro> macros) {
+	public static CasioString asciiToCasio(String content, boolean allowUnknownOpcodes, String progName, int startLine, List<Macro> macros) {
 		CasioString result = new CasioString();
 		
 		//Optimise for less wasted space
@@ -527,7 +541,7 @@ public class BIDE {
 		String[] lines = content.split("\\n|\\r|\\r\\n");
 				
 		for (int h = 0; h < lines.length; h++) {
-			if (lines[h].startsWith("#")) {
+			if (lines[h].startsWith("#") || lines[h].trim().isEmpty() || lines[h].trim().startsWith("'")) {
 				continue;
 			}
 			boolean currentPosIsString = false;
@@ -567,6 +581,22 @@ public class BIDE {
 					continue;
 				}
 				
+				//Test for macros
+				if (!allowUnknownOpcodes && !currentPosIsString && !currentPosIsComment) {
+					boolean foundMacro = false;
+					for (int j = 0; j < macros.size(); j++) {
+						if (lines[h].startsWith(macros.get(j).text, i)) {
+							lines[h] = lines[h].substring(0, i) + macros.get(j).replacement + lines[h].substring(i+macros.get(j).text.length());
+							foundMacro = true;
+							//System.out.println(lines[h]);
+							break;
+						}
+					}
+					/*if (foundMacro) {
+						i--;
+						continue;
+					}*/
+				}
 				
 				
 				for (int j = 0; j < opcodes.size(); j++) {
@@ -597,25 +627,7 @@ public class BIDE {
 				}
 				
 				if (!foundMatch) {
-					
-					//Test for macros
-					if (!allowUnknownOpcodes && !currentPosIsString && !currentPosIsComment) {
-						boolean foundMacro = false;
-						for (int j = 0; j < macros.size(); j++) {
-							if (lines[h].startsWith(macros.get(j).text, i)) {
-								lines[h] = lines[h].substring(0, i) + macros.get(j).replacement + lines[h].substring(i+macros.get(j).text.length());
-								foundMacro = true;
-								System.out.println(lines[h]);
-								break;
-							}
-						}
-						if (foundMacro) {
-							i--;
-							continue;
-						}
-					}
-				
-					if (!foundMatch && (!allowUnknownOpcodes && !currentPosIsString && !currentPosIsComment) || lines[h].charAt(i) == '&') {
+					if (!allowUnknownOpcodes && !currentPosIsString && !currentPosIsComment || lines[h].charAt(i) == '&') {
 						if (lines[h].charAt(i) != ' ') {
 							if (progName.endsWith("password")) {
 								i += 11;
@@ -936,6 +948,15 @@ public class BIDE {
 				}
 			}
 		}
+	}
+	
+	public static void initMacros() {
+		macros.clear();
+		macros.add(new Macro("!=", "!="));
+		macros.add(new Macro("!", "!="));
+		macros.add(new Macro("!=", "!="));
+		macros.add(new Macro("!=", "!="));
+		
 	}
 	
 	public static List<Byte> byteArrayToList(byte[] b) {

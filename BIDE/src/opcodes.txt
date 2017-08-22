@@ -1,3 +1,6 @@
+#
+#DO NOT EDIT THIS TAB, changes won't be saved!
+#
 #Opcode number in hex - ascii representation of the opcode - t/f (true/false): surround the ascii representation with '&' and ';' (can change)
 #Order opcodes by value of hex number (0x10 < 0xFF < 0x7F00)
 #Separate opcodes by a line feed only; no tabs, etc
@@ -38,11 +41,17 @@ F E t
 11 != f
 12 >= f
 13 => f
+14 f₁ f
 14 f1 f
+15 f₂ f
 15 f2 f
+16 f₃ f
 16 f3 f
+17 f₄ f
 17 f4 f
+18 f₅ f
 18 f5 f
+19 f₆ f
 19 f6 f
 1A  f
 1A hexA t
@@ -78,7 +87,7 @@ F E t
 88  f
 88 nPr t
 89 + f
-8A xnor f
+8A bitwisexnor t
 8B ² f
 8B ^2 t
 8C  f
@@ -96,13 +105,14 @@ F E t
 95 log  f
 #The cube root has a unicode character, but in casio it's represented as 2 different chars
 #96 ∛ f
+96 √ f
 96 cbrt t
 97 Abs  f
 98  f
 98 nCr t
 99 - f
 99 - t
-9A xor f
+9A bitwisexor t
 9B  f
 9B ^-1 t
 9C ° f
@@ -120,7 +130,7 @@ A6 Int  f
 A7 bitwiseNot t
 A8 ^ f
 A9 * f
-AA or f
+AA bitwiseor t
 AB fact t
 AC  f
 AC rad t
@@ -135,9 +145,11 @@ B5  f
 B5 _10 t
 B6 Frac  f
 B7 Neg  f
+B8 √ f
 B8 nth_root t
 B9 / f
-BA and f
+BA bitwiseand t
+BB ⌟ f
 BB frac t
 BC  f
 BC gra t
@@ -255,7 +267,9 @@ FE prob_t( t
 7F23 Conjg  f
 7F24 ReP  f
 7F25 ImP  f
+7F26 ddx( f
 7F26 d/dx( f
+7F27 d²dx²( f
 7F27 d^2/dx^2( f
 7F28 Solve( f
 7F29 Σ( f
@@ -278,7 +292,9 @@ FE prob_t( t
 7F3F Variance( f
 7F40 Mat  f
 7F41 Trn  f
+7F42 Row f
 7F42 *Row  f
+7F43 Row+  f
 7F43 *Row+  f
 7F44 Row+  f
 7F45 Swap  f
@@ -408,14 +424,18 @@ FE prob_t( t
 7FBE Fa f
 7FC0 n1 f
 7FC1 n2 f
+7FC2 1 f
 7FC2 mean_1 t
+7FC3 2 f
 7FC3 mean_2 t
 7FC4 sx1 f
 7FC5 sx2 f
 7FC6 sp f
 7FC7  f
 7FC7 p^ t
+7FC8 1 f
 7FC8 p^_1 t
+7FC9 2 f
 7FC9 p^_2 t
 7FCA Lower f
 7FCB Upper f
@@ -427,8 +447,8 @@ FE prob_t( t
 7FD2 p_val t
 7FD3 t_val t
 7FD4 se f
-7FD5 x² f
-7FD5 x^2 t
+7FD5 χ² f
+7FD5 chi^2 t
 7FD6 r² f
 7FD6 r^2 t
 7FD7 Adf f
@@ -455,7 +475,9 @@ FE prob_t( t
 7FF0 Y_graph t
 7FF1  f
 7FF1 r_graph t
+7FF2 t f
 7FF2 Xt_graph t
+7FF3 t f
 7FF3 Yt_graph t
 7FF4  f
 7FF4 X_graph t
@@ -1653,7 +1675,7 @@ F917 c2 f
 F918 cnStart f
 F919 IneqTypeIntsect f
 F919 IneqTypeAnd f
-F91B fn t
+F91B fn f
 F91C File  f
 F91D VarList  f
 F91E ClrMat  f

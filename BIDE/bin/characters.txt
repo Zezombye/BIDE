@@ -44,6 +44,7 @@ abcdefghijklmnopqrstuvwxyz
 00AC - 
 00B5 - 
 00B9 - /
+00BB - ⌟
 00BC - 
 00C2 - 
 00C3 - 

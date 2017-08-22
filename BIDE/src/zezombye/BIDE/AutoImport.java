@@ -38,7 +38,7 @@ public class AutoImport {
     HWND emulatorHWND = null;
     int emuSleep = 50; //optimal sleep time between keypresses for the emulator
     Robot robot;
-    BufferedImage confirmation, memMenu, complete;
+    BufferedImage confirmation, memMenu, complete, beginBenchmark, endBenchmark;
     int screenX, screenY, screenWidth, screenHeight;
     
     public AutoImport() {
@@ -46,6 +46,8 @@ public class AutoImport {
 			confirmation = ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/confirmation.png"));
 			complete = ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/complete.png"));
 			memMenu = ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/memMenu.png"));
+			beginBenchmark = ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/beginBenchmark.png"));
+			endBenchmark = ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/endBenchmark.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -60,21 +62,47 @@ public class AutoImport {
 		screenHeight = Integer.parseInt(BIDE.options.getProperty("screenHeight"));
     }
     
-	public void autoImport(String path) {
+    public void benchmark() {
+    	if (findEmulator() == null) return;
+    	for (int i = 1;; i++) {
+    		if (!testImgEquality(getEmuScreen(), beginBenchmark)) {
+    			System.out.println("Finished benchmark");
+    			return;
+    		}
+    		inputKey(KeyEvent.VK_ENTER, emuSleep);
+    		long timeBenchmark = System.currentTimeMillis();
+    		long timeout = System.currentTimeMillis()+10000;
+    		while (!testImgEquality(getEmuScreen(), endBenchmark) && System.currentTimeMillis() < timeout);
+    		long duration = System.currentTimeMillis()-timeBenchmark;
+    		System.out.println("Test "+i+": "+duration+"ms" + (System.currentTimeMillis() > timeout ? " or more (limit reached)" : ""));
+    		inputKey(KeyEvent.VK_ENTER, emuSleep);
+    		try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+    	}
+    }
+    
+    public Object findEmulator() {
 		emulatorHWND = null;
 		//menu = ImageIO.read(new File("C:\\Users\\Catherine\\Desktop\\menu.png"));
 		//long time = System.currentTimeMillis();
 		ArrayList<String> titles = enumWindows();
 		if (titles.contains("Ouvrir")) {
 			BIDE.error("There is another window titled \"Ouvrir\"");
-			return;
+			return null;
 		}
 		if (emulatorHWND == null) {
 			BIDE.error("Could not find emulator");
-			return;
+			return null;
 		}
 		user32.SetForegroundWindow(emulatorHWND);
-    	
+		return "done";
+    }
+    
+	public void autoImport(String path) {
+    	if (findEmulator() == null) return;
     	//storeEmuScreen();
     	//The user is supposed to be on the menu
     	inputKey(KeyEvent.VK_PAGE_DOWN, emuSleep);
@@ -95,19 +123,19 @@ public class AutoImport {
     		return;
     	}
     	inputKey(KeyEvent.VK_F3, emuSleep);
-    	end = System.currentTimeMillis()+10000;
+    	end = System.currentTimeMillis()+5000;
     	while (!enumWindows().contains("Ouvrir")) {
-    		 if (System.currentTimeMillis() < end) {
+    		 if (System.currentTimeMillis() > end) {
     			 BIDE.error("Couldn't open file system");
     			 return;
     		 }
     	}
     	try {
-			Thread.sleep(50);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-    	inputString(path, 0);
+    	inputString("                                   "+path, 1);
     	inputKey(KeyEvent.VK_ENTER, 0);
     	
     	//Wait for confirmation screen (copy to main mem/storage mem)
@@ -172,6 +200,8 @@ public class AutoImport {
 	//storeEmuScreenshot() takes a screenshot of the whole emulator, while storeEmuScreen() only takes a screenshot of the calculator screen.
 	public void storeEmuScreenshot() {
 		try {
+			findEmulator();
+			user32.SetForegroundWindow(emulatorHWND);
 			ImageIO.write(getEmuScreenshot(), "png", new File(System.getProperty("user.home")+"/emulator.png"));
 			System.out.println("Saved emulator screenshot at "+System.getProperty("user.home")+"/emulator.png");
 		} catch (IOException e) {
@@ -181,8 +211,10 @@ public class AutoImport {
 	
 	public void storeEmuScreen() {
 		try {
-			ImageIO.write(getEmuScreen(), "png", new File(System.getProperty("user.home")+"/open.png"));
-			System.out.println("Saved calculator screenshot at " + System.getProperty("user.home")+"/open.png");
+			findEmulator();
+			user32.SetForegroundWindow(emulatorHWND);
+			ImageIO.write(getEmuScreen(), "png", new File(System.getProperty("user.home")+"/screen.png"));
+			System.out.println("Saved calculator screenshot at " + System.getProperty("user.home")+"/screen.png");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

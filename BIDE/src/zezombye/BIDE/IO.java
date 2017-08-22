@@ -49,7 +49,7 @@ public class IO {
 		if (deleteFile) {
 			file.delete();
 		}
-		file.getParentFile().mkdir();
+		file.getParentFile().mkdirs();
 		Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
 		writer.write(content);
 		writer.close();
