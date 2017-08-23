@@ -29,6 +29,7 @@ import java.util.Scanner;
 import javax.imageio.ImageIO;
 import javax.swing.text.AbstractDocument;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -57,6 +58,24 @@ public class UI {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		//Set default font
+		/*java.util.Enumeration<Object> keys = UIManager.getDefaults().keys();
+		FontUIResource fontUI = new FontUIResource(BIDE.progFont);
+	    while (keys.hasMoreElements())
+	    {
+	        Object key = keys.nextElement();
+	        Object value = UIManager.get(key);
+	        if (value instanceof FontUIResource)
+	        {
+	        	System.out.println(key);
+	            UIManager.put(key, BIDE.progFont);
+	        }
+	    }*/
+
+	    UIManager.put("Label.font", new Font(BIDE.options.getProperty("progFontName"), Font.PLAIN, 12));
+	    UIManager.put("List.font", new Font(BIDE.options.getProperty("progFontName"), Font.PLAIN, 12));
+	    
 		jtp = new JTabbedPane() {
 			@Override public void addTab(String name, Component comp) {
 				super.addTab(name, comp);
@@ -492,8 +511,7 @@ public class UI {
     }
 	
 	public void saveFile() {
-		printStream.flush();
-		stdout.setText("");
+		
 		if (BIDE.pathToSavedG1M.isEmpty()) {
 			BIDE.pathToSavedG1M = BIDE.pathToG1M;
 		}

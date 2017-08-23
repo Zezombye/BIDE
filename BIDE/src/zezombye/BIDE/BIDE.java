@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -20,10 +21,17 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
+/*
+ * TODO:
+ * add find and replace
+ * add char selector
+ */
+
 public class BIDE {
 	
 	public static List<Opcode> opcodes = new ArrayList<Opcode>();
 	public static List<Macro> macros = new ArrayList<Macro>();
+	public static List<Macro> defaultMacros = new ArrayList<Macro>();
 	
 	public static String pathToG1M = System.getProperty("user.home")+"/desktop/";
 	public static String pathToSavedG1M = "";
@@ -114,7 +122,6 @@ public class BIDE {
 			}
 			
 		} else {
-			ProgramTextPane.initAutoComplete();
 			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 			try {
 				ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, BIDE.class.getClass().getResourceAsStream("/Casio Graph.ttf")));
@@ -132,6 +139,7 @@ public class BIDE {
 			}
 			pictFont = new Font("DejaVu Avec Casio", Font.TRUETYPE_FONT, Integer.parseInt(options.getProperty("pictFontSize")));
 			ui.createAndDisplayUI();
+			ProgramTextPane.initAutoComplete();
 			//ui.jtp.addTab("test", new Program("test1", "", "testcontent", TYPE_PICT).comp);
 			//ui.createNewTab(TYPE_COLORATION);
 			//((ProgScrollPane)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
@@ -277,12 +285,15 @@ public class BIDE {
 	public static void writeToG1M(String destPath, List<Program> parts) throws IOException {
 		
 		long time = System.currentTimeMillis();
+		System.setOut(System.out);
+		System.setOut(new PrintStream(new CustomOutputStream(BIDE.ui.stdout)));
+		BIDE.ui.stdout.setText("");
 		System.out.println("Saving to \""+destPath+"\"...");
 		
 		G1MWrapper g1mwrapper = new G1MWrapper();
 		//Parse text file
 		Program currentPart = null;
-		macros.clear();
+		clearMacros();
 		
 		//ArrayList<Macro> macros = new ArrayList<Macro>();
 		for (int h = 0; h < parts.size(); h++) {
@@ -353,7 +364,7 @@ public class BIDE {
 			
 			CasioString name = new CasioString(asciiToCasio(parts.get(i).name, true, parts.get(i).name+".name", 1, macros));
 
-			//System.out.println("Parsing \""+parts.get(i).name+"\"");
+			System.out.println("Parsing \""+parts.get(i).name+"\"");
 			
 			if (name.length() > 8) {
 				error("Program \""+parts.get(i).name+"\" has a name too long (8 characters max)!");
@@ -870,6 +881,7 @@ public class BIDE {
 			//BufferedReader br = new BufferedReader(new FileReader(new File(relativePath)));
 			BufferedReader br = new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/opcodes.txt"), "UTF-8"));
 			String hex, text;
+			int relevance;
 			boolean escape = false;
 			
 			while ((line = br.readLine()) != null) {
@@ -884,22 +896,11 @@ public class BIDE {
 					error("opcodes.txt", lineNb, "Could not parse hex string \"" + hex + "\"");
 				}
 				text = line.substring(line.indexOf(' ')+1, line.lastIndexOf(' '));
-				if (line.substring(line.length()-2, line.length()).equals(" f")) {
-					escape = false;
-				} else if (line.substring(line.length()-2, line.length()).equals(" t")) {
-					escape = true;
-				} else {
-					error("opcodes.txt", lineNb, "Unknown boolean \"" + line.substring(line.length()-2, line.length()) + "\"");
-				}
-				if (escape) {
-					text = "&" + text + ";";
-				}
+				relevance = Integer.parseInt(line.substring(line.length()-1));
 				
 				if (options.getProperty("allowUnicode").equals("true") || text.matches("([ -~])+")) {
-					opcodes.add(new Opcode(hex, text));
+					opcodes.add(new Opcode(hex, text, relevance));
 				}
-				
-				
 				//Check for correct order
 				if (opcodes.size() > 1 && Integer.parseInt(opcodes.get(opcodes.size()-1).hex, 16) < Integer.parseInt(opcodes.get(opcodes.size()-2).hex, 16)) {
 					error("opcodes.txt", lineNb, "Opcodes must be ascending!");
@@ -919,15 +920,15 @@ public class BIDE {
 		//Add opcodes for variables and operators that are ascii and one character
 		String additionalOpcodes = "\"'(),.0123456789:<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]{}~";
 		for (int i = 0; i < additionalOpcodes.length(); i++) {
-			opcodes.add(new Opcode(Integer.toHexString(additionalOpcodes.charAt(i)), additionalOpcodes.charAt(i)+""));
+			opcodes.add(new Opcode(Integer.toHexString(additionalOpcodes.charAt(i)), additionalOpcodes.charAt(i)+"", 0));
 		}
 		
 		//Add whitespace
-		opcodes.add(new Opcode("", "\t"));
+		opcodes.add(new Opcode("", "\t", 0));
 		//opcodes.add(new Opcode("", " "));
 		
 		//Add newline
-		opcodes.add(new Opcode("D", "\n"));
+		opcodes.add(new Opcode("D", "\n", 0));
 		
 		//Add disp
 		//opcodes.add(new Opcode("C", "&disp;\n"));
@@ -950,13 +951,75 @@ public class BIDE {
 		}
 	}
 	
-	public static void initMacros() {
+	public static void clearMacros() {
 		macros.clear();
-		macros.add(new Macro("!=", "!="));
-		macros.add(new Macro("!", "!="));
-		macros.add(new Macro("!=", "!="));
-		macros.add(new Macro("!=", "!="));
+		macros = new ArrayList<Macro>(defaultMacros);
+	}
+	
+	public static void initMacros() {
 		
+		defaultMacros.add(new Macro("!=", "!="));
+		defaultMacros.add(new Macro("!", "Not "));
+		defaultMacros.add(new Macro("&&", " And "));
+		defaultMacros.add(new Macro("||", " Or "));
+		defaultMacros.add(new Macro("%", " Rmdr "));
+		
+		Object[] keyCodes = {
+			"key_f1", 79,
+			"key_f2", 69,
+			"key_f3", 59,
+			"key_f4", 49,
+			"key_f5", 39,
+			"key_f6", 29,
+			"key_shift", 78,
+			"key_alpha", 77,
+			"key_optn", 68,
+			"key_square", 67,
+			"key_vars", 58,
+			"key_power", 57,
+			"key_menu", 48,
+			"key_exit", 47,
+			"key_up", 28,
+			"key_down", 37,
+			"key_left", 38,
+			"key_right", 27,
+			"key_x", 76,
+			"key_log", 66,
+			"key_ln", 56,
+			"key_sin", 46,
+			"key_cos", 36,
+			"key_tan", 26,
+			"key_frac", 75,
+			"key_fd", 65,
+			"key_lparen", 55,
+			"key_rparen", 45,
+			"key_comma", 35,
+			"key_arrow", 25,
+			"key_7", 74,
+			"key_8", 64,
+			"key_9", 54,
+			"key_del", 44,
+			"key_4", 73,
+			"key_5", 63,
+			"key_6", 53,
+			"key_mult", 43,
+			"key_div", 33,
+			"key_1", 72,
+			"key_2", 62,
+			"key_3", 52,
+			"key_plus", 42,
+			"key_minus", 32,
+			"key_0", 71,
+			"key_dot", 61,
+			"key_exp", 51,
+			"key_neg", 41,
+			"key_exe", 31,
+		};
+		for (int i = 0; i < keyCodes.length; i += 2) {
+			defaultMacros.add(new Macro((String)keyCodes[i], String.valueOf(keyCodes[i+1])));
+		}
+
+		macros = new ArrayList<Macro>(defaultMacros);
 	}
 	
 	public static List<Byte> byteArrayToList(byte[] b) {

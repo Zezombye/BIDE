@@ -32,8 +32,8 @@ hlColor=EEEEEE
 keywordColor=0000FF
 operatorColor=0080FF
 variableColor=8000FF
-#Border coloration doesn't work
-#borderColor=808080
+#border color doesn't work for now
+borderColor=808080
 strColor=808080
 entityColor=FF8000
 commentColor=008000
