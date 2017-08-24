@@ -24,7 +24,6 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 /*
  * TODO:
  * add find and replace
- * add char selector
  */
 
 public class BIDE {
@@ -552,7 +551,7 @@ public class BIDE {
 		String[] lines = content.split("\\n|\\r|\\r\\n");
 				
 		for (int h = 0; h < lines.length; h++) {
-			if (lines[h].startsWith("#") || lines[h].trim().isEmpty() || lines[h].trim().startsWith("'")) {
+			if (lines[h].startsWith("#") || lines[h].trim().isEmpty()) {
 				continue;
 			}
 			boolean currentPosIsString = false;
@@ -575,6 +574,15 @@ public class BIDE {
 				
 				if (lines[h].charAt(i) == '\'' && !currentPosIsString) {
 					currentPosIsComment = true;
+				}
+				
+				if (lines[h].charAt(i) == ':' && !currentPosIsString && currentPosIsComment) {
+					currentPosIsComment = false;
+					continue;
+				}
+				
+				if (currentPosIsComment) {
+					continue;
 				}
 				
 				//hex escape
@@ -645,8 +653,8 @@ public class BIDE {
 							} else if (progName.endsWith("name")) {
 								i += 15;
 							}
-							error(progName, h+startLine, i+1, "The char '" + lines[h].charAt(i) + 
-									"' shouldn't be here, BIDE did not recognize that opcode. Check the spelling and case.");
+							String unknownOpcode = lines[h].substring(i, (lines[h].indexOf(' ', i) <= i ? lines[h].length() : lines[h] .indexOf(' ', i)));
+							error(progName, h+startLine, i+1, "Unknown opcode \"" + unknownOpcode + "\". Check the spelling and case.");
 							return null;
 						}
 					} else {
@@ -658,7 +666,7 @@ public class BIDE {
 			}
 			
 			//add line feed
-			if (h < lines.length-1) {
+			if (h < lines.length-1 && !lines[h].trim().endsWith("◢") && !lines[h].trim().endsWith("&disp;")) {
 				result.add(0x0D);
 			}
 			
@@ -852,8 +860,8 @@ public class BIDE {
 			}
 			
 			if (!foundMatch) {
-				error("Unknown opcode 0x" + hex + "\nTell Zezombye to add it, or add it yourself in opcodes.txt");
-				return null;
+				System.out.println("WARNING: Unknown opcode 0x" + hex);
+				currentLine += "&#"+hex+";";
 			}
 
 			
@@ -963,6 +971,8 @@ public class BIDE {
 		defaultMacros.add(new Macro("&&", " And "));
 		defaultMacros.add(new Macro("||", " Or "));
 		defaultMacros.add(new Macro("%", " Rmdr "));
+		defaultMacros.add(new Macro("beginBenchmark", "ClrText:Locate 1,2,\"Begin\"&disp;"));
+		defaultMacros.add(new Macro("endBenchmark", "ClrText:Locate 1,2,\"End  \"&disp;"));
 		
 		Object[] keyCodes = {
 			"key_f1", 79,

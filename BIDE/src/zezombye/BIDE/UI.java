@@ -469,8 +469,10 @@ public class UI {
 		    	public void run() {
 				    ArrayList<Program> progs = new ArrayList<Program>();
 				    try {
-				    	if (BIDE.pathToG1M.endsWith(".bide")) {
-				    		progs = BIDE.readFromTxt(BIDE.pathToG1M);
+				    	G1MParser g1mparser = new G1MParser(BIDE.pathToG1M);
+						g1mparser.readG1M();
+						if (!g1mparser.checkValidity()) {
+							progs = BIDE.readFromTxt(BIDE.pathToG1M);
 				    	} else {
 				    		progs = BIDE.readFromG1M(BIDE.pathToG1M);
 				    	}

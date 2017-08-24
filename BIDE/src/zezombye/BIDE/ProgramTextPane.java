@@ -138,7 +138,6 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	}
 	
 	public static void initAutoComplete() {
-		System.out.println("Initializing autocomplete");
 	    DefaultCompletionProvider provider = new DefaultCompletionProvider() {
 	    	@Override protected boolean isValidChar(char ch) {
 	    		///return (ch >= 'A' && ch <= 'z') || "&^_".contains(""+ch);
@@ -148,7 +147,7 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	    CompletionCellRenderer ccr = new CompletionCellRenderer();
 	    ccr.setFont(new Font("Courier New", Font.PLAIN, 12));
 	    provider.setListCellRenderer(ccr);
-	    provider.setAutoActivationRules(false, "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
+	    provider.setAutoActivationRules(false, "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
 	    ArrayList<Opcode> opcodes2 = new ArrayList<Opcode>(BIDE.opcodes);
 	    Collections.sort(opcodes2, new Comparator<Opcode>() {
 			@Override
@@ -178,7 +177,7 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	    }
 	    for (int i = 0; i < BIDE.macros.size(); i++) {
 	    	if (BIDE.macros.get(i).text.length() > 1 && BIDE.macros.get(i).text.matches("\\w+")) {
-	    		provider.addCompletion(new BasicCompletion(provider, BIDE.macros.get(i).text, 8));
+	    		provider.addCompletion(new BasicCompletion(provider, BIDE.macros.get(i).text, 2));
 	    	}
 	    	
 	    }
