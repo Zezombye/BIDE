@@ -140,14 +140,16 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	public static void initAutoComplete() {
 	    DefaultCompletionProvider provider = new DefaultCompletionProvider() {
 	    	@Override protected boolean isValidChar(char ch) {
-	    		///return (ch >= 'A' && ch <= 'z') || "&^_".contains(""+ch);
+	    		//return (ch >= 'A' && ch <= 'z') || "&^_".contains(""+ch);
 	    		return ch >= '!' && ch <= '~';
 	    	}
 	    };
 	    CompletionCellRenderer ccr = new CompletionCellRenderer();
 	    ccr.setFont(new Font("Courier New", Font.PLAIN, 12));
 	    provider.setListCellRenderer(ccr);
-	    provider.setAutoActivationRules(false, "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
+	    //provider.setAutoActivationRules(false, "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
+	    //If you change this string make sure to change the one in org.fife.ui.autocomplete.AbstractCompletionProvider.getCompletionsImpl() !
+	    provider.setAutoActivationRules(false, "&ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
 	    ArrayList<Opcode> opcodes2 = new ArrayList<Opcode>(BIDE.opcodes);
 	    Collections.sort(opcodes2, new Comparator<Opcode>() {
 			@Override

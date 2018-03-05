@@ -1,0 +1,8 @@
+ant-classes
+bin
+dist
+javadoc
+rstaui_*.zip
+.gradle
+build
+
