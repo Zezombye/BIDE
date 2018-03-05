@@ -139,9 +139,12 @@ public class BIDE {
 			pictFont = new Font("DejaVu Avec Casio", Font.TRUETYPE_FONT, Integer.parseInt(options.getProperty("pictFontSize")));
 			ui.createAndDisplayUI();
 			ProgramTextPane.initAutoComplete();
-			//ui.jtp.addTab("test", new Program("test1", "", "testcontent", TYPE_PICT).comp);
+			
+			ui.jtp.addTab("test", new Program("test1", "", "testcontent", TYPE_PICT).comp);
 			//ui.createNewTab(TYPE_COLORATION);
-			//((ProgScrollPane)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
+			
+			((ProgScrollPane)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
+			
 			//new AutoImport().autoImport("C:\\Users\\Catherine\\Desktop\\PUISS4.g1m");
 			System.out.println("Finished initialization");
 		}

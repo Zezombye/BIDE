@@ -55,7 +55,7 @@ public class Program {
 		}
 		this.content = content;
 		
-		//if (!BIDE.isCLI) {
+		if (!BIDE.isCLI) {
 			ProgramTextPane textPane = new ProgramTextPane(type);
 			textPane.setText(content);
 			//if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
@@ -65,7 +65,7 @@ public class Program {
 				((JScrollPane)comp).getVerticalScrollBar().setUnitIncrement(30);
 				comp.setBorder(BorderFactory.createEmptyBorder());
 			//}
-		//}
+		}
 	}
 }
 
