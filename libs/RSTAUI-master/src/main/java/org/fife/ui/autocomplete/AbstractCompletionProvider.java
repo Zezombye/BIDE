@@ -212,15 +212,21 @@ public abstract class AbstractCompletionProvider
 					retVal.add(completions.get(i));
 				}*/
 				
+				text = text.toLowerCase();
+				
 				for (int j = 0; j < text.length(); j++) {
 					
 					//Speed up by ignoring non-starting characters
-					if ("&ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".indexOf(text.charAt(j)) < 0) {
+					//however it doesn't add opcodes that start with non-starting characters such as 1-Variable or *Row+
+					/*if ("&ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".indexOf(text.charAt(j)) < 0) {
 						continue;
-					}
+					}*/
 					
-					if (completions.get(i).getInputText().toLowerCase().startsWith(text.substring(j, text.length()))) {
-						completions.get(i).setRelevance(completions.get(i).initialRelevance-1000*j);
+					
+					if (completions.get(i).getInputText().toLowerCase().startsWith(text.substring(j))) {
+						completions.get(i).setRelevance(((BasicCompletion)completions.get(i)).initialRelevance-1000*j);
+						
+						//System.out.println("initRelevance : "+((BasicCompletion)completions.get(i)).initialRelevance);
 						retVal.add(completions.get(i));
 					}
 				}

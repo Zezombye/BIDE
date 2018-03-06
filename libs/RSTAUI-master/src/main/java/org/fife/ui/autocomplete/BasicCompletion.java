@@ -27,6 +27,7 @@ public class BasicCompletion extends AbstractCompletion {
 	private String shortDesc;
 	private String summary;
 	public int initialRelevance;
+	//public String initialReplacementText;
 
 
 	/**
@@ -40,9 +41,22 @@ public class BasicCompletion extends AbstractCompletion {
 	}
 	
 	public BasicCompletion(CompletionProvider provider, String replacementText, int relevance){
+		
 		this(provider, replacementText, null);
+		//this.initialReplacementText = replacementText;
 		this.setRelevance(relevance);
-		initialRelevance = relevance;
+		this.initialRelevance = relevance;
+		/*if (relevance == 0) {
+			System.out.println("relevance = 0??? for "+replacementText);
+		}*/
+		/*if (relevance != 0) {
+			System.out.println("relevance = "+relevance);
+			
+		}*/
+		/*if (this.initialRelevance != 0) {
+			System.out.println("initial relevance = "+relevance);
+		}*/
+		//System.out.println("initial relevance = "+this.initialRelevance);
 	}
 
 

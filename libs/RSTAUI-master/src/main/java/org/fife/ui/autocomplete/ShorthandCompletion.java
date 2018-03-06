@@ -36,10 +36,10 @@ public class ShorthandCompletion extends BasicCompletion {
 	 */
 	public ShorthandCompletion(CompletionProvider provider, String inputText,
 								String replacementText, int relevance) {
-		super(provider, replacementText);
+		super(provider, replacementText, relevance);
 		this.inputText = inputText;
-		this.setRelevance(relevance);
-		this.initialRelevance = relevance;
+		//this.setRelevance(relevance);
+		//this.initialRelevance = relevance;
 	}
 
 

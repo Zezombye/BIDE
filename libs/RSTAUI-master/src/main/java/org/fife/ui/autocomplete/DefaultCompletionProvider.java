@@ -117,11 +117,11 @@ public class DefaultCompletionProvider extends AbstractCompletionProvider {
 
 		len = segEnd - start;
 		
-		String result = len==0 ? EMPTY_STRING : new String(seg.array, start, len);
-		result = result.replaceAll("^[^A-Za-z]+", "");
+		return len==0 ? EMPTY_STRING : new String(seg.array, start, len);
+		//result = result.replaceAll("^[^A-Za-z]+", "");
 		//System.out.println("result = "+result);
 		
-		return result;
+		//return result;
 
 	}
 

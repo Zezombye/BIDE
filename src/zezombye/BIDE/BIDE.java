@@ -17,6 +17,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+
+import org.fife.ui.autocomplete.BasicCompletion;
+import org.fife.ui.autocomplete.DefaultCompletionProvider;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -66,7 +69,7 @@ public class BIDE {
 		
 		if (args.length > 0 && args[0].equals("debug")) {
 			//TODO: change that
-			debug = false;
+			debug = true;
 			System.out.println("Debug activated");
 			args = new String[0];
 		}
@@ -140,10 +143,10 @@ public class BIDE {
 			ui.createAndDisplayUI();
 			ProgramTextPane.initAutoComplete();
 			
-			ui.jtp.addTab("test", new Program("test1", "", "testcontent", TYPE_PICT).comp);
+			//ui.jtp.addTab("test", new Program("test1", "", "testcontent", TYPE_PICT).comp);
 			//ui.createNewTab(TYPE_COLORATION);
-			
-			((ProgScrollPane)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
+			ui.createNewTab(TYPE_COLORATION);
+			//((ProgScrollPane)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
 			
 			//new AutoImport().autoImport("C:\\Users\\Catherine\\Desktop\\PUISS4.g1m");
 			System.out.println("Finished initialization");

@@ -55,7 +55,7 @@ public class CompletionCellRenderer extends DefaultListCellRenderer {
 	 * The font to use when rendering items, or <code>null</code> if the
 	 * list's default font should be used.
 	 */
-	private Font font;
+	private Font font = new java.awt.Font("DejaVu Avec Casio", java.awt.Font.PLAIN, 12);
 
 	/**
 	 * Whether to display the types of fields and return types of functions
@@ -486,8 +486,8 @@ public class CompletionCellRenderer extends DefaultListCellRenderer {
 		Completion c, int index, boolean selected, boolean hasFocus) {
 
 		StringBuilder sb = new StringBuilder(PREFIX);
-		sb.append(c.getInputText());
-
+		sb.append(c.getInputText().replaceAll("&", "&amp;"));
+		//sb.append(" (r:"+c.getRelevance()+", "+((BasicCompletion)c).initialRelevance+")");
 		if (c instanceof BasicCompletion) {
 			String definition = ((BasicCompletion)c).getShortDescription();
 			if (definition!=null) {

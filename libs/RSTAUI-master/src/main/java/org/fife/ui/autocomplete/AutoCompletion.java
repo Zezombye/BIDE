@@ -594,12 +594,27 @@ public class AutoCompletion {
 		hidePopupWindow();
 		Caret caret = textComp.getCaret();
 
+		//String replacement = getReplacementText(c, textComp.getDocument(), start, len);
+		String replacement = c.getReplacementText();
+		
 		int dot = caret.getDot();
-		int len = alreadyEntered.length();
+		int len = 0;
+		//find which text to actually replace
+		//for example: input text "rani" and completion "int" only the "i" must be replaced, not "rani"
+		for (int i = 0; i < alreadyEntered.length(); i++) {
+			if (c.getInputText().toLowerCase().startsWith(alreadyEntered.substring(i).toLowerCase())) {
+				len = alreadyEntered.length()-i;
+				break;
+			}
+		}
+		//int len = alreadyEntered.length();
 		int start = dot - len;
-		String replacement = getReplacementText(c, textComp.getDocument(),
-				start, len);
-
+		
+		//System.out.println("already entered : "+alreadyEntered);
+		//System.out.println("replacement = "+replacement);
+		//System.out.println("replacement2 = "+c.getReplacementText());
+		//System.out.println("input text = "+c.getInputText());
+		
 		caret.setDot(start);
 		caret.moveDot(dot);
 		textComp.replaceSelection(replacement);
@@ -644,8 +659,7 @@ public class AutoCompletion {
 			oldParenKey = im.get(ks);
 			im.put(ks, PARAM_COMPLETE_KEY);
 			oldParenAction = am.get(PARAM_COMPLETE_KEY);
-			am.put(PARAM_COMPLETE_KEY, new ParameterizedCompletionStartAction(
-					start));
+			am.put(PARAM_COMPLETE_KEY, new ParameterizedCompletionStartAction(start));
 		}
 
 		textComponentListener.addTo(this.textComponent);
@@ -823,7 +837,7 @@ public class AutoCompletion {
 							.setDescriptionWindowSize(preferredDescWindowSize);
 				}
 			}
-
+			
 			popupWindow.setCompletions(completions);
 
 			if (!popupWindow.isVisible()) {

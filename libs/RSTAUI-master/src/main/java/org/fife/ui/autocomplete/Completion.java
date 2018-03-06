@@ -48,8 +48,6 @@ public interface Completion extends Comparable<Completion> {
 	 */
 	@Override
 	public int compareTo(Completion other);
-
-	public int initialRelevance = 0;
 	
 
 	/**

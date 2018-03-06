@@ -173,12 +173,16 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	    			}
 			    	
 	    		} else {
+	    			//System.out.println("relevance = "+opcodes2.get(i).relevance);
 			    	provider.addCompletion(new BasicCompletion(provider, txt, opcodes2.get(i).relevance));
 	    		}
 	    	}
 	    }
 	    for (int i = 0; i < BIDE.macros.size(); i++) {
 	    	if (BIDE.macros.get(i).text.length() > 1 && BIDE.macros.get(i).text.matches("\\w+")) {
+	    		/*BasicCompletion bc = new BasicCompletion(provider, BIDE.macros.get(i).text, 2);
+	    		provider.addCompletion(bc);
+	    		System.out.println(bc.initialRelevance);*/
 	    		provider.addCompletion(new BasicCompletion(provider, BIDE.macros.get(i).text, 2));
 	    	}
 	    	

@@ -74,7 +74,7 @@ public class UI {
 	    }*/
 
 	    UIManager.put("Label.font", new Font(BIDE.options.getProperty("progFontName"), Font.PLAIN, 12));
-	    UIManager.put("List.font", new Font(BIDE.options.getProperty("progFontName"), Font.PLAIN, 12));
+	    //UIManager.put("List.font", new Font(BIDE.options.getProperty("progFontName"), Font.PLAIN, 12));
 	    
 		jtp = new JTabbedPane() {
 			@Override public void addTab(String name, Component comp) {
@@ -108,8 +108,10 @@ public class UI {
 		window.add(sidebar, BorderLayout.EAST);
 		stdout.setWrapStyleWord(true);
 		printStream = new PrintStream(new CustomOutputStream(stdout));
-		System.setOut(printStream);
-		System.setErr(printStream);
+		if (!BIDE.debug) {
+			System.setOut(printStream);
+			System.setErr(printStream);
+		}
 		stdout.setBackground(Color.ORANGE);
 		stdout.setFont(BIDE.dispFont);
 		stdout.setLineWrap(true);
@@ -118,7 +120,7 @@ public class UI {
 		//sidebar.setLayout(new BorderLayout());
 		sidebar.add(new JLabel("Console output"));
 		sidebar.add(jsp2);
-		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		if (!BIDE.debug) window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		
 		jfc.setFileFilter(new FileFilter() {
 			@Override
