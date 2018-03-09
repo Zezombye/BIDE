@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import javax.swing.JEditorPane;
+import javax.swing.JWindow;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
@@ -133,6 +134,10 @@ public class ProgramTextPane extends RSyntaxTextArea {
 			ac.setAutoActivationEnabled(true);
 			ac.setAutoCompleteSingleChoices(false);
 			ac.setAutoActivationDelay(0);
+			ac.setShowDescWindow(true);
+			ac.setChoicesWindowSize(300, 206);
+			//to be the same height as the choices window, we must remove 60 px for some reason
+			ac.setDescriptionWindowSize(500, 206);
 		    ac.install(this);
 		}
 	}
@@ -145,7 +150,6 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	    	}
 	    };
 	    CompletionCellRenderer ccr = new CompletionCellRenderer();
-	    ccr.setFont(new Font("Courier New", Font.PLAIN, 12));
 	    provider.setListCellRenderer(ccr);
 	    //provider.setAutoActivationRules(false, "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
 	    //If you change this string make sure to change the one in org.fife.ui.autocomplete.AbstractCompletionProvider.getCompletionsImpl() !
@@ -163,18 +167,19 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	    for (int i = 0; i < opcodes2.size(); i++) {
 	    	if (opcodes2.get(i).text.length() > 1 && opcodes2.get(i).text.matches("([ -~])+")) {
 	    		String txt = opcodes2.get(i).text.replaceAll("^ +", "");
-	    		//Check if there is another opcode with the same hex value, but with unicode text
-	    		//Note that the unicode opcode is always before the ascii one
-	    		if (BIDE.options.getProperty("allowUnicode").equals("true") && opcodes2.get(i-1).hex.equals(opcodes2.get(i).hex)) {
-	    			if (opcodes2.get(i-1).text.length() == 1) {
-				    	provider.addCompletion(new ShorthandCompletion(provider, txt, opcodes2.get(i-1).text, opcodes2.get(i-1).text, opcodes2.get(i).relevance));
+	    		String summary = generateSummary(opcodes2.get(i));
+	    		//Add opcodes with unicode
+	    		if (opcodes2.get(i).unicode != null && BIDE.options.getProperty("allowUnicode").equals("true")) {
+	    			//Add unicode representation of character in description
+	    			if (opcodes2.get(i).unicode.length() == 1) {
+				    	provider.addCompletion(new ShorthandCompletion(provider, txt, opcodes2.get(i).unicode, opcodes2.get(i).unicode, opcodes2.get(i).relevance, summary));
 	    			} else {
-				    	provider.addCompletion(new ShorthandCompletion(provider, txt, opcodes2.get(i-1).text, opcodes2.get(i).relevance));
+				    	provider.addCompletion(new ShorthandCompletion(provider, txt, opcodes2.get(i).unicode, opcodes2.get(i).relevance, summary));
 	    			}
 			    	
 	    		} else {
 	    			//System.out.println("relevance = "+opcodes2.get(i).relevance);
-			    	provider.addCompletion(new BasicCompletion(provider, txt, opcodes2.get(i).relevance));
+			    	provider.addCompletion(new BasicCompletion(provider, txt, opcodes2.get(i).relevance, summary));
 	    		}
 	    	}
 	    }
@@ -183,11 +188,49 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	    		/*BasicCompletion bc = new BasicCompletion(provider, BIDE.macros.get(i).text, 2);
 	    		provider.addCompletion(bc);
 	    		System.out.println(bc.initialRelevance);*/
-	    		provider.addCompletion(new BasicCompletion(provider, BIDE.macros.get(i).text, 2));
+	    		provider.addCompletion(new BasicCompletion(provider, BIDE.macros.get(i).text, 2, "TODO: macro desc"));
 	    	}
 	    	
 	    }
 		cp = provider;
+	}
+	
+	public static String generateSummary(Opcode o) {
+		
+		String syntax = (o.syntax == null ? "" : generateHtmlSection("Syntax : ", convertToHtml("[code]"+o.syntax+"[/code]")));
+		String example = (o.example == null ? "" : generateHtmlSection("Example : ", convertToHtml(o.example)));
+		String desc = (o.description == null ? "" : generateHtmlSection("Description : ", convertToHtml(o.description)));
+		String compatibility = (o.compat == null ? "" : "<b>Compatibility : </b>" + convertToHtml(o.compat)+ "<br>");
+		
+		String result = syntax + desc + example + compatibility;
+		
+		if (o.unicode != null && o.unicode.length() == 1) {
+			result += "<b>Unicode : </b>U+"+Integer.toHexString(o.unicode.codePointAt(0))+"<br>";
+		}
+		
+		result += "<b>Hex value : </b>0x"+o.hex;
+		
+		return result;
+	}
+		
+	public static String generateHtmlSection(String title, String content) {
+		return "<b>"+title+"</b><br>"+content+"<br><br>";
+	}
+	
+	public static String convertToHtml(String str) {
+		return str
+				.replaceAll("&slash;", "")
+				.replaceAll("&mult;", "")
+				.replaceAll("&", "&amp;")
+				.replaceAll("<", "&lt;")
+				.replaceAll(">", "&gt;")
+				.replaceAll("\\[i\\]", "<em>")
+				.replaceAll("\\[\\/i\\]", "</em>")
+				.replaceAll("\\[b\\]", "<b>")
+				.replaceAll("\\[\\/b\\]", "</b>")
+				.replaceAll("\\[code\\]", "<font face='DejaVu Avec Casio' size='12px'><span style='background-color:rgb(240,240,240);'>")
+				.replaceAll("\\[\\/code\\]", "</span></font>")
+				.replaceAll("\n", "<br>");
 	}
 	
 	@Override

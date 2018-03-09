@@ -72,7 +72,7 @@ public class IO {
 		//return BIDE.class.getClass().getResource(fileName).getPath().substring(0);
 		return "./" + fileName;
 	}*/
-	
+
 	public static CasioString readFromFile(String path) throws IOException {
 		/*String content = "";
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "Cp1252"))) {

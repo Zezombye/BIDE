@@ -1,1812 +1,5935 @@
-#Opcode number in hex - ascii representation of the opcode - relevance
-#Order opcodes by value of hex number (0x10 < 0xFF < 0x7F00)
-#Separate opcodes by a line feed only; no tabs, etc
-#There must be one and only one space between each element (hex code, relevance, ascii)
-#Other spaces are interpreted as being part of the ascii representation
-#Remove leading 0's
-#
-1 &femto; 0
-2 &pico; 0
-3  0
-3 &nano; 0
-4 µ 0
-4 &micro; 0
-5 &milli; 0
-6 &kilo; 0
-7  0
-7 &mega; 0
-8  0
-8 &giga; 0
-9  0
-9 &tera; 0
-A  0
-A &peta; 0
-B  0
-B &exa; 0
-C ◢ 0
-C &disp; 5
-E -> 0
-F  0
-F &E; 5
-10 <= 0
-11 != 0
-12 >= 0
-13 => 0
-14 f₁ 0
-14 f1 0
-15 f₂ 0
-15 f2 0
-16 f₃ 0
-16 f3 0
-17 f₄ 0
-17 f4 0
-18 f₅ 0
-18 f5 0
-19 f₆ 0
-19 f6 0
-1A  0
-1A &hexA; 0
-1B  0
-1B &hexB; 0
-1C &hexC; 0
-1D  0
-1D &hexD; 0
-1E  0
-1E &hexE; 0
-1F  0
-1F &hexF; 0
-26 &amp; 0
-2A  0
-2A &ascii_*; 0
-2B &ascii_+; 0
-2D &ascii_-; 0
-2F  0
-2F &ascii_/; 0
-3D &=; 0
-5E &ascii_^; 0
-80 Pol( 0
-81 sin  3
-82 cos  3
-83 tan  3
-84 &hex; 0
-85 ln  3
-86 √ 0
-86 &sqrt; 3
-87 ﹣ 0
-87 &neg; 5
-88  0
-88 &nPr; 0
-89 + 0
-8A &bitwisexnor; 0
-8B ² 0
-8B &^2; 4
-8C  0
-8C &dms; 0
-8D ∫( 0
-8D &integral;( 0
-8E Mod 0
-8F Σx² 0
-8F sum(x^2) 0
-90 &x; 0
-91 asin  0
-92 acos  0
-93 atan  0
-94 &dec; 0
-95 log  4
-96 √ 0
-96 &cbrt; 4
-97 Abs  4
-98  0
-98 &nCr; 0
-99 - 0
-99 &-; 0
-9A &bitwisexor; 0
-9B  0
-9B &^-1; 4
-9C ° 0
-9C &deg; 0
-9E Med 0
-9F Σx 0
-9F &sum(x); 0
-A0 Rec( 0
-A1 sinh  0
-A2 cosh  0
-A3 tanh  0
-A4 &oct; 0
-A5 e^ 4
-A6 Int  5
-A7 &bitwiseNot; 0
-A8 ^ 0
-A9 * 0
-AA &bitwiseor; 0
-AB &fact; 0
-AC  0
-AC &rad; 0
-AD minY 0
-AE minX 0
-AF &n_stat; 0
-B1 asinh  0
-B2 acosh  0
-B3 atanh  0
-B4 &bin; 0
-B5  0
-B5 &_10; 4
-B6 Frac  0
-B7 Neg  0
-B8 √ 0
-B8 &nth_root; 4
-B9 / 0
-BA &bitwiseand; 0
-BB ⌟ 0
-BB &frac; 4
-BC  0
-BC &gra; 0
-BD maxY 0
-BE maxX 0
-BF Σy² 0
-BF sum(y^2) 0
-C0 Ans 5
-C1 Ran#  4
-C2  0
-C2 &x_overline; 0
-C3  0
-C3 &y_overline; 0
-C4 σx 0
-C4 sigma(x) 0
-C5 sx 0
-C6 σy 0
-C6 sigma(y) 0
-C7 sy 0
-C8 &a_reg; 0
-C9 &b_reg; 0
-CA &r_reg; 0
-CB  0
-CB &x^; 0
-CC  0
-CC &y^; 0
-CD  0
-CD &r; 5
-CE θ 0
-CE &theta; 5
-CF Σy 0
-CF sum(y) 0
-D0 π 0
-D0 &pi; 5
-D1 Cls 5
-D3 Rnd 0
-D4 Dec 0
-D5 Hex 0
-D6 Bin 0
-D7 Oct 0
-D8 ▯ 0
-D8 &white_rectangle; 0
-D9 Norm  0
-DA Deg 0
-DB Rad 0
-DC Gra 0
-DD Eng 0
-DE Intg  0
-DF Σxy 0
-DF sum(x,y) 0
-E0 Plot  0
-E1 Line 0
-E2 Lbl  5
-E3 Fix  0
-E4 Sci  0
-E8 Dsz  0
-E9 Isz  0
-EA Factor  0
-EB ViewWindow  5
-EC Goto  5
-ED Prog  5
-EE Graph Y= 0
-EF Graph ∫ 0
-EF Graph &integral; 0
-F0 Graph Y> 0
-F1 Graph Y< 0
-F2 Graph Y>= 0
-F3 Graph Y<= 0
-F4 Graph r= 0
-F5 Graph(X,Y)=( 5
-F6 &,; 0
-FB &prob_P(; 0
-FC &prob_Q(; 0
-FD &prob_R(; 0
-FE &prob_t(; 0
-7F00 Xmin 0
-7F01 Xmax 0
-7F02 Xscl 0
-7F04 Ymin 0
-7F05 Ymax 0
-7F06 Yscl 0
-7F08 Tθmin 0
-7F08 T&theta;min 0
-7F09 Tθmax 0
-7F09 T&theta;max 0
-7F0A Tθptch 0
-7F0A T&theta;ptch 0
-7F0B Xfct 0
-7F0C Yfct 0
-7F0D D Start 0
-7F0E D End 0
-7F0F D pitch 0
-7F10 RightXmin 0
-7F11 RightXmax 0
-7F12 RightXscl 0
-7F14 RightYmin 0
-7F15 RightYmax 0
-7F16 RightYscl 0
-7F18 Rightθmin 0
-7F18 RightT&theta;min 0
-7F19 Rightθmax 0
-7F19 RightT&theta;max 0
-7F1A Rightθptch 0
-7F1A RightT&theta;ptch 0
-7F1B StdDev_σ( 0
-7F1B StdDef_&sigma;( 0
-7F1C Variance_σ²( 0
-7F1C Variance_&sigma;&^2;( 0
-7F1D &c_reg; 0
-7F1E &d_reg; 0
-7F1F &e_reg; 0
-7F20 Max( 0
-7F21 Det  0
-7F22 Arg  0
-7F23 Conjg  0
-7F24 ReP  4
-7F25 ImP  4
-7F26 ddx( 0
-7F26 d/dx( 0
-7F27 d²dx²( 0
-7F27 d^2/dx^2( 0
-7F28 Solve( 0
-7F29 Σ( 0
-7F29 sum( 0
-7F2A FMin( 0
-7F2B FMax( 0
-7F2C Seq( 0
-7F2D Min( 0
-7F2E Mean( 0
-7F2F Median( 0
-7F30 SolveN( 0
-7F34 Red  0
-7F35 Blue  0
-7F36 Green  0
-7F3A &MOD(; 5
-7F3B MOD_Exp( 0
-7F3C &GCD(; 0
-7F3D &LCM(; 0
-7F3E StdDev( 0
-7F3F Variance( 0
-7F40 Mat  5
-7F41 Trn  0
-7F42 Row 0
-7F42 *Row  0
-7F43 Row+  0
-7F43 *Row+  0
-7F44 Row+  0
-7F45 Swap  0
-7F46 Dim  0
-7F47 Fill( 0
-7F48 Identity  0
-7F49 Augment( 0
-7F4A List->Mat( 0
-7F4B Mat->List 0
-7F4C Sum  0
-7F4D Prod  0
-7F4E Percent  0
-7F4F Cuml  0
-7F50  0
-7F50 &i; 5
-7F51 List  5
-7F52 ΔList 0
-7F52 &Delta;List  0
-7F53 ∞ 0
-7F53 &infty; 0
-7F54 ∠ 0
-7F54 &angle; 0
-7F55 Ref  0
-7F56 Rref  0
-7F57 &to; 0
-7F60 Sim Coef 0
-7F61 Ply Coef 0
-7F62 Sim Result 0
-7F63 Ply Result 0
-7F64 &n_financ; 0
-7F65 I% 0
-7F66 &PV; 0
-7F67 &PMT; 0
-7F68 &FV; 0
-7F6A List1 0
-7F6B List2 0
-7F6C List3 0
-7F6D List4 0
-7F6E List5 0
-7F6F List6 0
-7F76 Q₁ 0
-7F76 Q_1 0
-7F77 Q₃ 0
-7F77 Q_3 0
-7F78 x₁ 0
-7F78 x_1 0
-7F79 y₁ 0
-7F79 y_1 0
-7F7A x₂ 0
-7F7A x_2 0
-7F7B y₂ 0
-7F7B y_2 0
-7F7C x₃ 0
-7F7C x_3 0
-7F7D y₃ 0
-7F7D y_3 0
-7F84 Vct  0
-7F85 logab( 0
-7F86 RndFix( 0
-7F87 RanInt#( 5
-7F88 RanList#( 0
-7F89 RanBin#( 0
-7F8A RanNorm#( 0
-7F8B RanSamp#( 0
-7F8C Σa 0
-7F8C sum(a_n) 0
-7F8D Σb 0
-7F8D sum(b_n) 0
-7F8E Σc 0
-7F8E sum(c_n) 0
-7F8F GetKey 5
-7F90 F Result 0
-7F91 F Start 0
-7F92 F End 0
-7F93 F pitch 0
-7F94 R Result 0
-7F95 R Start 0
-7F96 R End 0
-7F97 H Start 0
-7F98 H pitch 0
-7F9C ->Simp  0
-7FA0 a 0
-7FA0 a_n 0
-7FA1 a₊₁ 0
-7FA1 a_(n+1) 0
-7FA2 a₊₂ 0
-7FA2 a_(n+2) 0
-7FA3 &n_recur; 0
-7FA4 a 5
-7FA4 a0 5
-7FA5 a 5
-7FA5 a1 5
-7FA6 a 5
-7FA6 a2 5
-7FA7 b 0
-7FA7 b_n 0
-7FA8 b₊₁ 0
-7FA8 b_(n+1) 0
-7FA9 b₊₂ 0
-7FA9 b_(n+2) 0
-7FAA b 5
-7FAA b0 5
-7FAB b 5
-7FAB b1 5
-7FAC b 5
-7FAC b2 5
-7FAD anStart 5
-7FAE bnStart 5
-7FB0  And  5
-7FB1  Or  5
-7FB3 Not  5
-7FB4  Xor  5
-7FB5 Σa₊₁ 0
-7FB5 sum(a_n+1) 0
-7FB6 Σb₊₁ 0
-7FB6 sum(b_n+1) 0
-7FB7 Σc₊₁ 0
-7FB7 sum(c_n+1) 0
-7FB9 Σa₊₂ 0
-7FB9 sum(a_n+2) 0
-7FBA Σb₊₂ 0
-7FBA sum(b_n+2) 0
-7FBB Σc₊₂ 0
-7FBB sum(c_n+2) 0
-7FBC  Int/  0
-7FBD  Rmdr  0
-7FBE Fa 0
-7FC0 n1 0
-7FC1 n2 0
-7FC2 1 0
-7FC2 &mean_1; 0
-7FC3 2 0
-7FC3 &mean_2; 0
-7FC4 sx1 0
-7FC5 sx2 0
-7FC6 sp 0
-7FC7  0
-7FC7 &p^; 0
-7FC8 1 0
-7FC8 &p^_1; 0
-7FC9 2 0
-7FC9 &p^_2; 0
-7FCA Lower 0
-7FCB Upper 0
-7FCC &P/Y; 0
-7FCD &C/Y; 0
-7FCE Fb 0
-7FD0 &F_val; 0
-7FD1 &z_val; 0
-7FD2 &p_val; 0
-7FD3 &t_val; 0
-7FD4 se 0
-7FD5 χ² 0
-7FD5 &chi^2; 0
-7FD6 r² 0
-7FD6 &r^2; 0
-7FD7 Adf 0
-7FD8 Edf 0
-7FD9 df 0
-7FDA SSa 0
-7FDB MSa 0
-7FDC SSe 0
-7FDD MSe 0
-7FDE Fab 0
-7FE0 Bdf 0
-7FE1 ABdf 0
-7FE2 pa 0
-7FE3 pb 0
-7FE4 pab 0
-7FE9 CellSum( 0
-7FEA CellProd( 0
-7FEB CellMin( 0
-7FEC CellMax( 0
-7FED CellMean( 0
-7FEE CellMedian( 0
-7FEF CellIf( 0
-7FF0  0
-7FF0 &Y_graph; 0
-7FF1  0
-7FF1 &r_graph; 0
-7FF2 t 0
-7FF2 &Xt_graph; 0
-7FF3 t 0
-7FF3 &Yt_graph; 0
-7FF4  0
-7FF4 &X_graph; 0
-7FFB SSb 0
-7FFC SSab 0
-7FFD MSb 0
-7FFE MSab 0
-E501 À 0
-E501 &Agrave; 0
-E502 Á 0
-E502 &Aacute; 0
-E503 Â 0
-E503 &Acirc; 0
-E504 Ã 0
-E504 &Atilde; 0
-E505 Ä 0
-E505 &Auml; 0
-E506 Å 0
-E506 &Aring; 0
-E507 Æ 0
-E507 &AE; 0
-E508 Ç 0
-E508 &Ccedil; 0
-E509 È 0
-E509 &Egrave; 0
-E50A É 0
-E50A &Eacute; 0
-E50B Ê 0
-E50B &Ecirc; 0
-E50C Ë 0
-E50C &Euml; 0
-E50D Ì 0
-E50D &Igrave; 0
-E50E Í 0
-E50E &Iacute; 0
-E50F Î 0
-E50F &Icirc; 0
-E510 Ï 0
-E510 &Iuml; 0
-E511 Ð 0
-E511 &Eth; 0
-E512 Ñ 0
-E512 &Ntilde; 0
-E513 Ò 0
-E513 &Ograve; 0
-E514 Ó 0
-E514 &Oacute; 0
-E515 Ô 0
-E515 &Ocirc; 0
-E516 Õ 0
-E516 &Otilde; 0
-E517 Ö 0
-E517 &Ouml; 0
-E518 Ø 0
-E518 &Oslash; 0
-E519 Ù 0
-E519 &Ugrave; 0
-E51A Ú 0
-E51A &Uacute; 0
-E51B Û 0
-E51B &Ucirc; 0
-E51C Ü 0
-E51C &Uuml; 0
-E51D Ý 0
-E51D &Yacute; 0
-E51E Þ 0
-E51E &Thorn; 0
-E520 Ÿ 0
-E520 &Yuml; 0
-E521 Ă 0
-E521 &Abreve; 0
-E522 Ą 0
-E522 &Aogon; 0
-E523 Ć 0
-E523 &Cacute; 0
-E524 Č 0
-E524 &Ccaron; 0
-E525 Œ 0
-E525 &OElig; 0
-E526 Ď 0
-E526 &Dcaron; 0
-E527 Ę 0
-E527 &Eogon; 0
-E528 Ě 0
-E528 &Ecaron; 0
-E529 Ł 0
-E529 &Lstrok; 0
-E52A Ń 0
-E52A &Nacute; 0
-E52B Ň 0
-E52B &Ncaron; 0
-E52C Ő 0
-E52C &Odblac; 0
-E52D Ř 0
-E52D &Rcaron; 0
-E52E Ś 0
-E52E &Sacute; 0
-E52F Š 0
-E52F &Scaron; 0
-E530 Ť 0
-E530 &Tcaron; 0
-E531 Ů 0
-E531 &Uring; 0
-E532 Ű 0
-E532 &Udblac; 0
-E533 Ź 0
-E533 &Zacute; 0
-E534 Ż 0
-E534 &Zdot; 0
-E535 Ž 0
-E535 &Zcaron; 0
-E540 &Alpha; 0
-E541 &Beta; 0
-E542 Γ 0
-E542 &Gamma; 0
-E543 Δ 0
-E543 &Delta; 0
-E544 &Epsilon; 0
-E545 &Zeta; 0
-E546 &Eta; 0
-E547 Θ 0
-E547 &Theta; 0
-E548 &Iota; 0
-E549 &Kappa; 0
-E54A Λ 0
-E54A &Lambda; 0
-E54B &Mu; 0
-E54C &Nu; 0
-E54D Ξ 0
-E54D &Xi; 0
-E54E &Omicron; 0
-E54F Π 0
-E54F &Pi; 0
-E550 &Rho; 0
-E551 Σ 0
-E551 &Sigma; 0
-E553 &Tau; 0
-E554 &Upsilon; 0
-E555 Φ 0
-E555 &Phi; 0
-E556 &Chi; 0
-E557 Ψ 0
-E557 &Psi; 0
-E558 Ω 0
-E558 &Omega; 0
-E560 &Acy; 0
-E561 Б 0
-E561 &Bcy; 0
-E562 &Vcy; 0
-E563 &Gcy; 0
-E564 Д 0
-E564 &Dcy; 0
-E565 &IEcy; 0
-E566 &IOcy; 0
-E567 Ж 0
-E567 &ZHcy; 0
-E568 З 0
-E568 &Zcy; 0
-E569 И 0
-E569 &Icy; 0
-E56A Й 0
-E56A &Jcy; 0
-E56B &Kcy; 0
-E56C Л 0
-E56C &Lcy; 0
-E56D &Mcy; 0
-E56E &Ncy; 0
-E56F &Ocy; 0
-E570 П 0
-E570 &Pcy; 0
-E571 &Rcy; 0
-E572 &Scy; 0
-E573 &Tcy; 0
-E574 У 0
-E574 &Ucy; 0
-E575 Ф 0
-E575 &Fcy; 0
-E576 &KHcy; 0
-E577 Ц 0
-E577 &TScy; 0
-E578 Ч 0
-E578 &CHcy; 0
-E579 Ш 0
-E579 &SHcy; 0
-E57A Щ 0
-E57A &SHCHcy; 0
-E57B Ъ 0
-E57B &HARDcy; 0
-E57C Ы 0
-E57C &Ycy; 0
-E57D Ь 0
-E57D &SOFTcy; 0
-E57E Э 0
-E57E &Ecy; 0
-E580 Ю 0
-E580 &YUcy; 0
-E581 Я 0
-E581 &YAcy; 0
-E582 Є 0
-E582 &Jukcy; 0
-E590 ¡ 0
-E590 &inverted_!; 0
-E591 ¿ 0
-E591 &inverted_?; 0
-E592 € 0
-E592 &euro; 0
-E593 ₣ 0
-E593 &franc; 0
-E594 … 0
-E594 &...; 0
-E595 ‘ 0
-E595 &left_'; 0
-E596 &right_'; 0
-E597 “ 0
-E597 &left_"; 0
-E598 ” 0
-E598 &right_"; 0
-E599 ¢ 0
-E599 &cent; 0
-E59A £ 0
-E59A &pound; 0
-E59B ¤ 0
-E59B &headshot; 0
-E59C ¥ 0
-E59C &yen; 0
-E59D § 0
-E59D &sect; 0
-E59E © 0
-E59E &copyright; 0
-E59F  0
-E59F &underlined_a; 0
-E5A0 ¬ 0
-E5A0 &logical_not; 0
-E5A1 ® 0
-E5A1 &registered; 0
-E5A2  0
-E5A2 &underlined_o; 0
-E5A3 « 0
-E5A3 &<<; 0
-E5A4 » 0
-E5A4 &>>; 0
-E5A5 ▫ 0
-E5A5 &small_square; 0
-E5A6 ⨯ 0
-E5A6 &small_cross; 0
-E5A7 · 0
-E5A7 &middle_dot; 0
-E5AB ⁉ 0
-E5AB &!?; 0
-E5AC ‼ 0
-E5AC &!!; 0
-E5AD ☆ 0
-E5AD &star; 0
-E5AE &2_rectangles; 0
-E5AF &cross; 0
-E5B0  0
-E5B0 &bold_e; 0
-E5B1 &bold_P; 0
-E5B2 &bold_r; 0
-E5B3 &bold_X; 0
-E5B4 &bold_Y; 0
-E5B5  0
-E5B5 &negative_B; 0
-E5B6  0
-E5B6 &negative_R; 0
-E5B7  0
-E5B7 &negative_L; 0
-E5B8  0
-E5B8 &negative_=; 0
-E5B9  0
-E5B9 &negative_<; 0
-E5BA  0
-E5BA &negative_>; 0
-E5BB  0
-E5BB &negative_<=; 0
-E5BC  0
-E5BC &negative_>=; 0
-E5BD ‚ 0
-E5BD &left_bottom_'; 0
-E5BE ± 0
-E5BE &+-; 0
-E5BF ∓ 0
-E5BF &-+; 0
-E5C0 ⁰ 0
-E5C0 &^0; 0
-E5C1 ¹ 0
-E5C1 &^1; 0
-E5C2 &^2_char; 0
-E5C3 ³ 0
-E5C3 &^3; 0
-E5C4 ⁴ 0
-E5C4 &^4; 0
-E5C5 ⁵ 0
-E5C5 &^5; 0
-E5C6 ⁶ 0
-E5C6 &^6; 0
-E5C7 ⁷ 0
-E5C7 &^7; 0
-E5C8 ⁸ 0
-E5C8 &^8; 0
-E5C9 ⁹ 0
-E5C9 &^9; 0
-E5CA &^-1_char; 0
-E5CB ⁺ 0
-E5CB &^+; 0
-E5CC ⁻ 0
-E5CC &^-; 0
-E5CD  0
-E5CD &small_0; 0
-E5CE  0
-E5CE &small_1; 0
-E5CF  0
-E5CF &small_2; 0
-E5D0 ₀ 0
-E5D0 &_0; 0
-E5D1 ₁ 0
-E5D1 &_1; 0
-E5D2 ₂ 0
-E5D2 &_2; 0
-E5D3 ₃ 0
-E5D3 &_3; 0
-E5D4 ₄ 0
-E5D4 &_4; 0
-E5D5 ₅ 0
-E5D5 &_5; 0
-E5D6 ₆ 0
-E5D6 &_6; 0
-E5D7 ₇ 0
-E5D7 &_7; 0
-E5D8 ₈ 0
-E5D8 &_8; 0
-E5D9 ₉ 0
-E5D9 &_9; 0
-E5DA  0
-E5DA &_-1; 0
-E5DB ₊ 0
-E5DB &_+; 0
-E5DC ₋ 0
-E5DC &_-; 0
-E5DD  0
-E5DD &^*; 0
-E5DE  0
-E5DE &small_n; 0
-E5DF  0
-E5DF &^3_with_style; 0
-E5E0 ♠ 0
-E5E0 &spade; 0
-E5E1 ♣ 0
-E5E1 &club; 0
-E5E2 ♥ 0
-E5E2 &heart; 0
-E5E3 ♦ 0
-E5E3 &diamond; 0
-E5E8 ⇦ 0
-E5E8 &left_white_arrow; 0
-E5E9 ⇨ 0
-E5E9 &right_white_arrow; 0
-E5EA ⇧ 0
-E5EA &up_white_arrow; 0
-E5EB ⇩ 0
-E5EB &down_white_arrow; 0
-E5EC ☜ 0
-E5EC &left_index; 0
-E5ED ☞ 0
-E5ED &right_index; 0
-E5EE ☝ 0
-E5EE &up_index; 0
-E5EF ☟ 0
-E5EF &down_index; 0
-E5F0 ① 0
-E5F0 &circled_1; 0
-E5F1 ② 0
-E5F1 &circled_2; 0
-E5F2 ③ 0
-E5F2 &circled_3; 0
-E5F3 ④ 0
-E5F3 &circled_4; 0
-E5F4 ⑤ 0
-E5F4 &circled_5; 0
-E5F5 ⑥ 0
-E5F5 &circled_6; 0
-E5FB ⑦ 0
-E5FB &circled_7; 0
-E5FC ⑧ 0
-E5FC &circled_8; 0
-E5FD ⑨ 0
-E5FD &circled_9; 0
-e601 à 0
-e601 &agrave; 0
-e602 á 0
-e602 &aacute; 0
-e603 â 0
-e603 &acirc; 0
-e604 ã 0
-e604 &atilde; 0
-e605 ä 0
-e605 &auml; 0
-e606 å 0
-e606 &aring; 0
-e607 æ 0
-e607 &ae; 0
-e608 ç 0
-e608 &ccedil; 0
-e609 è 0
-e609 &egrave; 0
-e60a é 0
-e60a &eacute; 0
-e60b ê 0
-e60b &ecirc; 0
-e60c ë 0
-e60c &euml; 0
-e60d ì 0
-e60d &igrave; 0
-e60e í 0
-e60e &iacute; 0
-e60f î 0
-e60f &icirc; 0
-e610 ï 0
-e610 &iuml; 0
-e611 ð 0
-e611 &eth; 0
-e612 ñ 0
-e612 &ntilde; 0
-e613 ò 0
-e613 &ograve; 0
-e614 ó 0
-e614 &oacute; 0
-e615 ô 0
-e615 &ocirc; 0
-e616 õ 0
-e616 &otilde; 0
-e617 ö 0
-e617 &ouml; 0
-E618 ø 0
-e618 &oslash; 0
-e619 ù 0
-e619 &ugrave; 0
-e61a ú 0
-e61a &uacute; 0
-e61b û 0
-e61b &ucirc; 0
-e61c ü 0
-e61c &uuml; 0
-e61d ý 0
-e61d &yacute; 0
-e61e þ 0
-e61e &thorn; 0
-E61F ß 0
-E61F &eszett; 0
-e620 ÿ 0
-e620 &yuml; 0
-e621 ă 0
-e621 &abreve; 0
-e622 ą 0
-e622 &aogon; 0
-e623 ć 0
-e623 &cacute; 0
-e624 č 0
-e624 &ccaron; 0
-e625 œ 0
-e625 &oelig; 0
-e626 ď 0
-e626 &dcaron; 0
-e627 ę 0
-e627 &eogon; 0
-e628 ě 0
-e628 &ecaron; 0
-e629 ł 0
-e629 &lstrok; 0
-e62a ń 0
-e62a &nacute; 0
-e62b ň 0
-e62b &ncaron; 0
-e62c ő 0
-e62c &odblac; 0
-e62d ř 0
-e62d &rcaron; 0
-e62e ś 0
-e62e &sacute; 0
-e62f š 0
-e62f &scaron; 0
-e630 ť 0
-e630 &tcaron; 0
-e631 ů 0
-e631 &uring; 0
-e632 ű 0
-e632 &udblac; 0
-e633 ź 0
-e633 &zacute; 0
-e634 ż 0
-e634 &zdot; 0
-e635 ž 0
-e635 &zcaron; 0
-E640 α 0
-E640 &alpha; 0
-E641 β 0
-E641 &beta; 0
-E642 γ 0
-E642 &gamma; 0
-E643 δ 0
-E643 &delta; 0
-E644 ε 0
-E644 &epsilon; 0
-E645 ζ 0
-E645 &zeta; 0
-E646 η 0
-E646 &eta; 0
-E647 &theta_char; 0
-E648 ι 0
-E648 &iota; 0
-E649 κ 0
-E649 &kappa; 0
-E64A λ 0
-E64A &lambda; 0
-E64B &mu; 0
-E64C ν 0
-E64C &nu; 0
-E64D ξ 0
-E64D &xi; 0
-E64E &omicron; 0
-E64F &pi_char; 0
-E650 ρ 0
-E650 &rho; 0
-E651 σ 0
-E651 &sigma; 0
-E652 ς 0
-E652 &sigma2; 0
-E653 τ 0
-E653 &tau; 0
-E654 &upsilon; 0
-E655 φ 0
-E655 &phi; 0
-E656 χ 0
-E656 &chi; 0
-E657 ψ 0
-E657 &psi; 0
-E658 ω 0
-E658 &omega; 0
-E660 &acy; 0
-E661 б 0
-E661 &bcy; 0
-E662 в 0
-E662 &vcy; 0
-E663 г 0
-E663 &gcy; 0
-E664 д 0
-E664 &dcy; 0
-E665 &iecy; 0
-E666 &iocy; 0
-E667 ж 0
-E667 &zhcy; 0
-E668 з 0
-E668 &zcy; 0
-E669 и 0
-E669 &icy; 0
-E66A й 0
-E66A &jcy; 0
-E66B &kcy; 0
-E66C л 0
-E66C &lcy; 0
-E66D м 0
-E66D &mcy; 0
-E66E н 0
-E66E &ncy; 0
-E66F &ocy; 0
-E670 п 0
-E670 &pcy; 0
-E671 &rcy; 0
-E672 &scy; 0
-E673 т 0
-E673 &tcy; 0
-E674 у 0
-E674 &ucy; 0
-E675 ф 0
-E675 &fcy; 0
-E676 &khcy; 0
-E677 ц 0
-E677 &tscy; 0
-E678 ч 0
-E678 &chcy; 0
-E679 ш 0
-E679 &shcy; 0
-E67A щ 0
-E67A &shchcy; 0
-E67B ъ 0
-E67B &hardcy; 0
-E67C ы 0
-E67C &ycy; 0
-E67D ь 0
-E67D &softcy; 0
-E67E э 0
-E67E &ecy; 0
-E680 ю 0
-E680 &yucy; 0
-E681 я 0
-E681 &yacy; 0
-E682 є 0
-E682 &jukcy; 0
-E690 ← 0
-E690 &left_arrow; 0
-E691 → 0
-E691 &right_arrow; 0
-E692 ↑ 0
-E692 &up_arrow; 0
-E693 ↓ 0
-E693 &down_arrow; 0
-E694 ↔ 0
-E694 &left_right_arrow; 0
-E695 ↕ 0
-E695 &up_down_arrow; 0
-E696 ↖ 0
-E696 &top_left_arrow; 0
-E697 ↗ 0
-E697 &top_right_arrow; 0
-E698 ↘ 0
-E698 &bottom_left_arrow; 0
-E699 ↙ 0
-E699 &bottom_right_arrow; 0
-E69A ◀ 0
-E69A &left_black_triangle; 0
-E69B ▶ 0
-E69B &right_black_triangle; 0
-E69C ▲ 0
-E69C &up_black_triangle; 0
-E69D ▼ 0
-E69D &down_black_triangle; 0
-E69E ▸ 0
-E69E &right_small_black_triangle; 0
-E69F ▷ 0
-E69F &right_white_triangle; 0
-E6A0 ⋇ 0
-E6A0 &divide_on_times; 0
-E6A1 【 0
-E6A1 &left_lenticular_bracket; 0
-E6A2 】 0
-E6A2 &right_lenticular_bracket; 0
-E6A3 ○ 0
-E6A3 &white_circle; 0
-E6A4 ● 0
-E6A4 &black_circle; 0
-E6A5 □ 0
-E6A5 &white_square; 0
-E6A6 ■ 0
-E6A6 &black_square; 0
-E6A7 ◇ 0
-E6A7 &white_diamond; 0
-E6A8 ◆ 0
-E6A8 &black_diamond; 0
-E6A9 ⊠ 0
-E6A9 &black_square_with_cross; 0
-E6AA ▪ 0
-E6AA &bullet_operator; 0
-E6AC △ 0
-E6AC &up_white_triangle; 0
-E6AD ▽ 0
-E6AD &down_white_triangle; 0
-E6AE ✖ 0
-E6AE &bold_cross; 0
-E6AF ◁ 0
-E6AF &left_white_triangle; 0
-E6B0 ≒ 0
-E6B0 &equal_with_dots; 0
-E6B1 ≈ 0
-E6B1 &approx_equal_to; 0
-E6B2 ≡ 0
-E6B2 &triple_equal; 0
-E6B3 ≢ 0
-E6B3 &not_triple_equal; 0
-E6B4 ≅ 0
-E6B4 &approx_triple_equal; 0
-E6B5 ∽ 0
-E6B5 &reversed_tilde; 0
-E6B6 ∝ 0
-E6B6 &proportional_to; 0
-E6B7 ∬ 0
-E6B7 &double_integral; 0
-E6B8 ∮ 0
-E6B8 &contour_integral; 0
-E6B9 ∂ 0
-E6B9 &partial_differential; 0
-E6BB ∫ 0
-E6BB &integral; 0
-E6BC ∡ 0
-E6BC &measured_angle; 0
-E6BD ∈ 0
-E6BD &element_of; 0
-E6BE ∋ 0
-E6BE &contains_as_member; 0
-E6BF ⊆ 0
-E6BF &subset_of_or_equal_to; 0
-E6C0 ⊇ 0
-E6C0 &superset_of_or_equal_to; 0
-E6C1 ⊂ 0
-E6C1 &subset_of; 0
-E6C2 ⊃ 0
-E6C2 &superset_of; 0
-E6C3 ∪ 0
-E6C3 &union; 0
-E6C4 ∩ 0
-E6C4 &intersection; 0
-E6C5 ∉ 0
-E6C5 &not_an_element_of; 0
-E6C6 ∌ 0
-E6C6 &does_not_contain_as_member; 0
-E6C7 ⊈ 0
-E6C7 &neither_a_subset_of_nor_equal_to; 0
-E6C8 ⊉ 0
-E6C8 &neither_a_superset_of_nor_equal_to; 0
-E6C9 ⊄ 0
-E6C9 &not_a_subset_of; 0
-E6CA ⊅ 0
-E6CA &not_a_superset_of; 0
-E6CB ∅ 0
-E6CB &empty_set; 0
-E6CC ∃ 0
-E6CC &there_exists; 0
-E6CD ∟ 0
-E6CD &right_angle; 0
-E6CE ∨ 0
-E6CE &\/; 0
-E6CF ∧ 0
-E6CF &/\; 0
-E6D0 ∀ 0
-E6D0 &for_all; 0
-E6D1 ⊕ 0
-E6D1 &circled_+; 0
-E6D2 ⊖ 0
-E6D2 &circled_-; 0
-E6D3 ⊗ 0
-E6D3 &circled_x; 0
-E6D4 ⊘ 0
-E6D4 &circled_/; 0
-E6D5 ⊥ 0
-E6D5 &perpendicular_to; 0
-E6D6 ⇔ 0
-E6D6 &left_right_double_arrow; 0
-E6D7 ∥ 0
-E6D7 &||; 0
-E6D8 ∦ 0
-E6D8 &||_strike; 0
-E6D9 ⫽ 0
-E6D9 &//; 0
-E6DA ∇ 0
-E6DA &shield; 0
-E6DB ∴ 0
-E6DB &dots_in_^; 0
-E6DC ∵ 0
-E6DC &dots_in_v; 0
-E6DD ′ 0
-E6DD &prime; 0
-E6DE ″ 0
-E6DE &double_prime; 0
-E701 [ns] 0
-E702 [µs] 0
-E703 [&micro;s] 0
-E703 [ms] 0
-E704 [s] 0
-E705 [min] 0
-E706 [h] 0
-E707 [day] 0
-E708 [week] 0
-E709 [yr] 0
-E70A [s-yr] 0
-E70B [t-yr] 0
-E70C [C] 0
-E70C [&deg;C] 0
-E70D &[K]; 0
-E70E [F] 0
-E70E [&deg;F] 0
-E70F [R] 0
-E70F [&deg;R] 0
-E710 [u] 0
-E711 [g] 0
-E712 [kg] 0
-E713 [lb] 0
-E714 [oz] 0
-E715 [slug] 0
-E716 [ton(short)] 0
-E717 [ton(long)] 0
-E719 [mton] 0
-E71A [l-atm] 0
-E71B [ft.lbf] 0
-E71C [cal] 0
-E71C [cal_IT] 0
-E71D [cal] 0
-E71D [cal_th] 0
-E71E [Btu] 0
-E71F [kW.h] 0
-E720 [kgf.m] 0
-E721 [Pa] 0
-E722 [kPa] 0
-E723 [bar] 0
-E724 [mmH2O] 0
-E725 [mmHg] 0
-E726 [inH20] 0
-E727 [inHg] 0
-E728 [lbf/in^2] 0
-E729 [kgf/cm^2] 0
-E72A [atm] 0
-E72B [dyne] 0
-E72C &[N]; 0
-E72D [kgf] 0
-E72E [lbf] 0
-E72F [tonf] 0
-e741  0
-e741 &_A; 0
-e742  0
-e742 &_B; 0
-e743  0
-e743 &_C; 0
-e744  0
-e744 &_D; 0
-e745  0
-e745 &_E; 0
-e746  0
-e746 &_F; 0
-e747  0
-e747 &_G; 0
-e748  0
-e748 &_H; 0
-e749  0
-e749 &_I; 0
-e74a  0
-e74a &_J; 0
-e74b  0
-e74b &_K; 0
-e74c  0
-e74c &_L; 0
-e74d  0
-e74d &_M; 0
-e74e  0
-e74e &_N; 0
-e74f  0
-e74f &_O; 0
-e750  0
-e750 &_P; 0
-e751  0
-e751 &_Q; 0
-e752  0
-e752 &_R; 0
-e753  0
-e753 &_S; 0
-e754  0
-e754 &_T; 0
-e755  0
-e755 &_U; 0
-e756  0
-e756 &_V; 0
-e757  0
-e757 &_W; 0
-e758  0
-e758 &_X; 0
-e759  0
-e759 &_Y; 0
-e75a  0
-e75a &_Z; 0
-e761  0
-e761 &_a; 0
-e762  0
-e762 &_b; 0
-e763  0
-e763 &_c; 0
-e764  0
-e764 &_d; 0
-e765  0
-e765 &_e; 0
-e766  0
-e766 &_f; 0
-e767  0
-e767 &_g; 0
-e768  0
-e768 &_h; 0
-e769  0
-e769 &_i; 0
-e76a  0
-e76a &_j; 0
-e76b  0
-e76b &_k; 0
-e76c  0
-e76c &_l; 0
-e76d  0
-e76d &_m; 0
-e76e  0
-e76e &_n; 0
-e76f  0
-e76f &_o; 0
-e770  0
-e770 &_p; 0
-e771  0
-e771 &_q; 0
-e772  0
-e772 &_r; 0
-e773  0
-e773 &_s; 0
-e774  0
-e774 &_t; 0
-e775  0
-e775 &_u; 0
-e776  0
-e776 &_v; 0
-e777  0
-e777 &_w; 0
-e778  0
-e778 &_x; 0
-e779  0
-e779 &_y; 0
-e77a  0
-e77a &_z; 0
-E7B0 [fm] 0
-E7B2 [mm] 0
-E7B3 [cm] 0
-E7B4 [m] 0
-E7B5 [km] 0
-E7B6 [Mil] 0
-E7B7 [in] 0
-E7B8 [ft] 0
-E7B9 [yd] 0
-E7BA [fath] 0
-E7BB [rd] 0
-E7BD [mile] 0
-E7BF [n mile] 0
-E7C0 [acre] 0
-E7C2 [ha] 0
-E7C3 [cm^2] 0
-E7C4 [m^2] 0
-E7C5 [km^2] 0
-E7C7 [in^2] 0
-E7C8 [ft^2] 0
-E7C9 [yd^2] 0
-E7CA [mile^2] 0
-E7CB [m/s] 0
-E7CC [km/h] 0
-E7CD [ft/s] 0
-E7CE [mile/h] 0
-E7CF [knot] 0
-E7D0 [mL] 0
-E7D1 &[L]; 0
-E7D2 [tsp] 0
-E7D3 [cm^3] 0
-E7D4 [m^3] 0
-E7D5 [tbsp] 0
-E7D7 [in^3] 0
-E7D8 [ft^3] 0
-E7D9 [fl_oz(UK)] 0
-E7DA [fl_oz(US)] 0
-E7DB [cup] 0
-E7DC [pt] 0
-E7DD [qt] 0
-E7DE [gal(US)] 0
-E7DF [gal(UK)] 0
-E7E2 [µm] 0
-E7E2 [&micro;m] 0
-E7E3 [mg] 0
-E7E4 [Ang] 0
-E7E8 &[AU]; 0
-E7E9 [l.y.] 0
-E7EA [pc] 0
-E7EB [ft.lbf/s] 0
-E7EC [cal_th/s] 0
-E7ED [hp] 0
-E7EE [Btu/min] 0
-E7EF &[W]; 0
-E7F0 [eV] 0
-E7F1 [erg] 0
-E7F2 &[J]; 0
-E7F3 [cal_15] 0
-E7F4 [kcal_15] 0
-E7F5 [kcal_th] 0
-E7FB [kcal_IT] 0
-F700 If  5
-F701 Then  5
-F702 Else  5
-F703 IfEnd 5
-F704 For  5
-F705  To  5
-F706  Step  5
-F707 Next 5
-F708 While  5
-F709 WhileEnd 5
-F70A Do 5
-F70B LpWhile  5
-F70C Return 5
-F70D Break 5
-F70E Stop 0
-F710 Locate  5
-F711 Send( 0
-F712 Receive( 0
-F713 OpenComport38k 0
-F714 CloseComport38k 0
-F715 Send38k  0
-F716 Receive38k  0
-F718 ClrText 5
-F719 ClrGraph 0
-F71A ClrList  5
-F71B LinearReg(a+bx)  0
-F71C S-L-Normal 0
-F71D S-L-Thick 0
-F71E S-L-Broken 0
-F71F S-L-Dot 0
-F720 DrawGraph 0
-F721 PlotPhase  0
-F722 DrawDyna 0
-F723 DrawStat 0
-F724 DrawFTG-Con 0
-F725 DrawFTG-Plt 0
-F726 DrawR-Con 0
-F727 DrawR-Plt 0
-F728 DrawRΣ-Con 0
-F728 DrawRSum-Con 0
-F729 DrawRΣ-Plt 0
-F729 DrawRSum-Plt 0
-F72A DrawWeb  0
-F72B NormalG  0
-F72C ThickG  0
-F72D BrokenThickG  0
-F72E DispF-Tbl 0
-F72F DispR-Tbl 0
-F730 SimplifyAuto 0
-F731 SimplifyMan 0
-F732 NPPlot 0
-F733 Sinusoidal 0
-F734 SinReg  0
-F735 Logistic 0
-F736 LogisticReg  0
-F73A Pie 0
-F73C Bar 0
-F73F DotG  0
-F740 1-Variable  0
-F741 2-Variable  0
-F742 LinearReg(ax+b)  0
-F743 Med-MedLine  0
-F744 QuadReg  0
-F745 CubicReg  0
-F746 QuartReg  0
-F747 LogReg  0
-F748 ExpReg(a*e^bx)  0
-F749 PowerReg  0
-F74A S-Gph1  0
-F74B S-Gph2  0
-F74C S-Gph3  0
-F74D Square 0
-F74E Cross 0
-F74F Dot 0
-F750 Scatter 0
-F751 xyLine 0
-F752 Hist 0
-F753 MedBox 0
-F755 N-Dist 0
-F756 Broken 0
-F757 Linear 0
-F758 Med-Med 0
-F759 Quad 0
-F75A Cubic 0
-F75B Quart 0
-F75C Log 0
-F75D Exp(a*e^bx) 0
-F75E Power 0
-F75F ExpReg(a*b^x)  0
-F760 S-WindAuto 0
-F761 S-WindMan 0
-F762 Graph X= 0
-F763 Y=Type 0
-F764 r=Type 0
-F765 ParamType 0
-F767 X=Type 0
-F768 X>Type 0
-F769 X<Type 0
-F76A Y>Type 0
-F76B Y<Type 0
-F76C Y>=Type 0
-F76D Y<=Type 0
-F76E X>=Type 0
-F76F X<=Type 0
-F770 G-Connect 0
-F771 G-Plot 0
-F776 Resid-None 0
-F777 Resid-List  0
-F778 BG-None 5
-F779 BG-Pict  5
-F77A GridOff 0
-F77C GridLine 0
-F77D GridOn 0
-F77E Exp(a*b^x) 0
-F780 D Var  0
-F787 Q1Q3TypeStd 0
-F788 VarRange 0
-F789 Q1Q3TypeOnData 0
-F78C SketchNormal  0
-F78D SketchThick  0
-F78E SketchBroken  0
-F78F SketchDot  0
-F790 aType 0
-F790 anType 0
-F791 a₊₁Type 0
-F791 an+1Type 0
-F792 a₊₂Type 0
-F792 an+2Type 0
-F793 StoPict  5
-F794 RclPict  5
-F795 StoGMEM  0
-F796 RclGMEM  0
-F797 StoV-Win  0
-F798 RclV-Win  0
-F799 &%_disp; 0
-F79A Data 0
-F79E Menu  5
-F79F RclCapt  5
-F7A0 Tangent  0
-F7A1 Normal  0
-F7A2 Inverse  0
-F7A3 Vertical  0
-F7A4 Horizontal  0
-F7A5 Text  5
-F7A6 Circle  0
-F7A7 F-Line  0
-F7A8 PlotOn  0
-F7A9 PlotOff  0
-F7AA PlotChg  0
-F7AB PxlOn  0
-F7AC PxlOff  0
-F7AD PxlChg  0
-F7AF PxlTest( 0
-F7B0 SortA( 0
-F7B1 SortD( 0
-F7B2 VarList1 0
-F7B3 VarList2 0
-F7B4 VarList3 0
-F7B5 VarList4 0
-F7B6 VarList5 0
-F7B7 VarList6 0
-F7B8 File1 0
-F7B9 File2 0
-F7BA File3 0
-F7BB File4 0
-F7BC File5 0
-F7BD File6 0
-F7BE Y=DrawSpeedNorm 0
-F7BF Y=DrawSpeedHigh 0
-F7C0 FuncOn 0
-F7C1 SimulOn 0
-F7C2 AxesOn 0
-F7C3 CoordOn 0
-F7C4 LabelOn 0
-F7C5 DerivOn 0
-F7C6 LocusOn 0
-F7C7 ΣDispOn 0
-F7C7 SumDispOn 0
-F7C8 G SelOn  0
-F7C9 T SelOn  0
-F7CA D SelOn  0
-F7CB R SelOn  0
-F7CC DrawOn 0
-F7CD abc 0
-F7CD ab/c 0
-F7CE dc 0
-F7CE d/c 0
-F7D0 FuncOff 0
-F7D1 SimulOff 0
-F7D2 AxesOff 0
-F7D3 CoordOff 0
-F7D4 LabelOff 0
-F7D5 DerivOff 0
-F7D6 LocusOff 0
-F7D7 ΣDispOff 0
-F7D7 SumDispOff 0
-F7D8 G SelOff  0
-F7D9 T SelOff  0
-F7DA D SelOff  0
-F7DB R SelOff  0
-F7DC DrawOff 0
-F901 ->Dec 0
-F902 ->Hex 0
-F903 ->Bin 0
-F904 ->Oct 0
-F905 ->DMS 0
-F906 ->a+b 0
-F906 ->a+bi 0
-F907 ->r∠θ 0
-F907 ->r&angle;&theta; 0
-F908 Real 0
-F909 a+b 0
-F909 a+bi 0
-F90A r∠θ 0
-F90A r&angle;&theta; 0
-F90B EngOn 0
-F90C EngOff 0
-F910 Sel a 0
-F910 Sel a0 0
-F911 Sel a 0
-F911 Sel a1 0
-F912 c 0
-F912 c_n 0
-F913 c₊₁ 0
-F913 c_(n+1) 0
-F914 c₊₂ 0
-F914 c_(n+2) 0
-F915 c 5
-F915 c0 5
-F916 c 5
-F916 c1 5
-F917 c 5
-F917 c2 5
-F918 cnStart 5
-F919 IneqTypeIntsect 0
-F919 IneqTypeAnd 0
-F91B f 0
-F91B fn 0
-F91C File  0
-F91D VarList  0
-F91E ClrMat  5
-F920 ZoomAuto 0
-F921 Xdot 0
-F922 RightXdot 0
-F924 DrawDistNorm  0
-F925 DrawDistT  0
-F926 DrawDistChi  0
-F927 DrawDistF  0
-F928 None 0
-F929 StickLength 0
-F92A StickHoriz 0
-F92B IneqTypeUnion 0
-F92B IneqTypeOr 0
-F92C Graph X> 0
-F92D Graph X< 0
-F92E Graph X>= 0
-F92F Graph X<= 0
-F930 StrJoin( 5
-F931 StrLen( 5
-F932 StrCmp( 5
-F933 StrSrc( 5
-F934 StrLeft( 5
-F935 StrRight( 5
-F936 StrMid( 5
-F937 Exp->Str( 5
-F938 Exp( 0
-F939 StrUpr( 5
-F93A StrLwr( 5
-F93B StrInv( 5
-F93C StrShift( 5
-F93D StrRotate( 5
-F93E ClrVct  0
-F93F Str  5
-F94A CrossP( 0
-F94B DotP( 0
-F95B Norm( 0
-F95E UnitV( 0
-F96D Angle( 0
-F973 ColorAuto  0
-F974 ColorLighter  0
-F975 ColorLinkX&amp;Y 0
-F976 ColorLinkOnlyX 0
-F977 ColorLinkOnlyY 0
-F978 ColorLinkOn 0
-F979 ColorLinkOff 0
-F97A ColorNormal  0
-F97B ERROR 0
-F97C BLANK 0
-F97D ColorClr  0
-F97E ColorLinkX&amp;Freq 0
-F980 NormPD( 0
-F981 NormCD( 0
-F982 InvNormCD( 0
-F983 tPD( 0
-F984 tCD( 0
-F985 InvTCD( 0
-F986 ChiPD( 0
-F987 ChiCD( 0
-F988 InvChiCD( 0
-F989 &FPD(; 0
-F98A &FCD(; 0
-F98B InvFCD( 0
-F98C BinominalPD( 0
-F98D BinominalCD( 0
-F98E InvBinominalCD( 0
-F98F PoissonPD( 0
-F990 PoissonCD( 0
-F991 InvPoissonCD( 0
-F992 GeoPD( 0
-F993 GeoCD( 0
-F994 InvGeoCD( 0
-F995 HypergeoPD( 0
-F996 HypergeoCD( 0
-F997 InvHypergeoCD( 0
-F998 SetG-Color  0
-F999 Plot/Line-Color  0
-F99A AxesScale 0
-F99B Black  0
-F99D Magenta  0
-F99E Cyan  0
-F99F Yellow  0
-F9A0 Smpl_SI( 0
-F9A1 Smpl_SFV( 0
-F9A2 Cmpd_n( 0
-F9A3 Cmpd_I%( 0
-F9A4 Cmpd_PV( 0
-F9A5 Cmpd_PMT( 0
-F9A6 Cmpd_FV( 0
-F9A7 Cash_NPV( 0
-F9A8 Cash_IRR( 0
-F9A9 Cash_PBP( 0
-F9AA Cash_NFV( 0
-F9AB Amt_BAL( 0
-F9AC Amt_INT( 0
-F9AD Amt_PRN( 0
-F9AE AMT_ΣINT( 0
-F9AE Amt_SumINT( 0
-F9AF AMT_ΣPRN( 0
-F9AF Amt_SumPRN( 0
-F9B0 Cnvt_EFF( 0
-F9B1 Cnvt_APR( 0
-F9B2 Cost( 0
-F9B3 Sell( 0
-F9B4 Margin( 0
-F9B5 PmtEnd 0
-F9B6 PmtBgn 0
-F9B7 Bond_PRC( 0
-F9B8 Bond_YLD( 0
-F9B9 DateMode365 0
-F9BA DateMode360 0
-F9BB PeriodsAnnual 0
-F9BC PeriodsSemi 0
-F9BD Days_Prd( 0
-F9E0 OneSampleZTest  0
-F9E1 TwoSampleZTest  0
-F9E2 OneProfZTest  0
-F9E3 TwoPropZTest  0
-F9E8 OneSampleTTest  0
-F9E9 TwoSampleTTest  0
-F9EA LinRegTTest  0
-F9EB ChiGOFTest  0
-F9EC ChiTest  0
-F9ED TwoSampleFTest  0
-F9EE OneWayANOVA  0
-F9EF TwoWayANOVA  0
-F9F0 x1InvN 0
-F9F1 x2InvN 0
-F9F2 xInv 0
-F9F3 SketchThin  0
-F9F4 S-L-Thin 0
-F9F5 ThinG  0
-F9FB zLow 0
-F9FC zUp 0
-F9FD tLow 0
-F9FE tUp 0
+[{
+	"hex":"",
+	"relevance":0,
+	"text":"	"
+},{
+	"hex":"1",
+	"relevance":0,
+	"text":"&femto;"
+},{
+	"hex":"2",
+	"relevance":0,
+	"text":"&pico;"
+},{
+	"hex":"3",
+	"relevance":0,
+	"text":"&nano;",
+	"unicode":""
+},{
+	"hex":"4",
+	"relevance":0,
+	"text":"&micro;",
+	"unicode":"µ"
+},{
+	"hex":"5",
+	"relevance":0,
+	"text":"&milli;"
+},{
+	"hex":"6",
+	"relevance":0,
+	"text":"&kilo;"
+},{
+	"hex":"7",
+	"relevance":0,
+	"text":"&mega;",
+	"unicode":""
+},{
+	"hex":"8",
+	"relevance":0,
+	"text":"&giga;",
+	"unicode":""
+},{
+	"hex":"9",
+	"relevance":0,
+	"text":"&tera;",
+	"unicode":""
+},{
+	"hex":"A",
+	"relevance":0,
+	"text":"&peta;",
+	"unicode":""
+},{
+	"hex":"B",
+	"relevance":0,
+	"text":"&exa;",
+	"unicode":""
+},{
+	"hex":"C",
+	"relevance":5,
+	"text":"&disp;",
+	"unicode":"◢"
+},{
+	"hex":"D",
+	"relevance":0,
+	"text":"\n"
+},{
+	"hex":"E",
+	"relevance":0,
+	"text":"->"
+},{
+	"hex":"F",
+	"relevance":5,
+	"text":"&E;",
+	"unicode":""
+},{
+	"hex":"10",
+	"relevance":0,
+	"text":"<="
+},{
+	"hex":"11",
+	"relevance":0,
+	"text":"!="
+},{
+	"hex":"12",
+	"relevance":0,
+	"text":">="
+},{
+	"hex":"13",
+	"relevance":0,
+	"text":"=>"
+},{
+	"hex":"14",
+	"relevance":0,
+	"text":"f1",
+	"unicode":"f₁"
+},{
+	"hex":"15",
+	"relevance":0,
+	"text":"f2",
+	"unicode":"f₂"
+},{
+	"hex":"16",
+	"relevance":0,
+	"text":"f3",
+	"unicode":"f₃"
+},{
+	"hex":"17",
+	"relevance":0,
+	"text":"f4",
+	"unicode":"f₄"
+},{
+	"hex":"18",
+	"relevance":0,
+	"text":"f5",
+	"unicode":"f₅"
+},{
+	"hex":"19",
+	"relevance":0,
+	"text":"f6",
+	"unicode":"f₆"
+},{
+	"hex":"1A",
+	"relevance":0,
+	"text":"&hexA;",
+	"unicode":""
+},{
+	"hex":"1B",
+	"relevance":0,
+	"text":"&hexB;",
+	"unicode":""
+},{
+	"hex":"1C",
+	"relevance":0,
+	"text":"&hexC;"
+},{
+	"hex":"1D",
+	"relevance":0,
+	"text":"&hexD;",
+	"unicode":""
+},{
+	"hex":"1E",
+	"relevance":0,
+	"text":"&hexE;",
+	"unicode":""
+},{
+	"hex":"1F",
+	"relevance":0,
+	"text":"&hexF;",
+	"unicode":""
+},{
+	"hex":"22",
+	"relevance":0,
+	"text":"\""
+},{
+	"hex":"26",
+	"relevance":0,
+	"text":"&amp;"
+},{
+	"hex":"27",
+	"relevance":0,
+	"text":"'"
+},{
+	"hex":"28",
+	"relevance":0,
+	"text":"("
+},{
+	"hex":"29",
+	"relevance":0,
+	"text":")"
+},{
+	"hex":"2A",
+	"relevance":0,
+	"text":"&ascii_*;",
+	"unicode":""
+},{
+	"hex":"2B",
+	"relevance":0,
+	"text":"&ascii_+;"
+},{
+	"hex":"2c",
+	"relevance":0,
+	"text":","
+},{
+	"hex":"2D",
+	"relevance":0,
+	"text":"&ascii_-;"
+},{
+	"hex":"2e",
+	"relevance":0,
+	"text":"."
+},{
+	"hex":"2F",
+	"relevance":0,
+	"text":"&ascii_/;",
+	"unicode":""
+},{
+	"hex":"30",
+	"relevance":0,
+	"text":"0"
+},{
+	"hex":"31",
+	"relevance":0,
+	"text":"1"
+},{
+	"hex":"32",
+	"relevance":0,
+	"text":"2"
+},{
+	"hex":"33",
+	"relevance":0,
+	"text":"3"
+},{
+	"hex":"34",
+	"relevance":0,
+	"text":"4"
+},{
+	"hex":"35",
+	"relevance":0,
+	"text":"5"
+},{
+	"hex":"36",
+	"relevance":0,
+	"text":"6"
+},{
+	"hex":"37",
+	"relevance":0,
+	"text":"7"
+},{
+	"hex":"38",
+	"relevance":0,
+	"text":"8"
+},{
+	"hex":"39",
+	"relevance":0,
+	"text":"9"
+},{
+	"hex":"3a",
+	"relevance":0,
+	"text":":"
+},{
+	"hex":"3c",
+	"relevance":0,
+	"text":"<"
+},{
+	"hex":"3d",
+	"relevance":0,
+	"text":"="
+},{
+	"hex":"3D",
+	"relevance":0,
+	"text":"&=;"
+},{
+	"hex":"3e",
+	"relevance":0,
+	"text":">"
+},{
+	"hex":"3f",
+	"relevance":0,
+	"text":"?"
+},{
+	"hex":"41",
+	"relevance":0,
+	"text":"A"
+},{
+	"hex":"42",
+	"relevance":0,
+	"text":"B"
+},{
+	"hex":"43",
+	"relevance":0,
+	"text":"C"
+},{
+	"hex":"44",
+	"relevance":0,
+	"text":"D"
+},{
+	"hex":"45",
+	"relevance":0,
+	"text":"E"
+},{
+	"hex":"46",
+	"relevance":0,
+	"text":"F"
+},{
+	"hex":"47",
+	"relevance":0,
+	"text":"G"
+},{
+	"hex":"48",
+	"relevance":0,
+	"text":"H"
+},{
+	"hex":"49",
+	"relevance":0,
+	"text":"I"
+},{
+	"hex":"4a",
+	"relevance":0,
+	"text":"J"
+},{
+	"hex":"4b",
+	"relevance":0,
+	"text":"K"
+},{
+	"hex":"4c",
+	"relevance":0,
+	"text":"L"
+},{
+	"hex":"4d",
+	"relevance":0,
+	"text":"M"
+},{
+	"hex":"4e",
+	"relevance":0,
+	"text":"N"
+},{
+	"hex":"4f",
+	"relevance":0,
+	"text":"O"
+},{
+	"hex":"50",
+	"relevance":0,
+	"text":"P"
+},{
+	"hex":"51",
+	"relevance":0,
+	"text":"Q"
+},{
+	"hex":"52",
+	"relevance":0,
+	"text":"R"
+},{
+	"hex":"53",
+	"relevance":0,
+	"text":"S"
+},{
+	"hex":"54",
+	"relevance":0,
+	"text":"T"
+},{
+	"hex":"55",
+	"relevance":0,
+	"text":"U"
+},{
+	"hex":"56",
+	"relevance":0,
+	"text":"V"
+},{
+	"hex":"57",
+	"relevance":0,
+	"text":"W"
+},{
+	"hex":"58",
+	"relevance":0,
+	"text":"X"
+},{
+	"hex":"59",
+	"relevance":0,
+	"text":"Y"
+},{
+	"hex":"5a",
+	"relevance":0,
+	"text":"Z"
+},{
+	"hex":"5b",
+	"relevance":0,
+	"text":"["
+},{
+	"hex":"5c",
+	"relevance":0,
+	"text":"\\"
+},{
+	"hex":"5d",
+	"relevance":0,
+	"text":"]"
+},{
+	"hex":"5E",
+	"relevance":0,
+	"text":"&ascii_^;"
+},{
+	"hex":"7b",
+	"relevance":0,
+	"text":"{"
+},{
+	"hex":"7d",
+	"relevance":0,
+	"text":"}"
+},{
+	"hex":"7e",
+	"relevance":0,
+	"text":"~"
+},{
+	"hex":"80",
+	"relevance":0,
+	"text":"Pol("
+},{
+	"hex":"81",
+	"relevance":3,
+	"text":"sin "
+},{
+	"hex":"82",
+	"relevance":3,
+	"text":"cos "
+},{
+	"hex":"83",
+	"relevance":3,
+	"text":"tan "
+},{
+	"hex":"84",
+	"relevance":0,
+	"text":"&hex;"
+},{
+	"hex":"85",
+	"relevance":3,
+	"text":"ln "
+},{
+	"hex":"86",
+	"relevance":3,
+	"text":"&sqrt;",
+	"unicode":"√"
+},{
+	"hex":"87",
+	"relevance":5,
+	"text":"&neg;",
+	"unicode":"﹣"
+},{
+	"hex":"88",
+	"relevance":0,
+	"text":"&nPr;",
+	"unicode":""
+},{
+	"hex":"89",
+	"relevance":0,
+	"text":"+"
+},{
+	"hex":"8A",
+	"relevance":0,
+	"text":"&bitwisexnor;"
+},{
+	"hex":"8B",
+	"relevance":4,
+	"text":"&^2;",
+	"unicode":"²"
+},{
+	"hex":"8C",
+	"relevance":0,
+	"text":"&dms;",
+	"unicode":""
+},{
+	"hex":"8D",
+	"relevance":0,
+	"text":"&integral;(",
+	"unicode":"∫("
+},{
+	"hex":"8E",
+	"relevance":0,
+	"text":"Mod"
+},{
+	"hex":"8F",
+	"relevance":0,
+	"text":"sum(x^2)",
+	"unicode":"Σx²"
+},{
+	"hex":"90",
+	"relevance":0,
+	"text":"&x;"
+},{
+	"hex":"91",
+	"relevance":0,
+	"text":"asin "
+},{
+	"hex":"92",
+	"relevance":0,
+	"text":"acos "
+},{
+	"hex":"93",
+	"relevance":0,
+	"text":"atan "
+},{
+	"hex":"94",
+	"relevance":0,
+	"text":"&dec;"
+},{
+	"hex":"95",
+	"relevance":4,
+	"text":"log "
+},{
+	"hex":"96",
+	"relevance":4,
+	"text":"&cbrt;",
+	"unicode":"√"
+},{
+	"hex":"97",
+	"relevance":4,
+	"text":"Abs ",
+	"syntax":"Abs <number>\nAbs <list>\nAbs <mat>",
+	"description":"Calculates the absolute value of the number (distance from 0 in the complex plane). If a list/matrix is given, returns a list/matrix with the absolute value of each case.\n\nDo not forget the parentheses if you are calculating the absolute value of a complex number.",
+	"example":"[code]Abs -5[/code] returns 5\n[code]Abs (1+2i)[/code] returns sqrt(5)"
+},{
+	"hex":"98",
+	"relevance":0,
+	"text":"&nCr;",
+	"unicode":""
+},{
+	"hex":"99",
+	"relevance":0,
+	"text":"&-;",
+	"unicode":"-"
+},{
+	"hex":"9A",
+	"relevance":0,
+	"text":"&bitwisexor;"
+},{
+	"hex":"9B",
+	"relevance":4,
+	"text":"&^-1;",
+	"unicode":""
+},{
+	"hex":"9C",
+	"relevance":0,
+	"text":"&deg;",
+	"unicode":"°"
+},{
+	"hex":"9E",
+	"relevance":0,
+	"text":"Med"
+},{
+	"hex":"9F",
+	"relevance":0,
+	"text":"&sum(x);",
+	"unicode":"Σx"
+},{
+	"hex":"A0",
+	"relevance":0,
+	"text":"Rec("
+},{
+	"hex":"A1",
+	"relevance":0,
+	"text":"sinh "
+},{
+	"hex":"A2",
+	"relevance":0,
+	"text":"cosh "
+},{
+	"hex":"A3",
+	"relevance":0,
+	"text":"tanh "
+},{
+	"hex":"A4",
+	"relevance":0,
+	"text":"&oct;"
+},{
+	"hex":"A5",
+	"relevance":4,
+	"text":"e^"
+},{
+	"hex":"A6",
+	"relevance":5,
+	"text":"Int "
+},{
+	"hex":"A7",
+	"relevance":0,
+	"text":"&bitwiseNot;"
+},{
+	"hex":"A8",
+	"relevance":0,
+	"text":"^"
+},{
+	"hex":"A9",
+	"relevance":0,
+	"text":"*"
+},{
+	"hex":"AA",
+	"relevance":0,
+	"text":"&bitwiseor;"
+},{
+	"hex":"AB",
+	"relevance":0,
+	"text":"&fact;",
+	"syntax":"<int>&fact;",
+	"example":"[code]3&fact;[/code] is 3*2*1=6",
+	"description":"Calculates the factorial of the given integer."
+},{
+	"hex":"AC",
+	"relevance":0,
+	"text":"&rad;",
+	"unicode":""
+},{
+	"hex":"AD",
+	"relevance":0,
+	"text":"minY"
+},{
+	"hex":"AE",
+	"relevance":0,
+	"text":"minX"
+},{
+	"hex":"AF",
+	"relevance":0,
+	"text":"&n_stat;"
+},{
+	"hex":"B1",
+	"relevance":0,
+	"text":"asinh "
+},{
+	"hex":"B2",
+	"relevance":0,
+	"text":"acosh "
+},{
+	"hex":"B3",
+	"relevance":0,
+	"text":"atanh "
+},{
+	"hex":"B4",
+	"relevance":0,
+	"text":"&bin;"
+},{
+	"hex":"B5",
+	"relevance":4,
+	"text":"&_10;",
+	"unicode":""
+},{
+	"hex":"B6",
+	"relevance":0,
+	"text":"Frac ",
+	"syntax": "Frac <value>\nFrac <list>\nFrac <mat>",
+	"description": "Returns the fractionary part of the given value. If it is a list or matrix, it returns a list/matrix with their fractionary parts (as if Frac were applied to each case).",
+	"example": "[code]Frac {1.5, 3}[/code] returns {0.5, 0}"
+},{
+	"hex":"B7",
+	"relevance":0,
+	"text":"Neg "
+},{
+	"hex":"B8",
+	"relevance":4,
+	"text":"&nth_root;",
+	"unicode":"√"
+},{
+	"hex":"B9",
+	"relevance":0,
+	"text":"/"
+},{
+	"hex":"BA",
+	"relevance":0,
+	"text":"&bitwiseand;"
+},{
+	"hex":"BB",
+	"relevance":0,
+	"text":"&frac;",
+	"unicode":"⌟"
+},{
+	"hex":"BC",
+	"relevance":0,
+	"text":"&gra;",
+	"unicode":""
+},{
+	"hex":"BD",
+	"relevance":0,
+	"text":"maxY"
+},{
+	"hex":"BE",
+	"relevance":0,
+	"text":"maxX"
+},{
+	"hex":"BF",
+	"relevance":0,
+	"text":"sum(y^2)",
+	"unicode":"Σy²"
+},{
+	"hex":"C0",
+	"relevance":5,
+	"text":"Ans",
+	"description":"The temporary variable Ans.\n\nWhen you perform a calculation without assigning the result to a variable, the result of this calculation is stored in Ans. If it is a list/matrix, it is stored in List Ans or Mat Ans."
+},{
+	"hex":"C1",
+	"relevance":4,
+	"text":"Ran# "
+},{
+	"hex":"C2",
+	"relevance":0,
+	"text":"&x_overline;",
+	"unicode":""
+},{
+	"hex":"C3",
+	"relevance":0,
+	"text":"&y_overline;",
+	"unicode":""
+},{
+	"hex":"C4",
+	"relevance":0,
+	"text":"sigma(x)",
+	"unicode":"σx"
+},{
+	"hex":"C5",
+	"relevance":0,
+	"text":"sx"
+},{
+	"hex":"C6",
+	"relevance":0,
+	"text":"sigma(y)",
+	"unicode":"σy"
+},{
+	"hex":"C7",
+	"relevance":0,
+	"text":"sy"
+},{
+	"hex":"C8",
+	"relevance":0,
+	"text":"&a_reg;"
+},{
+	"hex":"C9",
+	"relevance":0,
+	"text":"&b_reg;"
+},{
+	"hex":"CA",
+	"relevance":0,
+	"text":"&r_reg;"
+},{
+	"hex":"CB",
+	"relevance":0,
+	"text":"&x^;",
+	"unicode":""
+},{
+	"hex":"CC",
+	"relevance":0,
+	"text":"&y^;",
+	"unicode":""
+},{
+	"hex":"CD",
+	"relevance":5,
+	"text":"&r;",
+	"unicode":""
+},{
+	"hex":"CE",
+	"relevance":5,
+	"text":"&theta;",
+	"unicode":"θ"
+},{
+	"hex":"CF",
+	"relevance":0,
+	"text":"sum(y)",
+	"unicode":"Σy"
+},{
+	"hex":"D0",
+	"relevance":5,
+	"text":"&pi;",
+	"unicode":"π"
+},{
+	"hex":"D1",
+	"relevance":5,
+	"text":"Cls",
+	"description": "Clears the graphical screen, but not the ViewWindow. To clear the ViewWindow, see ClrGraph."
+},{
+	"hex":"D3",
+	"relevance":0,
+	"text":"Rnd"
+},{
+	"hex":"D4",
+	"relevance":0,
+	"text":"Dec"
+},{
+	"hex":"D5",
+	"relevance":0,
+	"text":"Hex"
+},{
+	"hex":"D6",
+	"relevance":0,
+	"text":"Bin"
+},{
+	"hex":"D7",
+	"relevance":0,
+	"text":"Oct"
+},{
+	"hex":"D8",
+	"relevance":0,
+	"text":"&white_rectangle;",
+	"unicode":"▯"
+},{
+	"hex":"D9",
+	"relevance":0,
+	"text":"Norm "
+},{
+	"hex":"DA",
+	"relevance":0,
+	"text":"Deg",
+	"description": "Sets the calculation mode to Degrees. See also : Rad, Gra"
+},{
+	"hex":"DB",
+	"relevance":0,
+	"text":"Rad",
+	"description": "Sets the calculation mode to Radians (360 deg = 2pi rad). See also : Deg, Gra"
+},{
+	"hex":"DC",
+	"relevance":0,
+	"text":"Gra",
+	"description": "Sets the calculation mode to Gradians (1 gra = 1/400th of circle). See also : Deg, Rad"
+},{
+	"hex":"DD",
+	"relevance":0,
+	"text":"Eng"
+},{
+	"hex":"DE",
+	"relevance":0,
+	"text":"Intg "
+},{
+	"hex":"DF",
+	"relevance":0,
+	"text":"sum(x,y)",
+	"unicode":"Σxy"
+},{
+	"hex":"E0",
+	"relevance":0,
+	"text":"Plot "
+},{
+	"hex":"E1",
+	"relevance":0,
+	"text":"Line"
+},{
+	"hex":"E2",
+	"relevance":5,
+	"text":"Lbl "
+},{
+	"hex":"E3",
+	"relevance":0,
+	"text":"Fix ",
+	"syntax": "Fix <0-9>",
+	"description": "Fixes the number of decimals displayed when displaying a number. Note that it does not affect the internal calculations, only the display.\n\nThe result is rounded, or padded with 0's.\n\nThis function only supports literals, using [code]Fix A[/code] will give a syntax error.",
+	"example":"With [code]Fix 3[/code] :\n- 0.5678 is displayed as 0.568\n- 0.4 is displayed as 0.400"
+},{
+	"hex":"E4",
+	"relevance":0,
+	"text":"Sci "
+},{
+	"hex":"E8",
+	"relevance":0,
+	"text":"Dsz ",
+	"syntax": "Dsz <alphaVar>",
+	"description": "Decrements the given alpha var (A-Z, r, theta) by 1. [b]If the variable is 0 after the decrementation, the following instruction will not be executed![/b]\n\nThe instruction takes slightly less time than [code]alphaVar-1->alphaVar[/code], but it is advised not to use it because of the quirk, or at least to put an ':' after it so that it always executes the next instruction.\n\nSee also : Isz",
+	"example": "[code]1->A : Dsz A : \"Test\"[/code] - \"Test\" will not be displayed because A = 0 after the decrementation."
+},{
+	"hex":"E9",
+	"relevance":0,
+	"text":"Isz ",
+	"syntax": "Isz <alphaVar>",
+	"description": "Increments the given alpha var (A-Z, r, theta) by 1. [b]If the variable is 0 after the incrementation, the following instruction will not be executed![/b]\n\nThe instruction takes slightly less time than [code]alphaVar+1->alphaVar[/code], but it is advised not to use it because of the quirk, or at least to put an ':' after it so that it always executes the next instruction.\n\nSee also : Dsz",
+	"example": "[code]-1->A : Isz A : \"Test\"[/code] - \"Test\" will not be displayed because A = 0 after the incrementation."
+},{
+	"hex":"EA",
+	"relevance":0,
+	"text":"Factor "
+},{
+	"hex":"EB",
+	"relevance":5,
+	"text":"ViewWindow "
+},{
+	"hex":"EC",
+	"relevance":5,
+	"text":"Goto "
+},{
+	"hex":"ED",
+	"relevance":5,
+	"text":"Prog "
+},{
+	"hex":"EE",
+	"relevance":0,
+	"text":"Graph Y="
+},{
+	"hex":"EF",
+	"relevance":0,
+	"text":"Graph &integral;",
+	"unicode":"Graph ∫"
+},{
+	"hex":"F0",
+	"relevance":0,
+	"text":"Graph Y>"
+},{
+	"hex":"F1",
+	"relevance":0,
+	"text":"Graph Y<"
+},{
+	"hex":"F2",
+	"relevance":0,
+	"text":"Graph Y>="
+},{
+	"hex":"F3",
+	"relevance":0,
+	"text":"Graph Y<="
+},{
+	"hex":"F4",
+	"relevance":0,
+	"text":"Graph r="
+},{
+	"hex":"F5",
+	"relevance":5,
+	"text":"Graph(X,Y)=("
+},{
+	"hex":"F6",
+	"relevance":0,
+	"text":"&,;"
+},{
+	"hex":"FB",
+	"relevance":0,
+	"text":"&prob_P(;"
+},{
+	"hex":"FC",
+	"relevance":0,
+	"text":"&prob_Q(;"
+},{
+	"hex":"FD",
+	"relevance":0,
+	"text":"&prob_R(;"
+},{
+	"hex":"FE",
+	"relevance":0,
+	"text":"&prob_t(;"
+},{
+	"hex":"7F00",
+	"relevance":0,
+	"text":"Xmin"
+},{
+	"hex":"7F01",
+	"relevance":0,
+	"text":"Xmax"
+},{
+	"hex":"7F02",
+	"relevance":0,
+	"text":"Xscl"
+},{
+	"hex":"7F04",
+	"relevance":0,
+	"text":"Ymin"
+},{
+	"hex":"7F05",
+	"relevance":0,
+	"text":"Ymax"
+},{
+	"hex":"7F06",
+	"relevance":0,
+	"text":"Yscl"
+},{
+	"hex":"7F08",
+	"relevance":0,
+	"text":"T&theta;min",
+	"unicode":"Tθmin"
+},{
+	"hex":"7F09",
+	"relevance":0,
+	"text":"T&theta;max",
+	"unicode":"Tθmax"
+},{
+	"hex":"7F0A",
+	"relevance":0,
+	"text":"T&theta;ptch",
+	"unicode":"Tθptch"
+},{
+	"hex":"7F0B",
+	"relevance":0,
+	"text":"Xfct"
+},{
+	"hex":"7F0C",
+	"relevance":0,
+	"text":"Yfct"
+},{
+	"hex":"7F0D",
+	"relevance":0,
+	"text":"D Start"
+},{
+	"hex":"7F0E",
+	"relevance":0,
+	"text":"D End"
+},{
+	"hex":"7F0F",
+	"relevance":0,
+	"text":"D pitch"
+},{
+	"hex":"7F10",
+	"relevance":0,
+	"text":"RightXmin"
+},{
+	"hex":"7F11",
+	"relevance":0,
+	"text":"RightXmax"
+},{
+	"hex":"7F12",
+	"relevance":0,
+	"text":"RightXscl"
+},{
+	"hex":"7F14",
+	"relevance":0,
+	"text":"RightYmin"
+},{
+	"hex":"7F15",
+	"relevance":0,
+	"text":"RightYmax"
+},{
+	"hex":"7F16",
+	"relevance":0,
+	"text":"RightYscl"
+},{
+	"hex":"7F18",
+	"relevance":0,
+	"text":"RightT&theta;min",
+	"unicode":"Rightθmin"
+},{
+	"hex":"7F19",
+	"relevance":0,
+	"text":"RightT&theta;max",
+	"unicode":"Rightθmax"
+},{
+	"hex":"7F1A",
+	"relevance":0,
+	"text":"RightT&theta;ptch",
+	"unicode":"Rightθptch"
+},{
+	"hex":"7F1B",
+	"relevance":0,
+	"text":"StdDef_&sigma;(",
+	"unicode":"StdDev_σ("
+},{
+	"hex":"7F1C",
+	"relevance":0,
+	"text":"Variance_&sigma;&^2;(",
+	"unicode":"Variance_σ²("
+},{
+	"hex":"7F1D",
+	"relevance":0,
+	"text":"&c_reg;"
+},{
+	"hex":"7F1E",
+	"relevance":0,
+	"text":"&d_reg;"
+},{
+	"hex":"7F1F",
+	"relevance":0,
+	"text":"&e_reg;"
+},{
+	"hex":"7F20",
+	"relevance":0,
+	"text":"Max("
+},{
+	"hex":"7F21",
+	"relevance":0,
+	"text":"Det "
+},{
+	"hex":"7F22",
+	"relevance":0,
+	"text":"Arg "
+},{
+	"hex":"7F23",
+	"relevance":0,
+	"text":"Conjg "
+},{
+	"hex":"7F24",
+	"relevance":4,
+	"text":"ReP "
+},{
+	"hex":"7F25",
+	"relevance":4,
+	"text":"ImP "
+},{
+	"hex":"7F26",
+	"relevance":0,
+	"text":"d/dx(",
+	"unicode":"ddx("
+},{
+	"hex":"7F27",
+	"relevance":0,
+	"text":"d^2/dx^2(",
+	"unicode":"d²dx²("
+},{
+	"hex":"7F28",
+	"relevance":0,
+	"text":"Solve("
+},{
+	"hex":"7F29",
+	"relevance":0,
+	"text":"sum(",
+	"unicode":"Σ("
+},{
+	"hex":"7F2A",
+	"relevance":0,
+	"text":"FMin("
+},{
+	"hex":"7F2B",
+	"relevance":0,
+	"text":"FMax("
+},{
+	"hex":"7F2C",
+	"relevance":0,
+	"text":"Seq("
+},{
+	"hex":"7F2D",
+	"relevance":0,
+	"text":"Min("
+},{
+	"hex":"7F2E",
+	"relevance":0,
+	"text":"Mean("
+},{
+	"hex":"7F2F",
+	"relevance":0,
+	"text":"Median("
+},{
+	"hex":"7F30",
+	"relevance":0,
+	"text":"SolveN("
+},{
+	"hex":"7F34",
+	"relevance":0,
+	"text":"Red ",
+	"syntax": "Red <graphical function>",
+	"description": "Displays the given graphical function in red.",
+	"compat": "Prizm/Graph 90+E"
+},{
+	"hex":"7F35",
+	"relevance":0,
+	"text":"Blue ",
+	"syntax": "Blue <graphical function>",
+	"description": "Displays the given graphical function in blue.",
+	"compat": "Prizm/Graph 90+E"
+},{
+	"hex":"7F36",
+	"relevance":0,
+	"text":"Green ",
+	"syntax": "Green <graphical function>",
+	"description": "Displays the given graphical function in green.",
+	"compat": "Prizm/Graph 90+E"
+},{
+	"hex":"7F3A",
+	"relevance":5,
+	"text":"&MOD(;"
+},{
+	"hex":"7F3B",
+	"relevance":0,
+	"text":"MOD_Exp("
+},{
+	"hex":"7F3C",
+	"relevance":0,
+	"text":"&GCD(;",
+	"syntax": "GCD(int nb1, int nb2(, int ...))\nGCD(List l)\nGCD(int nb, List l)\nGCD(List l, int nb)",
+	"description": "Calculates the Greatest Common Divisor (PGCD in french) between the numbers given.\n\nIf ints (at least 2) or a list (at least 2 cases) of integers is given, it calculates the PGCD of all these numbers. If a list and int is given, it calculates the PGCD between the int and each case of the list (separately).\n\nIn BIDE, the function is written &GCD(; to prevent confusion because it could be interpreted as the product of variables G, C, D, and some parenthesized expression.",
+	"example": "[code]GCD(12, 48)[/code] = [code]GCD({12, 48})[/code] = 12\n[code]GCD(12, 48, 3)[/code] = 3\n[code]GCD({12, 16}, 3)[/code] = {3, 1}"
+},{
+	"hex":"7F3D",
+	"relevance":0,
+	"text":"&LCM(;"
+},{
+	"hex":"7F3E",
+	"relevance":0,
+	"text":"StdDev("
+},{
+	"hex":"7F3F",
+	"relevance":0,
+	"text":"Variance("
+},{
+	"hex":"7F40",
+	"relevance":5,
+	"text":"Mat "
+},{
+	"hex":"7F41",
+	"relevance":0,
+	"text":"Trn "
+},{
+	"hex":"7F42",
+	"relevance":0,
+	"text":"*Row ",
+	"unicode":"Row",
+	"syntax":"&mult;Row <multiplier>, <matLetter>, <line>",
+	"description":"Calculates the product of the given line of the given matrix by the multiplier.",	"example":"[code]&mult;Row 4,C,3[/code] computes the product of the 3rd line of Mat C by 4"
+},{
+	"hex":"7F43",
+	"relevance":0,
+	"text":"*Row+ ",
+	"unicode":"Row+ ",
+	"syntax":"&mult;Row+ <multiplier>, <matLetter>, <line1>, <line2>",
+	"description":"Calculates the product of the line1-th line of the given matrix by the multiplier, then adds the result to the line2-th line.",
+	"example":"[code]&mult;Row 4,C,3,6[/code] computes the product of the 3rd line of Mat C by 4, then adds the result to the 6th line of Mat C."
+},{
+	"hex":"7F44",
+	"relevance":0,
+	"text":"Row+ "
+},{
+	"hex":"7F45",
+	"relevance":0,
+	"text":"Swap "
+},{
+	"hex":"7F46",
+	"relevance":0,
+	"text":"Dim ",
+	"syntax": "<number> -> Dim <list>\n<list of 2 cases> -> Dim <mat>\nDim <list&slash;mat>",
+	"description": "Sets (or gets, if there is no assignment) the dimension of the given matrix/list.\n\nIf it assigns a value to the dimension, it creates a new list/matrix of the given dimension, filled with 0's.",
+	"example": "[code]3->Dim List 1[/code] - List 1 is now {0,0,0}\n[code]{2,3}->Dim Mat A[/code] - Mat A is now [[0,0][0,0][0,0]]"
+},{
+	"hex":"7F47",
+	"relevance":0,
+	"text":"Fill(",
+	"syntax": "Fill(Nbr n, Mat m)\nFill(Nbr n, List l)",
+	"description": "Fills the given matrix/list with the given number."
+},{
+	"hex":"7F48",
+	"relevance":0,
+	"text":"Identity "
+},{
+	"hex":"7F49",
+	"relevance":0,
+	"text":"Augment(",
+	"syntax":"Augment(Mat matA, Mat matB)\nAugment(List list1, List list2)",
+	"description": "Returns the concatenation of the given matrixes/lists. Both matrixes must have the same number of lines.",
+	"example": "[code]Augment([[1,2][3,4]], [[5][7]])[/code] returns [[1,2,5][3,4,7]]\n[code]Augment({1,2,3}, {4,5}[/code] returns {1,2,3,4,5}"
+},{
+	"hex":"7F4A",
+	"relevance":0,
+	"text":"List->Mat("
+},{
+	"hex":"7F4B",
+	"relevance":0,
+	"text":"Mat->List"
+},{
+	"hex":"7F4C",
+	"relevance":0,
+	"text":"Sum "
+},{
+	"hex":"7F4D",
+	"relevance":0,
+	"text":"Prod "
+},{
+	"hex":"7F4E",
+	"relevance":0,
+	"text":"Percent "
+},{
+	"hex":"7F4F",
+	"relevance":0,
+	"text":"Cuml ",
+	"syntax": "Cuml <list>",
+	"description": "Returns the cumulated sum of the given list, such that each case of the list is the sum of itself and the previous ones.",
+	"example": "[code]Cuml {1,2,3,4}[/code] returns {1,3,6,10} ({1, 1+2, 1+2+3, 1+2+3+4})"
+},{
+	"hex":"7F50",
+	"relevance":5,
+	"text":"&i;",
+	"unicode":"",
+	"description": "The imaginary unit i such that i² = -1."
+},{
+	"hex":"7F51",
+	"relevance":5,
+	"text":"List "
+},{
+	"hex":"7F52",
+	"relevance":0,
+	"text":"&Delta;List ",
+	"unicode":"ΔList"
+},{
+	"hex":"7F53",
+	"relevance":0,
+	"text":"&infty;",
+	"unicode":"∞"
+},{
+	"hex":"7F54",
+	"relevance":0,
+	"text":"&angle;",
+	"unicode":"∠"
+},{
+	"hex":"7F55",
+	"relevance":0,
+	"text":"Ref "
+},{
+	"hex":"7F56",
+	"relevance":0,
+	"text":"Rref "
+},{
+	"hex":"7F57",
+	"relevance":0,
+	"text":"&to;"
+},{
+	"hex":"7F60",
+	"relevance":0,
+	"text":"Sim Coef"
+},{
+	"hex":"7F61",
+	"relevance":0,
+	"text":"Ply Coef"
+},{
+	"hex":"7F62",
+	"relevance":0,
+	"text":"Sim Result"
+},{
+	"hex":"7F63",
+	"relevance":0,
+	"text":"Ply Result"
+},{
+	"hex":"7F64",
+	"relevance":0,
+	"text":"&n_financ;"
+},{
+	"hex":"7F65",
+	"relevance":0,
+	"text":"I%"
+},{
+	"hex":"7F66",
+	"relevance":0,
+	"text":"&PV;"
+},{
+	"hex":"7F67",
+	"relevance":0,
+	"text":"&PMT;"
+},{
+	"hex":"7F68",
+	"relevance":0,
+	"text":"&FV;"
+},{
+	"hex":"7F6A",
+	"relevance":0,
+	"text":"List1"
+},{
+	"hex":"7F6B",
+	"relevance":0,
+	"text":"List2"
+},{
+	"hex":"7F6C",
+	"relevance":0,
+	"text":"List3"
+},{
+	"hex":"7F6D",
+	"relevance":0,
+	"text":"List4"
+},{
+	"hex":"7F6E",
+	"relevance":0,
+	"text":"List5"
+},{
+	"hex":"7F6F",
+	"relevance":0,
+	"text":"List6"
+},{
+	"hex":"7F76",
+	"relevance":0,
+	"text":"Q_1",
+	"unicode":"Q₁"
+},{
+	"hex":"7F77",
+	"relevance":0,
+	"text":"Q_3",
+	"unicode":"Q₃"
+},{
+	"hex":"7F78",
+	"relevance":0,
+	"text":"x_1",
+	"unicode":"x₁"
+},{
+	"hex":"7F79",
+	"relevance":0,
+	"text":"y_1",
+	"unicode":"y₁"
+},{
+	"hex":"7F7A",
+	"relevance":0,
+	"text":"x_2",
+	"unicode":"x₂"
+},{
+	"hex":"7F7B",
+	"relevance":0,
+	"text":"y_2",
+	"unicode":"y₂"
+},{
+	"hex":"7F7C",
+	"relevance":0,
+	"text":"x_3",
+	"unicode":"x₃"
+},{
+	"hex":"7F7D",
+	"relevance":0,
+	"text":"y_3",
+	"unicode":"y₃"
+},{
+	"hex":"7F84",
+	"relevance":0,
+	"text":"Vct "
+},{
+	"hex":"7F85",
+	"relevance":0,
+	"text":"logab("
+},{
+	"hex":"7F86",
+	"relevance":0,
+	"text":"RndFix("
+},{
+	"hex":"7F87",
+	"relevance":5,
+	"text":"RanInt#(",
+	"syntax":"RanInt#(int lowerBound, int higherBound)\nRanInt#(int lowerBound, int higherBound, int nbGenerations)",
+	"example":"[code]RanInt#(1,2)[/code] returns randomly 1 or 2\n[code]RanInt#(1,2,3)[/code] will return a list with 3 elements, either 1 or 2 in value",
+	"description":"Returns a random number (or a list of [code]nbGenerations[/code] random numbers, if specified) between lowerBound and higherBound (included). lowerBound must be strictly inferior to higherBound.",
+	"compat":"OS 2.00"
+},{
+	"hex":"7F88",
+	"relevance":0,
+	"text":"RanList#("
+},{
+	"hex":"7F89",
+	"relevance":0,
+	"text":"RanBin#("
+},{
+	"hex":"7F8A",
+	"relevance":0,
+	"text":"RanNorm#("
+},{
+	"hex":"7F8B",
+	"relevance":0,
+	"text":"RanSamp#("
+},{
+	"hex":"7F8C",
+	"relevance":0,
+	"text":"sum(a_n)",
+	"unicode":"Σa"
+},{
+	"hex":"7F8D",
+	"relevance":0,
+	"text":"sum(b_n)",
+	"unicode":"Σb"
+},{
+	"hex":"7F8E",
+	"relevance":0,
+	"text":"sum(c_n)",
+	"unicode":"Σc"
+},{
+	"hex":"7F8F",
+	"relevance":5,
+	"text":"GetKey"
+},{
+	"hex":"7F90",
+	"relevance":0,
+	"text":"F Result"
+},{
+	"hex":"7F91",
+	"relevance":0,
+	"text":"F Start"
+},{
+	"hex":"7F92",
+	"relevance":0,
+	"text":"F End"
+},{
+	"hex":"7F93",
+	"relevance":0,
+	"text":"F pitch"
+},{
+	"hex":"7F94",
+	"relevance":0,
+	"text":"R Result"
+},{
+	"hex":"7F95",
+	"relevance":0,
+	"text":"R Start"
+},{
+	"hex":"7F96",
+	"relevance":0,
+	"text":"R End"
+},{
+	"hex":"7F97",
+	"relevance":0,
+	"text":"H Start"
+},{
+	"hex":"7F98",
+	"relevance":0,
+	"text":"H pitch"
+},{
+	"hex":"7F9C",
+	"relevance":0,
+	"text":"->Simp "
+},{
+	"hex":"7FA0",
+	"relevance":0,
+	"text":"a_n",
+	"unicode":"a"
+},{
+	"hex":"7FA1",
+	"relevance":0,
+	"text":"a_(n+1)",
+	"unicode":"a₊₁"
+},{
+	"hex":"7FA2",
+	"relevance":0,
+	"text":"a_(n+2)",
+	"unicode":"a₊₂"
+},{
+	"hex":"7FA3",
+	"relevance":0,
+	"text":"&n_recur;"
+},{
+	"hex":"7FA4",
+	"relevance":5,
+	"text":"a0",
+	"unicode":"a"
+},{
+	"hex":"7FA5",
+	"relevance":5,
+	"text":"a1",
+	"unicode":"a"
+},{
+	"hex":"7FA6",
+	"relevance":5,
+	"text":"a2",
+	"unicode":"a"
+},{
+	"hex":"7FA7",
+	"relevance":0,
+	"text":"b_n",
+	"unicode":"b"
+},{
+	"hex":"7FA8",
+	"relevance":0,
+	"text":"b_(n+1)",
+	"unicode":"b₊₁"
+},{
+	"hex":"7FA9",
+	"relevance":0,
+	"text":"b_(n+2)",
+	"unicode":"b₊₂"
+},{
+	"hex":"7FAA",
+	"relevance":5,
+	"text":"b0",
+	"unicode":"b"
+},{
+	"hex":"7FAB",
+	"relevance":5,
+	"text":"b1",
+	"unicode":"b"
+},{
+	"hex":"7FAC",
+	"relevance":5,
+	"text":"b2",
+	"unicode":"b"
+},{
+	"hex":"7FAD",
+	"relevance":5,
+	"text":"anStart"
+},{
+	"hex":"7FAE",
+	"relevance":5,
+	"text":"bnStart"
+},{
+	"hex":"7FB0",
+	"relevance":5,
+	"text":" And ",
+	"syntax":"<number&slash;list> And <number&slash;list>",
+	"description":"Performs a logical And on the operands.",
+	"example":"[code]0 And 0[/code] is 0\n[code]0 And 1[/code] is 0\n[code]1 And 0[/code] is 0\n[code]1 And 1[/code] is 1\nNote that 1 could be replaced by any non-0 value (0.3, -4, etc).\nIf performed on lists, it matches each value in the list with the other operand:\n[code]{1,0} And 1[/code] is {1,0}\n[code]{1,0,1} And {1,1,0}[/code] is {1,0,0}"
+},{
+	"hex":"7FB1",
+	"relevance":5,
+	"text":" Or "
+},{
+	"hex":"7FB3",
+	"relevance":5,
+	"text":"Not "
+},{
+	"hex":"7FB4",
+	"relevance":5,
+	"text":" Xor "
+},{
+	"hex":"7FB5",
+	"relevance":0,
+	"text":"sum(a_n+1)",
+	"unicode":"Σa₊₁"
+},{
+	"hex":"7FB6",
+	"relevance":0,
+	"text":"sum(b_n+1)",
+	"unicode":"Σb₊₁"
+},{
+	"hex":"7FB7",
+	"relevance":0,
+	"text":"sum(c_n+1)",
+	"unicode":"Σc₊₁"
+},{
+	"hex":"7FB9",
+	"relevance":0,
+	"text":"sum(a_n+2)",
+	"unicode":"Σa₊₂"
+},{
+	"hex":"7FBA",
+	"relevance":0,
+	"text":"sum(b_n+2)",
+	"unicode":"Σb₊₂"
+},{
+	"hex":"7FBB",
+	"relevance":0,
+	"text":"sum(c_n+2)",
+	"unicode":"Σc₊₂"
+},{
+	"hex":"7FBC",
+	"relevance":0,
+	"text":" Int/ "
+},{
+	"hex":"7FBD",
+	"relevance":0,
+	"text":" Rmdr "
+},{
+	"hex":"7FBE",
+	"relevance":0,
+	"text":"Fa"
+},{
+	"hex":"7FC0",
+	"relevance":0,
+	"text":"n1"
+},{
+	"hex":"7FC1",
+	"relevance":0,
+	"text":"n2"
+},{
+	"hex":"7FC2",
+	"relevance":0,
+	"text":"&mean_1;",
+	"unicode":"1"
+},{
+	"hex":"7FC3",
+	"relevance":0,
+	"text":"&mean_2;",
+	"unicode":"2"
+},{
+	"hex":"7FC4",
+	"relevance":0,
+	"text":"sx1"
+},{
+	"hex":"7FC5",
+	"relevance":0,
+	"text":"sx2"
+},{
+	"hex":"7FC6",
+	"relevance":0,
+	"text":"sp"
+},{
+	"hex":"7FC7",
+	"relevance":0,
+	"text":"&p^;",
+	"unicode":""
+},{
+	"hex":"7FC8",
+	"relevance":0,
+	"text":"&p^_1;",
+	"unicode":"1"
+},{
+	"hex":"7FC9",
+	"relevance":0,
+	"text":"&p^_2;",
+	"unicode":"2"
+},{
+	"hex":"7FCA",
+	"relevance":0,
+	"text":"Lower"
+},{
+	"hex":"7FCB",
+	"relevance":0,
+	"text":"Upper"
+},{
+	"hex":"7FCC",
+	"relevance":0,
+	"text":"&P/Y;"
+},{
+	"hex":"7FCD",
+	"relevance":0,
+	"text":"&C/Y;"
+},{
+	"hex":"7FCE",
+	"relevance":0,
+	"text":"Fb"
+},{
+	"hex":"7FD0",
+	"relevance":0,
+	"text":"&F_val;"
+},{
+	"hex":"7FD1",
+	"relevance":0,
+	"text":"&z_val;"
+},{
+	"hex":"7FD2",
+	"relevance":0,
+	"text":"&p_val;"
+},{
+	"hex":"7FD3",
+	"relevance":0,
+	"text":"&t_val;"
+},{
+	"hex":"7FD4",
+	"relevance":0,
+	"text":"se"
+},{
+	"hex":"7FD5",
+	"relevance":0,
+	"text":"&chi^2;",
+	"unicode":"χ²"
+},{
+	"hex":"7FD6",
+	"relevance":0,
+	"text":"&r^2;",
+	"unicode":"r²"
+},{
+	"hex":"7FD7",
+	"relevance":0,
+	"text":"Adf"
+},{
+	"hex":"7FD8",
+	"relevance":0,
+	"text":"Edf"
+},{
+	"hex":"7FD9",
+	"relevance":0,
+	"text":"df"
+},{
+	"hex":"7FDA",
+	"relevance":0,
+	"text":"SSa"
+},{
+	"hex":"7FDB",
+	"relevance":0,
+	"text":"MSa"
+},{
+	"hex":"7FDC",
+	"relevance":0,
+	"text":"SSe"
+},{
+	"hex":"7FDD",
+	"relevance":0,
+	"text":"MSe"
+},{
+	"hex":"7FDE",
+	"relevance":0,
+	"text":"Fab"
+},{
+	"hex":"7FE0",
+	"relevance":0,
+	"text":"Bdf"
+},{
+	"hex":"7FE1",
+	"relevance":0,
+	"text":"ABdf"
+},{
+	"hex":"7FE2",
+	"relevance":0,
+	"text":"pa"
+},{
+	"hex":"7FE3",
+	"relevance":0,
+	"text":"pb"
+},{
+	"hex":"7FE4",
+	"relevance":0,
+	"text":"pab"
+},{
+	"hex":"7FE9",
+	"relevance":0,
+	"text":"CellSum("
+},{
+	"hex":"7FEA",
+	"relevance":0,
+	"text":"CellProd("
+},{
+	"hex":"7FEB",
+	"relevance":0,
+	"text":"CellMin("
+},{
+	"hex":"7FEC",
+	"relevance":0,
+	"text":"CellMax("
+},{
+	"hex":"7FED",
+	"relevance":0,
+	"text":"CellMean("
+},{
+	"hex":"7FEE",
+	"relevance":0,
+	"text":"CellMedian("
+},{
+	"hex":"7FEF",
+	"relevance":0,
+	"text":"CellIf("
+},{
+	"hex":"7FF0",
+	"relevance":0,
+	"text":"&Y_graph;",
+	"unicode":""
+},{
+	"hex":"7FF1",
+	"relevance":0,
+	"text":"&r_graph;",
+	"unicode":""
+},{
+	"hex":"7FF2",
+	"relevance":0,
+	"text":"&Xt_graph;",
+	"unicode":"t"
+},{
+	"hex":"7FF3",
+	"relevance":0,
+	"text":"&Yt_graph;",
+	"unicode":"t"
+},{
+	"hex":"7FF4",
+	"relevance":0,
+	"text":"&X_graph;",
+	"unicode":""
+},{
+	"hex":"7FFB",
+	"relevance":0,
+	"text":"SSb"
+},{
+	"hex":"7FFC",
+	"relevance":0,
+	"text":"SSab"
+},{
+	"hex":"7FFD",
+	"relevance":0,
+	"text":"MSb"
+},{
+	"hex":"7FFE",
+	"relevance":0,
+	"text":"MSab"
+},{
+	"hex":"E501",
+	"relevance":0,
+	"text":"&Agrave;",
+	"unicode":"À"
+},{
+	"hex":"E502",
+	"relevance":0,
+	"text":"&Aacute;",
+	"unicode":"Á"
+},{
+	"hex":"E503",
+	"relevance":0,
+	"text":"&Acirc;",
+	"unicode":"Â"
+},{
+	"hex":"E504",
+	"relevance":0,
+	"text":"&Atilde;",
+	"unicode":"Ã"
+},{
+	"hex":"E505",
+	"relevance":0,
+	"text":"&Auml;",
+	"unicode":"Ä"
+},{
+	"hex":"E506",
+	"relevance":0,
+	"text":"&Aring;",
+	"unicode":"Å"
+},{
+	"hex":"E507",
+	"relevance":0,
+	"text":"&AE;",
+	"unicode":"Æ"
+},{
+	"hex":"E508",
+	"relevance":0,
+	"text":"&Ccedil;",
+	"unicode":"Ç"
+},{
+	"hex":"E509",
+	"relevance":0,
+	"text":"&Egrave;",
+	"unicode":"È"
+},{
+	"hex":"E50A",
+	"relevance":0,
+	"text":"&Eacute;",
+	"unicode":"É"
+},{
+	"hex":"E50B",
+	"relevance":0,
+	"text":"&Ecirc;",
+	"unicode":"Ê"
+},{
+	"hex":"E50C",
+	"relevance":0,
+	"text":"&Euml;",
+	"unicode":"Ë"
+},{
+	"hex":"E50D",
+	"relevance":0,
+	"text":"&Igrave;",
+	"unicode":"Ì"
+},{
+	"hex":"E50E",
+	"relevance":0,
+	"text":"&Iacute;",
+	"unicode":"Í"
+},{
+	"hex":"E50F",
+	"relevance":0,
+	"text":"&Icirc;",
+	"unicode":"Î"
+},{
+	"hex":"E510",
+	"relevance":0,
+	"text":"&Iuml;",
+	"unicode":"Ï"
+},{
+	"hex":"E511",
+	"relevance":0,
+	"text":"&Eth;",
+	"unicode":"Ð"
+},{
+	"hex":"E512",
+	"relevance":0,
+	"text":"&Ntilde;",
+	"unicode":"Ñ"
+},{
+	"hex":"E513",
+	"relevance":0,
+	"text":"&Ograve;",
+	"unicode":"Ò"
+},{
+	"hex":"E514",
+	"relevance":0,
+	"text":"&Oacute;",
+	"unicode":"Ó"
+},{
+	"hex":"E515",
+	"relevance":0,
+	"text":"&Ocirc;",
+	"unicode":"Ô"
+},{
+	"hex":"E516",
+	"relevance":0,
+	"text":"&Otilde;",
+	"unicode":"Õ"
+},{
+	"hex":"E517",
+	"relevance":0,
+	"text":"&Ouml;",
+	"unicode":"Ö"
+},{
+	"hex":"E518",
+	"relevance":0,
+	"text":"&Oslash;",
+	"unicode":"Ø"
+},{
+	"hex":"E519",
+	"relevance":0,
+	"text":"&Ugrave;",
+	"unicode":"Ù"
+},{
+	"hex":"E51A",
+	"relevance":0,
+	"text":"&Uacute;",
+	"unicode":"Ú"
+},{
+	"hex":"E51B",
+	"relevance":0,
+	"text":"&Ucirc;",
+	"unicode":"Û"
+},{
+	"hex":"E51C",
+	"relevance":0,
+	"text":"&Uuml;",
+	"unicode":"Ü"
+},{
+	"hex":"E51D",
+	"relevance":0,
+	"text":"&Yacute;",
+	"unicode":"Ý"
+},{
+	"hex":"E51E",
+	"relevance":0,
+	"text":"&Thorn;",
+	"unicode":"Þ"
+},{
+	"hex":"E520",
+	"relevance":0,
+	"text":"&Yuml;",
+	"unicode":"Ÿ"
+},{
+	"hex":"E521",
+	"relevance":0,
+	"text":"&Abreve;",
+	"unicode":"Ă"
+},{
+	"hex":"E522",
+	"relevance":0,
+	"text":"&Aogon;",
+	"unicode":"Ą"
+},{
+	"hex":"E523",
+	"relevance":0,
+	"text":"&Cacute;",
+	"unicode":"Ć"
+},{
+	"hex":"E524",
+	"relevance":0,
+	"text":"&Ccaron;",
+	"unicode":"Č"
+},{
+	"hex":"E525",
+	"relevance":0,
+	"text":"&OElig;",
+	"unicode":"Œ"
+},{
+	"hex":"E526",
+	"relevance":0,
+	"text":"&Dcaron;",
+	"unicode":"Ď"
+},{
+	"hex":"E527",
+	"relevance":0,
+	"text":"&Eogon;",
+	"unicode":"Ę"
+},{
+	"hex":"E528",
+	"relevance":0,
+	"text":"&Ecaron;",
+	"unicode":"Ě"
+},{
+	"hex":"E529",
+	"relevance":0,
+	"text":"&Lstrok;",
+	"unicode":"Ł"
+},{
+	"hex":"E52A",
+	"relevance":0,
+	"text":"&Nacute;",
+	"unicode":"Ń"
+},{
+	"hex":"E52B",
+	"relevance":0,
+	"text":"&Ncaron;",
+	"unicode":"Ň"
+},{
+	"hex":"E52C",
+	"relevance":0,
+	"text":"&Odblac;",
+	"unicode":"Ő"
+},{
+	"hex":"E52D",
+	"relevance":0,
+	"text":"&Rcaron;",
+	"unicode":"Ř"
+},{
+	"hex":"E52E",
+	"relevance":0,
+	"text":"&Sacute;",
+	"unicode":"Ś"
+},{
+	"hex":"E52F",
+	"relevance":0,
+	"text":"&Scaron;",
+	"unicode":"Š"
+},{
+	"hex":"E530",
+	"relevance":0,
+	"text":"&Tcaron;",
+	"unicode":"Ť"
+},{
+	"hex":"E531",
+	"relevance":0,
+	"text":"&Uring;",
+	"unicode":"Ů"
+},{
+	"hex":"E532",
+	"relevance":0,
+	"text":"&Udblac;",
+	"unicode":"Ű"
+},{
+	"hex":"E533",
+	"relevance":0,
+	"text":"&Zacute;",
+	"unicode":"Ź"
+},{
+	"hex":"E534",
+	"relevance":0,
+	"text":"&Zdot;",
+	"unicode":"Ż"
+},{
+	"hex":"E535",
+	"relevance":0,
+	"text":"&Zcaron;",
+	"unicode":"Ž"
+},{
+	"hex":"E540",
+	"relevance":0,
+	"text":"&Alpha;"
+},{
+	"hex":"E541",
+	"relevance":0,
+	"text":"&Beta;"
+},{
+	"hex":"E542",
+	"relevance":0,
+	"text":"&Gamma;",
+	"unicode":"Γ"
+},{
+	"hex":"E543",
+	"relevance":0,
+	"text":"&Delta;",
+	"unicode":"Δ"
+},{
+	"hex":"E544",
+	"relevance":0,
+	"text":"&Epsilon;"
+},{
+	"hex":"E545",
+	"relevance":0,
+	"text":"&Zeta;"
+},{
+	"hex":"E546",
+	"relevance":0,
+	"text":"&Eta;"
+},{
+	"hex":"E547",
+	"relevance":0,
+	"text":"&Theta;",
+	"unicode":"Θ"
+},{
+	"hex":"E548",
+	"relevance":0,
+	"text":"&Iota;"
+},{
+	"hex":"E549",
+	"relevance":0,
+	"text":"&Kappa;"
+},{
+	"hex":"E54A",
+	"relevance":0,
+	"text":"&Lambda;",
+	"unicode":"Λ"
+},{
+	"hex":"E54B",
+	"relevance":0,
+	"text":"&Mu;"
+},{
+	"hex":"E54C",
+	"relevance":0,
+	"text":"&Nu;"
+},{
+	"hex":"E54D",
+	"relevance":0,
+	"text":"&Xi;",
+	"unicode":"Ξ"
+},{
+	"hex":"E54E",
+	"relevance":0,
+	"text":"&Omicron;"
+},{
+	"hex":"E54F",
+	"relevance":0,
+	"text":"&Pi;",
+	"unicode":"Π"
+},{
+	"hex":"E550",
+	"relevance":0,
+	"text":"&Rho;"
+},{
+	"hex":"E551",
+	"relevance":0,
+	"text":"&Sigma;",
+	"unicode":"Σ"
+},{
+	"hex":"E553",
+	"relevance":0,
+	"text":"&Tau;"
+},{
+	"hex":"E554",
+	"relevance":0,
+	"text":"&Upsilon;"
+},{
+	"hex":"E555",
+	"relevance":0,
+	"text":"&Phi;",
+	"unicode":"Φ"
+},{
+	"hex":"E556",
+	"relevance":0,
+	"text":"&Chi;"
+},{
+	"hex":"E557",
+	"relevance":0,
+	"text":"&Psi;",
+	"unicode":"Ψ"
+},{
+	"hex":"E558",
+	"relevance":0,
+	"text":"&Omega;",
+	"unicode":"Ω"
+},{
+	"hex":"E560",
+	"relevance":0,
+	"text":"&Acy;"
+},{
+	"hex":"E561",
+	"relevance":0,
+	"text":"&Bcy;",
+	"unicode":"Б"
+},{
+	"hex":"E562",
+	"relevance":0,
+	"text":"&Vcy;"
+},{
+	"hex":"E563",
+	"relevance":0,
+	"text":"&Gcy;"
+},{
+	"hex":"E564",
+	"relevance":0,
+	"text":"&Dcy;",
+	"unicode":"Д"
+},{
+	"hex":"E565",
+	"relevance":0,
+	"text":"&IEcy;"
+},{
+	"hex":"E566",
+	"relevance":0,
+	"text":"&IOcy;"
+},{
+	"hex":"E567",
+	"relevance":0,
+	"text":"&ZHcy;",
+	"unicode":"Ж"
+},{
+	"hex":"E568",
+	"relevance":0,
+	"text":"&Zcy;",
+	"unicode":"З"
+},{
+	"hex":"E569",
+	"relevance":0,
+	"text":"&Icy;",
+	"unicode":"И"
+},{
+	"hex":"E56A",
+	"relevance":0,
+	"text":"&Jcy;",
+	"unicode":"Й"
+},{
+	"hex":"E56B",
+	"relevance":0,
+	"text":"&Kcy;"
+},{
+	"hex":"E56C",
+	"relevance":0,
+	"text":"&Lcy;",
+	"unicode":"Л"
+},{
+	"hex":"E56D",
+	"relevance":0,
+	"text":"&Mcy;"
+},{
+	"hex":"E56E",
+	"relevance":0,
+	"text":"&Ncy;"
+},{
+	"hex":"E56F",
+	"relevance":0,
+	"text":"&Ocy;"
+},{
+	"hex":"E570",
+	"relevance":0,
+	"text":"&Pcy;",
+	"unicode":"П"
+},{
+	"hex":"E571",
+	"relevance":0,
+	"text":"&Rcy;"
+},{
+	"hex":"E572",
+	"relevance":0,
+	"text":"&Scy;"
+},{
+	"hex":"E573",
+	"relevance":0,
+	"text":"&Tcy;"
+},{
+	"hex":"E574",
+	"relevance":0,
+	"text":"&Ucy;",
+	"unicode":"У"
+},{
+	"hex":"E575",
+	"relevance":0,
+	"text":"&Fcy;",
+	"unicode":"Ф"
+},{
+	"hex":"E576",
+	"relevance":0,
+	"text":"&KHcy;"
+},{
+	"hex":"E577",
+	"relevance":0,
+	"text":"&TScy;",
+	"unicode":"Ц"
+},{
+	"hex":"E578",
+	"relevance":0,
+	"text":"&CHcy;",
+	"unicode":"Ч"
+},{
+	"hex":"E579",
+	"relevance":0,
+	"text":"&SHcy;",
+	"unicode":"Ш"
+},{
+	"hex":"E57A",
+	"relevance":0,
+	"text":"&SHCHcy;",
+	"unicode":"Щ"
+},{
+	"hex":"E57B",
+	"relevance":0,
+	"text":"&HARDcy;",
+	"unicode":"Ъ"
+},{
+	"hex":"E57C",
+	"relevance":0,
+	"text":"&Ycy;",
+	"unicode":"Ы"
+},{
+	"hex":"E57D",
+	"relevance":0,
+	"text":"&SOFTcy;",
+	"unicode":"Ь"
+},{
+	"hex":"E57E",
+	"relevance":0,
+	"text":"&Ecy;",
+	"unicode":"Э"
+},{
+	"hex":"E580",
+	"relevance":0,
+	"text":"&YUcy;",
+	"unicode":"Ю"
+},{
+	"hex":"E581",
+	"relevance":0,
+	"text":"&YAcy;",
+	"unicode":"Я"
+},{
+	"hex":"E582",
+	"relevance":0,
+	"text":"&Jukcy;",
+	"unicode":"Є"
+},{
+	"hex":"E590",
+	"relevance":0,
+	"text":"&inverted_!;",
+	"unicode":"¡"
+},{
+	"hex":"E591",
+	"relevance":0,
+	"text":"&inverted_?;",
+	"unicode":"¿"
+},{
+	"hex":"E592",
+	"relevance":0,
+	"text":"&euro;",
+	"unicode":"€"
+},{
+	"hex":"E593",
+	"relevance":0,
+	"text":"&franc;",
+	"unicode":"₣"
+},{
+	"hex":"E594",
+	"relevance":0,
+	"text":"&...;",
+	"unicode":"…"
+},{
+	"hex":"E595",
+	"relevance":0,
+	"text":"&left_';",
+	"unicode":"‘"
+},{
+	"hex":"E596",
+	"relevance":0,
+	"text":"&right_';"
+},{
+	"hex":"E597",
+	"relevance":0,
+	"text":"&left_\";",
+	"unicode":"“"
+},{
+	"hex":"E598",
+	"relevance":0,
+	"text":"&right_\";",
+	"unicode":"”"
+},{
+	"hex":"E599",
+	"relevance":0,
+	"text":"&cent;",
+	"unicode":"¢"
+},{
+	"hex":"E59A",
+	"relevance":0,
+	"text":"&pound;",
+	"unicode":"£"
+},{
+	"hex":"E59B",
+	"relevance":0,
+	"text":"&headshot;",
+	"unicode":"¤"
+},{
+	"hex":"E59C",
+	"relevance":0,
+	"text":"&yen;",
+	"unicode":"¥"
+},{
+	"hex":"E59D",
+	"relevance":0,
+	"text":"&sect;",
+	"unicode":"§"
+},{
+	"hex":"E59E",
+	"relevance":0,
+	"text":"&copyright;",
+	"unicode":"©"
+},{
+	"hex":"E59F",
+	"relevance":0,
+	"text":"&underlined_a;",
+	"unicode":""
+},{
+	"hex":"E5A0",
+	"relevance":0,
+	"text":"&logical_not;",
+	"unicode":"¬"
+},{
+	"hex":"E5A1",
+	"relevance":0,
+	"text":"&registered;",
+	"unicode":"®"
+},{
+	"hex":"E5A2",
+	"relevance":0,
+	"text":"&underlined_o;",
+	"unicode":""
+},{
+	"hex":"E5A3",
+	"relevance":0,
+	"text":"&<<;",
+	"unicode":"«"
+},{
+	"hex":"E5A4",
+	"relevance":0,
+	"text":"&>>;",
+	"unicode":"»"
+},{
+	"hex":"E5A5",
+	"relevance":0,
+	"text":"&small_square;",
+	"unicode":"▫"
+},{
+	"hex":"E5A6",
+	"relevance":0,
+	"text":"&small_cross;",
+	"unicode":"⨯"
+},{
+	"hex":"E5A7",
+	"relevance":0,
+	"text":"&middle_dot;",
+	"unicode":"·"
+},{
+	"hex":"E5AB",
+	"relevance":0,
+	"text":"&!?;",
+	"unicode":"⁉"
+},{
+	"hex":"E5AC",
+	"relevance":0,
+	"text":"&!!;",
+	"unicode":"‼"
+},{
+	"hex":"E5AD",
+	"relevance":0,
+	"text":"&star;",
+	"unicode":"☆"
+},{
+	"hex":"E5AE",
+	"relevance":0,
+	"text":"&2_rectangles;"
+},{
+	"hex":"E5AF",
+	"relevance":0,
+	"text":"&cross;"
+},{
+	"hex":"E5B0",
+	"relevance":0,
+	"text":"&bold_e;",
+	"unicode":""
+},{
+	"hex":"E5B1",
+	"relevance":0,
+	"text":"&bold_P;"
+},{
+	"hex":"E5B2",
+	"relevance":0,
+	"text":"&bold_r;"
+},{
+	"hex":"E5B3",
+	"relevance":0,
+	"text":"&bold_X;"
+},{
+	"hex":"E5B4",
+	"relevance":0,
+	"text":"&bold_Y;"
+},{
+	"hex":"E5B5",
+	"relevance":0,
+	"text":"&negative_B;",
+	"unicode":""
+},{
+	"hex":"E5B6",
+	"relevance":0,
+	"text":"&negative_R;",
+	"unicode":""
+},{
+	"hex":"E5B7",
+	"relevance":0,
+	"text":"&negative_L;",
+	"unicode":""
+},{
+	"hex":"E5B8",
+	"relevance":0,
+	"text":"&negative_=;",
+	"unicode":""
+},{
+	"hex":"E5B9",
+	"relevance":0,
+	"text":"&negative_<;",
+	"unicode":""
+},{
+	"hex":"E5BA",
+	"relevance":0,
+	"text":"&negative_>;",
+	"unicode":""
+},{
+	"hex":"E5BB",
+	"relevance":0,
+	"text":"&negative_<=;",
+	"unicode":""
+},{
+	"hex":"E5BC",
+	"relevance":0,
+	"text":"&negative_>=;",
+	"unicode":""
+},{
+	"hex":"E5BD",
+	"relevance":0,
+	"text":"&left_bottom_';",
+	"unicode":"‚"
+},{
+	"hex":"E5BE",
+	"relevance":0,
+	"text":"&+-;",
+	"unicode":"±"
+},{
+	"hex":"E5BF",
+	"relevance":0,
+	"text":"&-+;",
+	"unicode":"∓"
+},{
+	"hex":"E5C0",
+	"relevance":0,
+	"text":"&^0;",
+	"unicode":"⁰"
+},{
+	"hex":"E5C1",
+	"relevance":0,
+	"text":"&^1;",
+	"unicode":"¹"
+},{
+	"hex":"E5C2",
+	"relevance":0,
+	"text":"&^2_char;"
+},{
+	"hex":"E5C3",
+	"relevance":0,
+	"text":"&^3;",
+	"unicode":"³"
+},{
+	"hex":"E5C4",
+	"relevance":0,
+	"text":"&^4;",
+	"unicode":"⁴"
+},{
+	"hex":"E5C5",
+	"relevance":0,
+	"text":"&^5;",
+	"unicode":"⁵"
+},{
+	"hex":"E5C6",
+	"relevance":0,
+	"text":"&^6;",
+	"unicode":"⁶"
+},{
+	"hex":"E5C7",
+	"relevance":0,
+	"text":"&^7;",
+	"unicode":"⁷"
+},{
+	"hex":"E5C8",
+	"relevance":0,
+	"text":"&^8;",
+	"unicode":"⁸"
+},{
+	"hex":"E5C9",
+	"relevance":0,
+	"text":"&^9;",
+	"unicode":"⁹"
+},{
+	"hex":"E5CA",
+	"relevance":0,
+	"text":"&^-1_char;"
+},{
+	"hex":"E5CB",
+	"relevance":0,
+	"text":"&^+;",
+	"unicode":"⁺"
+},{
+	"hex":"E5CC",
+	"relevance":0,
+	"text":"&^-;",
+	"unicode":"⁻"
+},{
+	"hex":"E5CD",
+	"relevance":0,
+	"text":"&small_0;",
+	"unicode":""
+},{
+	"hex":"E5CE",
+	"relevance":0,
+	"text":"&small_1;",
+	"unicode":""
+},{
+	"hex":"E5CF",
+	"relevance":0,
+	"text":"&small_2;",
+	"unicode":""
+},{
+	"hex":"E5D0",
+	"relevance":0,
+	"text":"&_0;",
+	"unicode":"₀"
+},{
+	"hex":"E5D1",
+	"relevance":0,
+	"text":"&_1;",
+	"unicode":"₁"
+},{
+	"hex":"E5D2",
+	"relevance":0,
+	"text":"&_2;",
+	"unicode":"₂"
+},{
+	"hex":"E5D3",
+	"relevance":0,
+	"text":"&_3;",
+	"unicode":"₃"
+},{
+	"hex":"E5D4",
+	"relevance":0,
+	"text":"&_4;",
+	"unicode":"₄"
+},{
+	"hex":"E5D5",
+	"relevance":0,
+	"text":"&_5;",
+	"unicode":"₅"
+},{
+	"hex":"E5D6",
+	"relevance":0,
+	"text":"&_6;",
+	"unicode":"₆"
+},{
+	"hex":"E5D7",
+	"relevance":0,
+	"text":"&_7;",
+	"unicode":"₇"
+},{
+	"hex":"E5D8",
+	"relevance":0,
+	"text":"&_8;",
+	"unicode":"₈"
+},{
+	"hex":"E5D9",
+	"relevance":0,
+	"text":"&_9;",
+	"unicode":"₉"
+},{
+	"hex":"E5DA",
+	"relevance":0,
+	"text":"&_-1;",
+	"unicode":""
+},{
+	"hex":"E5DB",
+	"relevance":0,
+	"text":"&_+;",
+	"unicode":"₊"
+},{
+	"hex":"E5DC",
+	"relevance":0,
+	"text":"&_-;",
+	"unicode":"₋"
+},{
+	"hex":"E5DD",
+	"relevance":0,
+	"text":"&^*;",
+	"unicode":""
+},{
+	"hex":"E5DE",
+	"relevance":0,
+	"text":"&small_n;",
+	"unicode":""
+},{
+	"hex":"E5DF",
+	"relevance":0,
+	"text":"&^3_with_style;",
+	"unicode":""
+},{
+	"hex":"E5E0",
+	"relevance":0,
+	"text":"&spade;",
+	"unicode":"♠"
+},{
+	"hex":"E5E1",
+	"relevance":0,
+	"text":"&club;",
+	"unicode":"♣"
+},{
+	"hex":"E5E2",
+	"relevance":0,
+	"text":"&heart;",
+	"unicode":"♥"
+},{
+	"hex":"E5E3",
+	"relevance":0,
+	"text":"&diamond;",
+	"unicode":"♦"
+},{
+	"hex":"E5E8",
+	"relevance":0,
+	"text":"&left_white_arrow;",
+	"unicode":"⇦"
+},{
+	"hex":"E5E9",
+	"relevance":0,
+	"text":"&right_white_arrow;",
+	"unicode":"⇨"
+},{
+	"hex":"E5EA",
+	"relevance":0,
+	"text":"&up_white_arrow;",
+	"unicode":"⇧"
+},{
+	"hex":"E5EB",
+	"relevance":0,
+	"text":"&down_white_arrow;",
+	"unicode":"⇩"
+},{
+	"hex":"E5EC",
+	"relevance":0,
+	"text":"&left_index;",
+	"unicode":"☜"
+},{
+	"hex":"E5ED",
+	"relevance":0,
+	"text":"&right_index;",
+	"unicode":"☞"
+},{
+	"hex":"E5EE",
+	"relevance":0,
+	"text":"&up_index;",
+	"unicode":"☝"
+},{
+	"hex":"E5EF",
+	"relevance":0,
+	"text":"&down_index;",
+	"unicode":"☟"
+},{
+	"hex":"E5F0",
+	"relevance":0,
+	"text":"&circled_1;",
+	"unicode":"①"
+},{
+	"hex":"E5F1",
+	"relevance":0,
+	"text":"&circled_2;",
+	"unicode":"②"
+},{
+	"hex":"E5F2",
+	"relevance":0,
+	"text":"&circled_3;",
+	"unicode":"③"
+},{
+	"hex":"E5F3",
+	"relevance":0,
+	"text":"&circled_4;",
+	"unicode":"④"
+},{
+	"hex":"E5F4",
+	"relevance":0,
+	"text":"&circled_5;",
+	"unicode":"⑤"
+},{
+	"hex":"E5F5",
+	"relevance":0,
+	"text":"&circled_6;",
+	"unicode":"⑥"
+},{
+	"hex":"E5FB",
+	"relevance":0,
+	"text":"&circled_7;",
+	"unicode":"⑦"
+},{
+	"hex":"E5FC",
+	"relevance":0,
+	"text":"&circled_8;",
+	"unicode":"⑧"
+},{
+	"hex":"E5FD",
+	"relevance":0,
+	"text":"&circled_9;",
+	"unicode":"⑨"
+},{
+	"hex":"e601",
+	"relevance":0,
+	"text":"&agrave;",
+	"unicode":"à"
+},{
+	"hex":"e602",
+	"relevance":0,
+	"text":"&aacute;",
+	"unicode":"á"
+},{
+	"hex":"e603",
+	"relevance":0,
+	"text":"&acirc;",
+	"unicode":"â"
+},{
+	"hex":"e604",
+	"relevance":0,
+	"text":"&atilde;",
+	"unicode":"ã"
+},{
+	"hex":"e605",
+	"relevance":0,
+	"text":"&auml;",
+	"unicode":"ä"
+},{
+	"hex":"e606",
+	"relevance":0,
+	"text":"&aring;",
+	"unicode":"å"
+},{
+	"hex":"e607",
+	"relevance":0,
+	"text":"&ae;",
+	"unicode":"æ"
+},{
+	"hex":"e608",
+	"relevance":0,
+	"text":"&ccedil;",
+	"unicode":"ç"
+},{
+	"hex":"e609",
+	"relevance":0,
+	"text":"&egrave;",
+	"unicode":"è"
+},{
+	"hex":"e60a",
+	"relevance":0,
+	"text":"&eacute;",
+	"unicode":"é"
+},{
+	"hex":"e60b",
+	"relevance":0,
+	"text":"&ecirc;",
+	"unicode":"ê"
+},{
+	"hex":"e60c",
+	"relevance":0,
+	"text":"&euml;",
+	"unicode":"ë"
+},{
+	"hex":"e60d",
+	"relevance":0,
+	"text":"&igrave;",
+	"unicode":"ì"
+},{
+	"hex":"e60e",
+	"relevance":0,
+	"text":"&iacute;",
+	"unicode":"í"
+},{
+	"hex":"e60f",
+	"relevance":0,
+	"text":"&icirc;",
+	"unicode":"î"
+},{
+	"hex":"e610",
+	"relevance":0,
+	"text":"&iuml;",
+	"unicode":"ï"
+},{
+	"hex":"e611",
+	"relevance":0,
+	"text":"&eth;",
+	"unicode":"ð"
+},{
+	"hex":"e612",
+	"relevance":0,
+	"text":"&ntilde;",
+	"unicode":"ñ"
+},{
+	"hex":"e613",
+	"relevance":0,
+	"text":"&ograve;",
+	"unicode":"ò"
+},{
+	"hex":"e614",
+	"relevance":0,
+	"text":"&oacute;",
+	"unicode":"ó"
+},{
+	"hex":"e615",
+	"relevance":0,
+	"text":"&ocirc;",
+	"unicode":"ô"
+},{
+	"hex":"e616",
+	"relevance":0,
+	"text":"&otilde;",
+	"unicode":"õ"
+},{
+	"hex":"e617",
+	"relevance":0,
+	"text":"&ouml;",
+	"unicode":"ö"
+},{
+	"hex":"E618",
+	"relevance":0,
+	"text":"ø"
+},{
+	"hex":"e618",
+	"relevance":0,
+	"text":"&oslash;"
+},{
+	"hex":"e619",
+	"relevance":0,
+	"text":"&ugrave;",
+	"unicode":"ù"
+},{
+	"hex":"e61a",
+	"relevance":0,
+	"text":"&uacute;",
+	"unicode":"ú"
+},{
+	"hex":"e61b",
+	"relevance":0,
+	"text":"&ucirc;",
+	"unicode":"û"
+},{
+	"hex":"e61c",
+	"relevance":0,
+	"text":"&uuml;",
+	"unicode":"ü"
+},{
+	"hex":"e61d",
+	"relevance":0,
+	"text":"&yacute;",
+	"unicode":"ý"
+},{
+	"hex":"e61e",
+	"relevance":0,
+	"text":"&thorn;",
+	"unicode":"þ"
+},{
+	"hex":"E61F",
+	"relevance":0,
+	"text":"&eszett;",
+	"unicode":"ß"
+},{
+	"hex":"e620",
+	"relevance":0,
+	"text":"&yuml;",
+	"unicode":"ÿ"
+},{
+	"hex":"e621",
+	"relevance":0,
+	"text":"&abreve;",
+	"unicode":"ă"
+},{
+	"hex":"e622",
+	"relevance":0,
+	"text":"&aogon;",
+	"unicode":"ą"
+},{
+	"hex":"e623",
+	"relevance":0,
+	"text":"&cacute;",
+	"unicode":"ć"
+},{
+	"hex":"e624",
+	"relevance":0,
+	"text":"&ccaron;",
+	"unicode":"č"
+},{
+	"hex":"e625",
+	"relevance":0,
+	"text":"&oelig;",
+	"unicode":"œ"
+},{
+	"hex":"e626",
+	"relevance":0,
+	"text":"&dcaron;",
+	"unicode":"ď"
+},{
+	"hex":"e627",
+	"relevance":0,
+	"text":"&eogon;",
+	"unicode":"ę"
+},{
+	"hex":"e628",
+	"relevance":0,
+	"text":"&ecaron;",
+	"unicode":"ě"
+},{
+	"hex":"e629",
+	"relevance":0,
+	"text":"&lstrok;",
+	"unicode":"ł"
+},{
+	"hex":"e62a",
+	"relevance":0,
+	"text":"&nacute;",
+	"unicode":"ń"
+},{
+	"hex":"e62b",
+	"relevance":0,
+	"text":"&ncaron;",
+	"unicode":"ň"
+},{
+	"hex":"e62c",
+	"relevance":0,
+	"text":"&odblac;",
+	"unicode":"ő"
+},{
+	"hex":"e62d",
+	"relevance":0,
+	"text":"&rcaron;",
+	"unicode":"ř"
+},{
+	"hex":"e62e",
+	"relevance":0,
+	"text":"&sacute;",
+	"unicode":"ś"
+},{
+	"hex":"e62f",
+	"relevance":0,
+	"text":"&scaron;",
+	"unicode":"š"
+},{
+	"hex":"e630",
+	"relevance":0,
+	"text":"&tcaron;",
+	"unicode":"ť"
+},{
+	"hex":"e631",
+	"relevance":0,
+	"text":"&uring;",
+	"unicode":"ů"
+},{
+	"hex":"e632",
+	"relevance":0,
+	"text":"&udblac;",
+	"unicode":"ű"
+},{
+	"hex":"e633",
+	"relevance":0,
+	"text":"&zacute;",
+	"unicode":"ź"
+},{
+	"hex":"e634",
+	"relevance":0,
+	"text":"&zdot;",
+	"unicode":"ż"
+},{
+	"hex":"e635",
+	"relevance":0,
+	"text":"&zcaron;",
+	"unicode":"ž"
+},{
+	"hex":"E640",
+	"relevance":0,
+	"text":"&alpha;",
+	"unicode":"α"
+},{
+	"hex":"E641",
+	"relevance":0,
+	"text":"&beta;",
+	"unicode":"β"
+},{
+	"hex":"E642",
+	"relevance":0,
+	"text":"&gamma;",
+	"unicode":"γ"
+},{
+	"hex":"E643",
+	"relevance":0,
+	"text":"&delta;",
+	"unicode":"δ"
+},{
+	"hex":"E644",
+	"relevance":0,
+	"text":"&epsilon;",
+	"unicode":"ε"
+},{
+	"hex":"E645",
+	"relevance":0,
+	"text":"&zeta;",
+	"unicode":"ζ"
+},{
+	"hex":"E646",
+	"relevance":0,
+	"text":"&eta;",
+	"unicode":"η"
+},{
+	"hex":"E647",
+	"relevance":0,
+	"text":"&theta_char;"
+},{
+	"hex":"E648",
+	"relevance":0,
+	"text":"&iota;",
+	"unicode":"ι"
+},{
+	"hex":"E649",
+	"relevance":0,
+	"text":"&kappa;",
+	"unicode":"κ"
+},{
+	"hex":"E64A",
+	"relevance":0,
+	"text":"&lambda;",
+	"unicode":"λ"
+},{
+	"hex":"E64B",
+	"relevance":0,
+	"text":"&mu;"
+},{
+	"hex":"E64C",
+	"relevance":0,
+	"text":"&nu;",
+	"unicode":"ν"
+},{
+	"hex":"E64D",
+	"relevance":0,
+	"text":"&xi;",
+	"unicode":"ξ"
+},{
+	"hex":"E64E",
+	"relevance":0,
+	"text":"&omicron;"
+},{
+	"hex":"E64F",
+	"relevance":0,
+	"text":"&pi_char;"
+},{
+	"hex":"E650",
+	"relevance":0,
+	"text":"&rho;",
+	"unicode":"ρ"
+},{
+	"hex":"E651",
+	"relevance":0,
+	"text":"&sigma;",
+	"unicode":"σ"
+},{
+	"hex":"E652",
+	"relevance":0,
+	"text":"&sigma2;",
+	"unicode":"ς"
+},{
+	"hex":"E653",
+	"relevance":0,
+	"text":"&tau;",
+	"unicode":"τ"
+},{
+	"hex":"E654",
+	"relevance":0,
+	"text":"&upsilon;"
+},{
+	"hex":"E655",
+	"relevance":0,
+	"text":"&phi;",
+	"unicode":"φ"
+},{
+	"hex":"E656",
+	"relevance":0,
+	"text":"&chi;",
+	"unicode":"χ"
+},{
+	"hex":"E657",
+	"relevance":0,
+	"text":"&psi;",
+	"unicode":"ψ"
+},{
+	"hex":"E658",
+	"relevance":0,
+	"text":"&omega;",
+	"unicode":"ω"
+},{
+	"hex":"E660",
+	"relevance":0,
+	"text":"&acy;"
+},{
+	"hex":"E661",
+	"relevance":0,
+	"text":"&bcy;",
+	"unicode":"б"
+},{
+	"hex":"E662",
+	"relevance":0,
+	"text":"&vcy;",
+	"unicode":"в"
+},{
+	"hex":"E663",
+	"relevance":0,
+	"text":"&gcy;",
+	"unicode":"г"
+},{
+	"hex":"E664",
+	"relevance":0,
+	"text":"&dcy;",
+	"unicode":"д"
+},{
+	"hex":"E665",
+	"relevance":0,
+	"text":"&iecy;"
+},{
+	"hex":"E666",
+	"relevance":0,
+	"text":"&iocy;"
+},{
+	"hex":"E667",
+	"relevance":0,
+	"text":"&zhcy;",
+	"unicode":"ж"
+},{
+	"hex":"E668",
+	"relevance":0,
+	"text":"&zcy;",
+	"unicode":"з"
+},{
+	"hex":"E669",
+	"relevance":0,
+	"text":"&icy;",
+	"unicode":"и"
+},{
+	"hex":"E66A",
+	"relevance":0,
+	"text":"&jcy;",
+	"unicode":"й"
+},{
+	"hex":"E66B",
+	"relevance":0,
+	"text":"&kcy;"
+},{
+	"hex":"E66C",
+	"relevance":0,
+	"text":"&lcy;",
+	"unicode":"л"
+},{
+	"hex":"E66D",
+	"relevance":0,
+	"text":"&mcy;",
+	"unicode":"м"
+},{
+	"hex":"E66E",
+	"relevance":0,
+	"text":"&ncy;",
+	"unicode":"н"
+},{
+	"hex":"E66F",
+	"relevance":0,
+	"text":"&ocy;"
+},{
+	"hex":"E670",
+	"relevance":0,
+	"text":"&pcy;",
+	"unicode":"п"
+},{
+	"hex":"E671",
+	"relevance":0,
+	"text":"&rcy;"
+},{
+	"hex":"E672",
+	"relevance":0,
+	"text":"&scy;"
+},{
+	"hex":"E673",
+	"relevance":0,
+	"text":"&tcy;",
+	"unicode":"т"
+},{
+	"hex":"E674",
+	"relevance":0,
+	"text":"&ucy;",
+	"unicode":"у"
+},{
+	"hex":"E675",
+	"relevance":0,
+	"text":"&fcy;",
+	"unicode":"ф"
+},{
+	"hex":"E676",
+	"relevance":0,
+	"text":"&khcy;"
+},{
+	"hex":"E677",
+	"relevance":0,
+	"text":"&tscy;",
+	"unicode":"ц"
+},{
+	"hex":"E678",
+	"relevance":0,
+	"text":"&chcy;",
+	"unicode":"ч"
+},{
+	"hex":"E679",
+	"relevance":0,
+	"text":"&shcy;",
+	"unicode":"ш"
+},{
+	"hex":"E67A",
+	"relevance":0,
+	"text":"&shchcy;",
+	"unicode":"щ"
+},{
+	"hex":"E67B",
+	"relevance":0,
+	"text":"&hardcy;",
+	"unicode":"ъ"
+},{
+	"hex":"E67C",
+	"relevance":0,
+	"text":"&ycy;",
+	"unicode":"ы"
+},{
+	"hex":"E67D",
+	"relevance":0,
+	"text":"&softcy;",
+	"unicode":"ь"
+},{
+	"hex":"E67E",
+	"relevance":0,
+	"text":"&ecy;",
+	"unicode":"э"
+},{
+	"hex":"E680",
+	"relevance":0,
+	"text":"&yucy;",
+	"unicode":"ю"
+},{
+	"hex":"E681",
+	"relevance":0,
+	"text":"&yacy;",
+	"unicode":"я"
+},{
+	"hex":"E682",
+	"relevance":0,
+	"text":"&jukcy;",
+	"unicode":"є"
+},{
+	"hex":"E690",
+	"relevance":0,
+	"text":"&left_arrow;",
+	"unicode":"←"
+},{
+	"hex":"E691",
+	"relevance":0,
+	"text":"&right_arrow;",
+	"unicode":"→"
+},{
+	"hex":"E692",
+	"relevance":0,
+	"text":"&up_arrow;",
+	"unicode":"↑"
+},{
+	"hex":"E693",
+	"relevance":0,
+	"text":"&down_arrow;",
+	"unicode":"↓"
+},{
+	"hex":"E694",
+	"relevance":0,
+	"text":"&left_right_arrow;",
+	"unicode":"↔"
+},{
+	"hex":"E695",
+	"relevance":0,
+	"text":"&up_down_arrow;",
+	"unicode":"↕"
+},{
+	"hex":"E696",
+	"relevance":0,
+	"text":"&top_left_arrow;",
+	"unicode":"↖"
+},{
+	"hex":"E697",
+	"relevance":0,
+	"text":"&top_right_arrow;",
+	"unicode":"↗"
+},{
+	"hex":"E698",
+	"relevance":0,
+	"text":"&bottom_left_arrow;",
+	"unicode":"↘"
+},{
+	"hex":"E699",
+	"relevance":0,
+	"text":"&bottom_right_arrow;",
+	"unicode":"↙"
+},{
+	"hex":"E69A",
+	"relevance":0,
+	"text":"&left_black_triangle;",
+	"unicode":"◀"
+},{
+	"hex":"E69B",
+	"relevance":0,
+	"text":"&right_black_triangle;",
+	"unicode":"▶"
+},{
+	"hex":"E69C",
+	"relevance":0,
+	"text":"&up_black_triangle;",
+	"unicode":"▲"
+},{
+	"hex":"E69D",
+	"relevance":0,
+	"text":"&down_black_triangle;",
+	"unicode":"▼"
+},{
+	"hex":"E69E",
+	"relevance":0,
+	"text":"&right_small_black_triangle;",
+	"unicode":"▸"
+},{
+	"hex":"E69F",
+	"relevance":0,
+	"text":"&right_white_triangle;",
+	"unicode":"▷"
+},{
+	"hex":"E6A0",
+	"relevance":0,
+	"text":"&divide_on_times;",
+	"unicode":"⋇"
+},{
+	"hex":"E6A1",
+	"relevance":0,
+	"text":"&left_lenticular_bracket;",
+	"unicode":"【"
+},{
+	"hex":"E6A2",
+	"relevance":0,
+	"text":"&right_lenticular_bracket;",
+	"unicode":"】"
+},{
+	"hex":"E6A3",
+	"relevance":0,
+	"text":"&white_circle;",
+	"unicode":"○"
+},{
+	"hex":"E6A4",
+	"relevance":0,
+	"text":"&black_circle;",
+	"unicode":"●"
+},{
+	"hex":"E6A5",
+	"relevance":0,
+	"text":"&white_square;",
+	"unicode":"□"
+},{
+	"hex":"E6A6",
+	"relevance":0,
+	"text":"&black_square;",
+	"unicode":"■"
+},{
+	"hex":"E6A7",
+	"relevance":0,
+	"text":"&white_diamond;",
+	"unicode":"◇"
+},{
+	"hex":"E6A8",
+	"relevance":0,
+	"text":"&black_diamond;",
+	"unicode":"◆"
+},{
+	"hex":"E6A9",
+	"relevance":0,
+	"text":"&black_square_with_cross;",
+	"unicode":"⊠"
+},{
+	"hex":"E6AA",
+	"relevance":0,
+	"text":"&bullet_operator;",
+	"unicode":"▪"
+},{
+	"hex":"E6AC",
+	"relevance":0,
+	"text":"&up_white_triangle;",
+	"unicode":"△"
+},{
+	"hex":"E6AD",
+	"relevance":0,
+	"text":"&down_white_triangle;",
+	"unicode":"▽"
+},{
+	"hex":"E6AE",
+	"relevance":0,
+	"text":"&bold_cross;",
+	"unicode":"✖"
+},{
+	"hex":"E6AF",
+	"relevance":0,
+	"text":"&left_white_triangle;",
+	"unicode":"◁"
+},{
+	"hex":"E6B0",
+	"relevance":0,
+	"text":"&equal_with_dots;",
+	"unicode":"≒"
+},{
+	"hex":"E6B1",
+	"relevance":0,
+	"text":"&approx_equal_to;",
+	"unicode":"≈"
+},{
+	"hex":"E6B2",
+	"relevance":0,
+	"text":"&triple_equal;",
+	"unicode":"≡"
+},{
+	"hex":"E6B3",
+	"relevance":0,
+	"text":"&not_triple_equal;",
+	"unicode":"≢"
+},{
+	"hex":"E6B4",
+	"relevance":0,
+	"text":"&approx_triple_equal;",
+	"unicode":"≅"
+},{
+	"hex":"E6B5",
+	"relevance":0,
+	"text":"&reversed_tilde;",
+	"unicode":"∽"
+},{
+	"hex":"E6B6",
+	"relevance":0,
+	"text":"&proportional_to;",
+	"unicode":"∝"
+},{
+	"hex":"E6B7",
+	"relevance":0,
+	"text":"&double_integral;",
+	"unicode":"∬"
+},{
+	"hex":"E6B8",
+	"relevance":0,
+	"text":"&contour_integral;",
+	"unicode":"∮"
+},{
+	"hex":"E6B9",
+	"relevance":0,
+	"text":"&partial_differential;",
+	"unicode":"∂"
+},{
+	"hex":"E6BB",
+	"relevance":0,
+	"text":"&integral;",
+	"unicode":"∫"
+},{
+	"hex":"E6BC",
+	"relevance":0,
+	"text":"&measured_angle;",
+	"unicode":"∡"
+},{
+	"hex":"E6BD",
+	"relevance":0,
+	"text":"&element_of;",
+	"unicode":"∈"
+},{
+	"hex":"E6BE",
+	"relevance":0,
+	"text":"&contains_as_member;",
+	"unicode":"∋"
+},{
+	"hex":"E6BF",
+	"relevance":0,
+	"text":"&subset_of_or_equal_to;",
+	"unicode":"⊆"
+},{
+	"hex":"E6C0",
+	"relevance":0,
+	"text":"&superset_of_or_equal_to;",
+	"unicode":"⊇"
+},{
+	"hex":"E6C1",
+	"relevance":0,
+	"text":"&subset_of;",
+	"unicode":"⊂"
+},{
+	"hex":"E6C2",
+	"relevance":0,
+	"text":"&superset_of;",
+	"unicode":"⊃"
+},{
+	"hex":"E6C3",
+	"relevance":0,
+	"text":"&union;",
+	"unicode":"∪"
+},{
+	"hex":"E6C4",
+	"relevance":0,
+	"text":"&intersection;",
+	"unicode":"∩"
+},{
+	"hex":"E6C5",
+	"relevance":0,
+	"text":"&not_an_element_of;",
+	"unicode":"∉"
+},{
+	"hex":"E6C6",
+	"relevance":0,
+	"text":"&does_not_contain_as_member;",
+	"unicode":"∌"
+},{
+	"hex":"E6C7",
+	"relevance":0,
+	"text":"&neither_a_subset_of_nor_equal_to;",
+	"unicode":"⊈"
+},{
+	"hex":"E6C8",
+	"relevance":0,
+	"text":"&neither_a_superset_of_nor_equal_to;",
+	"unicode":"⊉"
+},{
+	"hex":"E6C9",
+	"relevance":0,
+	"text":"&not_a_subset_of;",
+	"unicode":"⊄"
+},{
+	"hex":"E6CA",
+	"relevance":0,
+	"text":"&not_a_superset_of;",
+	"unicode":"⊅"
+},{
+	"hex":"E6CB",
+	"relevance":0,
+	"text":"&empty_set;",
+	"unicode":"∅"
+},{
+	"hex":"E6CC",
+	"relevance":0,
+	"text":"&there_exists;",
+	"unicode":"∃"
+},{
+	"hex":"E6CD",
+	"relevance":0,
+	"text":"&right_angle;",
+	"unicode":"∟"
+},{
+	"hex":"E6CE",
+	"relevance":0,
+	"text":"&\\/;",
+	"unicode":"∨"
+},{
+	"hex":"E6CF",
+	"relevance":0,
+	"text":"&/\\;",
+	"unicode":"∧"
+},{
+	"hex":"E6D0",
+	"relevance":0,
+	"text":"&for_all;",
+	"unicode":"∀"
+},{
+	"hex":"E6D1",
+	"relevance":0,
+	"text":"&circled_+;",
+	"unicode":"⊕"
+},{
+	"hex":"E6D2",
+	"relevance":0,
+	"text":"&circled_-;",
+	"unicode":"⊖"
+},{
+	"hex":"E6D3",
+	"relevance":0,
+	"text":"&circled_x;",
+	"unicode":"⊗"
+},{
+	"hex":"E6D4",
+	"relevance":0,
+	"text":"&circled_/;",
+	"unicode":"⊘"
+},{
+	"hex":"E6D5",
+	"relevance":0,
+	"text":"&perpendicular_to;",
+	"unicode":"⊥"
+},{
+	"hex":"E6D6",
+	"relevance":0,
+	"text":"&left_right_double_arrow;",
+	"unicode":"⇔"
+},{
+	"hex":"E6D7",
+	"relevance":0,
+	"text":"&||;",
+	"unicode":"∥"
+},{
+	"hex":"E6D8",
+	"relevance":0,
+	"text":"&||_strike;",
+	"unicode":"∦"
+},{
+	"hex":"E6D9",
+	"relevance":0,
+	"text":"&//;",
+	"unicode":"⫽"
+},{
+	"hex":"E6DA",
+	"relevance":0,
+	"text":"&shield;",
+	"unicode":"∇"
+},{
+	"hex":"E6DB",
+	"relevance":0,
+	"text":"&dots_in_^;",
+	"unicode":"∴"
+},{
+	"hex":"E6DC",
+	"relevance":0,
+	"text":"&dots_in_v;",
+	"unicode":"∵"
+},{
+	"hex":"E6DD",
+	"relevance":0,
+	"text":"&prime;",
+	"unicode":"′"
+},{
+	"hex":"E6DE",
+	"relevance":0,
+	"text":"&double_prime;",
+	"unicode":"″"
+},{
+	"hex":"E701",
+	"relevance":0,
+	"text":"[ns]"
+},{
+	"hex":"E702",
+	"relevance":0,
+	"text":"[µs]"
+},{
+	"hex":"E703",
+	"relevance":0,
+	"text":"[&micro;s]",
+	"unicode":"[ms]"
+},{
+	"hex":"E704",
+	"relevance":0,
+	"text":"[s]"
+},{
+	"hex":"E705",
+	"relevance":0,
+	"text":"[min]"
+},{
+	"hex":"E706",
+	"relevance":0,
+	"text":"[h]"
+},{
+	"hex":"E707",
+	"relevance":0,
+	"text":"[day]"
+},{
+	"hex":"E708",
+	"relevance":0,
+	"text":"[week]"
+},{
+	"hex":"E709",
+	"relevance":0,
+	"text":"[yr]"
+},{
+	"hex":"E70A",
+	"relevance":0,
+	"text":"[s-yr]"
+},{
+	"hex":"E70B",
+	"relevance":0,
+	"text":"[t-yr]"
+},{
+	"hex":"E70C",
+	"relevance":0,
+	"text":"[&deg;C]",
+	"unicode":"[C]"
+},{
+	"hex":"E70D",
+	"relevance":0,
+	"text":"&[K];"
+},{
+	"hex":"E70E",
+	"relevance":0,
+	"text":"[&deg;F]",
+	"unicode":"[F]"
+},{
+	"hex":"E70F",
+	"relevance":0,
+	"text":"[&deg;R]",
+	"unicode":"[R]"
+},{
+	"hex":"E710",
+	"relevance":0,
+	"text":"[u]"
+},{
+	"hex":"E711",
+	"relevance":0,
+	"text":"[g]"
+},{
+	"hex":"E712",
+	"relevance":0,
+	"text":"[kg]"
+},{
+	"hex":"E713",
+	"relevance":0,
+	"text":"[lb]"
+},{
+	"hex":"E714",
+	"relevance":0,
+	"text":"[oz]"
+},{
+	"hex":"E715",
+	"relevance":0,
+	"text":"[slug]"
+},{
+	"hex":"E716",
+	"relevance":0,
+	"text":"[ton(short)]"
+},{
+	"hex":"E717",
+	"relevance":0,
+	"text":"[ton(long)]"
+},{
+	"hex":"E719",
+	"relevance":0,
+	"text":"[mton]"
+},{
+	"hex":"E71A",
+	"relevance":0,
+	"text":"[l-atm]"
+},{
+	"hex":"E71B",
+	"relevance":0,
+	"text":"[ft.lbf]"
+},{
+	"hex":"E71C",
+	"relevance":0,
+	"text":"[cal_IT]",
+	"unicode":"[cal]"
+},{
+	"hex":"E71D",
+	"relevance":0,
+	"text":"[cal_th]",
+	"unicode":"[cal]"
+},{
+	"hex":"E71E",
+	"relevance":0,
+	"text":"[Btu]"
+},{
+	"hex":"E71F",
+	"relevance":0,
+	"text":"[kW.h]"
+},{
+	"hex":"E720",
+	"relevance":0,
+	"text":"[kgf.m]"
+},{
+	"hex":"E721",
+	"relevance":0,
+	"text":"[Pa]"
+},{
+	"hex":"E722",
+	"relevance":0,
+	"text":"[kPa]"
+},{
+	"hex":"E723",
+	"relevance":0,
+	"text":"[bar]"
+},{
+	"hex":"E724",
+	"relevance":0,
+	"text":"[mmH2O]"
+},{
+	"hex":"E725",
+	"relevance":0,
+	"text":"[mmHg]"
+},{
+	"hex":"E726",
+	"relevance":0,
+	"text":"[inH20]"
+},{
+	"hex":"E727",
+	"relevance":0,
+	"text":"[inHg]"
+},{
+	"hex":"E728",
+	"relevance":0,
+	"text":"[lbf/in^2]"
+},{
+	"hex":"E729",
+	"relevance":0,
+	"text":"[kgf/cm^2]"
+},{
+	"hex":"E72A",
+	"relevance":0,
+	"text":"[atm]"
+},{
+	"hex":"E72B",
+	"relevance":0,
+	"text":"[dyne]"
+},{
+	"hex":"E72C",
+	"relevance":0,
+	"text":"&[N];"
+},{
+	"hex":"E72D",
+	"relevance":0,
+	"text":"[kgf]"
+},{
+	"hex":"E72E",
+	"relevance":0,
+	"text":"[lbf]"
+},{
+	"hex":"E72F",
+	"relevance":0,
+	"text":"[tonf]"
+},{
+	"hex":"e741",
+	"relevance":0,
+	"text":"&_A;",
+	"unicode":""
+},{
+	"hex":"e742",
+	"relevance":0,
+	"text":"&_B;",
+	"unicode":""
+},{
+	"hex":"e743",
+	"relevance":0,
+	"text":"&_C;",
+	"unicode":""
+},{
+	"hex":"e744",
+	"relevance":0,
+	"text":"&_D;",
+	"unicode":""
+},{
+	"hex":"e745",
+	"relevance":0,
+	"text":"&_E;",
+	"unicode":""
+},{
+	"hex":"e746",
+	"relevance":0,
+	"text":"&_F;",
+	"unicode":""
+},{
+	"hex":"e747",
+	"relevance":0,
+	"text":"&_G;",
+	"unicode":""
+},{
+	"hex":"e748",
+	"relevance":0,
+	"text":"&_H;",
+	"unicode":""
+},{
+	"hex":"e749",
+	"relevance":0,
+	"text":"&_I;",
+	"unicode":""
+},{
+	"hex":"e74a",
+	"relevance":0,
+	"text":"&_J;",
+	"unicode":""
+},{
+	"hex":"e74b",
+	"relevance":0,
+	"text":"&_K;",
+	"unicode":""
+},{
+	"hex":"e74c",
+	"relevance":0,
+	"text":"&_L;",
+	"unicode":""
+},{
+	"hex":"e74d",
+	"relevance":0,
+	"text":"&_M;",
+	"unicode":""
+},{
+	"hex":"e74e",
+	"relevance":0,
+	"text":"&_N;",
+	"unicode":""
+},{
+	"hex":"e74f",
+	"relevance":0,
+	"text":"&_O;",
+	"unicode":""
+},{
+	"hex":"e750",
+	"relevance":0,
+	"text":"&_P;",
+	"unicode":""
+},{
+	"hex":"e751",
+	"relevance":0,
+	"text":"&_Q;",
+	"unicode":""
+},{
+	"hex":"e752",
+	"relevance":0,
+	"text":"&_R;",
+	"unicode":""
+},{
+	"hex":"e753",
+	"relevance":0,
+	"text":"&_S;",
+	"unicode":""
+},{
+	"hex":"e754",
+	"relevance":0,
+	"text":"&_T;",
+	"unicode":""
+},{
+	"hex":"e755",
+	"relevance":0,
+	"text":"&_U;",
+	"unicode":""
+},{
+	"hex":"e756",
+	"relevance":0,
+	"text":"&_V;",
+	"unicode":""
+},{
+	"hex":"e757",
+	"relevance":0,
+	"text":"&_W;",
+	"unicode":""
+},{
+	"hex":"e758",
+	"relevance":0,
+	"text":"&_X;",
+	"unicode":""
+},{
+	"hex":"e759",
+	"relevance":0,
+	"text":"&_Y;",
+	"unicode":""
+},{
+	"hex":"e75a",
+	"relevance":0,
+	"text":"&_Z;",
+	"unicode":""
+},{
+	"hex":"e761",
+	"relevance":0,
+	"text":"&_a;",
+	"unicode":""
+},{
+	"hex":"e762",
+	"relevance":0,
+	"text":"&_b;",
+	"unicode":""
+},{
+	"hex":"e763",
+	"relevance":0,
+	"text":"&_c;",
+	"unicode":""
+},{
+	"hex":"e764",
+	"relevance":0,
+	"text":"&_d;",
+	"unicode":""
+},{
+	"hex":"e765",
+	"relevance":0,
+	"text":"&_e;",
+	"unicode":""
+},{
+	"hex":"e766",
+	"relevance":0,
+	"text":"&_f;",
+	"unicode":""
+},{
+	"hex":"e767",
+	"relevance":0,
+	"text":"&_g;",
+	"unicode":""
+},{
+	"hex":"e768",
+	"relevance":0,
+	"text":"&_h;",
+	"unicode":""
+},{
+	"hex":"e769",
+	"relevance":0,
+	"text":"&_i;",
+	"unicode":""
+},{
+	"hex":"e76a",
+	"relevance":0,
+	"text":"&_j;",
+	"unicode":""
+},{
+	"hex":"e76b",
+	"relevance":0,
+	"text":"&_k;",
+	"unicode":""
+},{
+	"hex":"e76c",
+	"relevance":0,
+	"text":"&_l;",
+	"unicode":""
+},{
+	"hex":"e76d",
+	"relevance":0,
+	"text":"&_m;",
+	"unicode":""
+},{
+	"hex":"e76e",
+	"relevance":0,
+	"text":"&_n;",
+	"unicode":""
+},{
+	"hex":"e76f",
+	"relevance":0,
+	"text":"&_o;",
+	"unicode":""
+},{
+	"hex":"e770",
+	"relevance":0,
+	"text":"&_p;",
+	"unicode":""
+},{
+	"hex":"e771",
+	"relevance":0,
+	"text":"&_q;",
+	"unicode":""
+},{
+	"hex":"e772",
+	"relevance":0,
+	"text":"&_r;",
+	"unicode":""
+},{
+	"hex":"e773",
+	"relevance":0,
+	"text":"&_s;",
+	"unicode":""
+},{
+	"hex":"e774",
+	"relevance":0,
+	"text":"&_t;",
+	"unicode":""
+},{
+	"hex":"e775",
+	"relevance":0,
+	"text":"&_u;",
+	"unicode":""
+},{
+	"hex":"e776",
+	"relevance":0,
+	"text":"&_v;",
+	"unicode":""
+},{
+	"hex":"e777",
+	"relevance":0,
+	"text":"&_w;",
+	"unicode":""
+},{
+	"hex":"e778",
+	"relevance":0,
+	"text":"&_x;",
+	"unicode":""
+},{
+	"hex":"e779",
+	"relevance":0,
+	"text":"&_y;",
+	"unicode":""
+},{
+	"hex":"e77a",
+	"relevance":0,
+	"text":"&_z;",
+	"unicode":""
+},{
+	"hex":"E7B0",
+	"relevance":0,
+	"text":"[fm]"
+},{
+	"hex":"E7B2",
+	"relevance":0,
+	"text":"[mm]"
+},{
+	"hex":"E7B3",
+	"relevance":0,
+	"text":"[cm]"
+},{
+	"hex":"E7B4",
+	"relevance":0,
+	"text":"[m]"
+},{
+	"hex":"E7B5",
+	"relevance":0,
+	"text":"[km]"
+},{
+	"hex":"E7B6",
+	"relevance":123,
+	"text":"[Mil]"
+},{
+	"hex":"E7B7",
+	"relevance":0,
+	"text":"[in]"
+},{
+	"hex":"E7B8",
+	"relevance":0,
+	"text":"[ft]"
+},{
+	"hex":"E7B9",
+	"relevance":0,
+	"text":"[yd]"
+},{
+	"hex":"E7BA",
+	"relevance":0,
+	"text":"[fath]"
+},{
+	"hex":"E7BB",
+	"relevance":0,
+	"text":"[rd]"
+},{
+	"hex":"E7BD",
+	"relevance":0,
+	"text":"[mile]"
+},{
+	"hex":"E7BF",
+	"relevance":0,
+	"text":"[n mile]"
+},{
+	"hex":"E7C0",
+	"relevance":0,
+	"text":"[acre]"
+},{
+	"hex":"E7C2",
+	"relevance":0,
+	"text":"[ha]"
+},{
+	"hex":"E7C3",
+	"relevance":0,
+	"text":"[cm^2]"
+},{
+	"hex":"E7C4",
+	"relevance":0,
+	"text":"[m^2]"
+},{
+	"hex":"E7C5",
+	"relevance":0,
+	"text":"[km^2]"
+},{
+	"hex":"E7C7",
+	"relevance":0,
+	"text":"[in^2]"
+},{
+	"hex":"E7C8",
+	"relevance":0,
+	"text":"[ft^2]"
+},{
+	"hex":"E7C9",
+	"relevance":0,
+	"text":"[yd^2]"
+},{
+	"hex":"E7CA",
+	"relevance":0,
+	"text":"[mile^2]"
+},{
+	"hex":"E7CB",
+	"relevance":0,
+	"text":"[m/s]"
+},{
+	"hex":"E7CC",
+	"relevance":0,
+	"text":"[km/h]"
+},{
+	"hex":"E7CD",
+	"relevance":0,
+	"text":"[ft/s]"
+},{
+	"hex":"E7CE",
+	"relevance":0,
+	"text":"[mile/h]"
+},{
+	"hex":"E7CF",
+	"relevance":0,
+	"text":"[knot]"
+},{
+	"hex":"E7D0",
+	"relevance":0,
+	"text":"[mL]"
+},{
+	"hex":"E7D1",
+	"relevance":0,
+	"text":"&[L];"
+},{
+	"hex":"E7D2",
+	"relevance":0,
+	"text":"[tsp]"
+},{
+	"hex":"E7D3",
+	"relevance":0,
+	"text":"[cm^3]"
+},{
+	"hex":"E7D4",
+	"relevance":0,
+	"text":"[m^3]"
+},{
+	"hex":"E7D5",
+	"relevance":0,
+	"text":"[tbsp]"
+},{
+	"hex":"E7D7",
+	"relevance":0,
+	"text":"[in^3]"
+},{
+	"hex":"E7D8",
+	"relevance":0,
+	"text":"[ft^3]"
+},{
+	"hex":"E7D9",
+	"relevance":0,
+	"text":"[fl_oz(UK)]"
+},{
+	"hex":"E7DA",
+	"relevance":0,
+	"text":"[fl_oz(US)]"
+},{
+	"hex":"E7DB",
+	"relevance":0,
+	"text":"[cup]"
+},{
+	"hex":"E7DC",
+	"relevance":0,
+	"text":"[pt]"
+},{
+	"hex":"E7DD",
+	"relevance":0,
+	"text":"[qt]"
+},{
+	"hex":"E7DE",
+	"relevance":0,
+	"text":"[gal(US)]"
+},{
+	"hex":"E7DF",
+	"relevance":0,
+	"text":"[gal(UK)]"
+},{
+	"hex":"E7E2",
+	"relevance":0,
+	"text":"[&micro;m]",
+	"unicode":"[µm]"
+},{
+	"hex":"E7E3",
+	"relevance":0,
+	"text":"[mg]"
+},{
+	"hex":"E7E4",
+	"relevance":0,
+	"text":"[Ang]"
+},{
+	"hex":"E7E8",
+	"relevance":0,
+	"text":"&[AU];"
+},{
+	"hex":"E7E9",
+	"relevance":0,
+	"text":"[l.y.]"
+},{
+	"hex":"E7EA",
+	"relevance":0,
+	"text":"[pc]"
+},{
+	"hex":"E7EB",
+	"relevance":0,
+	"text":"[ft.lbf/s]"
+},{
+	"hex":"E7EC",
+	"relevance":0,
+	"text":"[cal_th/s]"
+},{
+	"hex":"E7ED",
+	"relevance":0,
+	"text":"[hp]"
+},{
+	"hex":"E7EE",
+	"relevance":0,
+	"text":"[Btu/min]"
+},{
+	"hex":"E7EF",
+	"relevance":0,
+	"text":"&[W];"
+},{
+	"hex":"E7F0",
+	"relevance":0,
+	"text":"[eV]"
+},{
+	"hex":"E7F1",
+	"relevance":0,
+	"text":"[erg]"
+},{
+	"hex":"E7F2",
+	"relevance":0,
+	"text":"&[J];"
+},{
+	"hex":"E7F3",
+	"relevance":0,
+	"text":"[cal_15]"
+},{
+	"hex":"E7F4",
+	"relevance":0,
+	"text":"[kcal_15]"
+},{
+	"hex":"E7F5",
+	"relevance":0,
+	"text":"[kcal_th]"
+},{
+	"hex":"E7FB",
+	"relevance":0,
+	"text":"[kcal_IT]"
+},{
+	"hex":"F700",
+	"relevance":5,
+	"text":"If "
+},{
+	"hex":"F701",
+	"relevance":5,
+	"text":"Then "
+},{
+	"hex":"F702",
+	"relevance":5,
+	"text":"Else "
+},{
+	"hex":"F703",
+	"relevance":5,
+	"text":"IfEnd"
+},{
+	"hex":"F704",
+	"relevance":5,
+	"text":"For ",
+	"syntax": "For <startValue> -> <alphaVar> To <endValue> (Step <stepValue>)\n	<code>\nNext",
+	"description": "For loop. If Step is not specified, it defaults to 1.\n\nStarts by putting startValue into alphaVar, and ends when alphaVar is greater than endValue (or lower than endValue, if stepValue is negative).\n\nIf endValue < startValue and Step is positive (or the opposite), the loop is ignored.\n\nBeware of using empty for loops to simulate Sleep, as your code could run faster or slower on different calculators.",
+	"example": "[code]For 1->I To 4 Step 2 : \"test\"◢ : Next[/code] will print \"test\" 2 times"
+},{
+	"hex":"F705",
+	"relevance":5,
+	"text":" To "
+},{
+	"hex":"F706",
+	"relevance":5,
+	"text":" Step "
+},{
+	"hex":"F707",
+	"relevance":5,
+	"text":"Next"
+},{
+	"hex":"F708",
+	"relevance":5,
+	"text":"While "
+},{
+	"hex":"F709",
+	"relevance":5,
+	"text":"WhileEnd"
+},{
+	"hex":"F70A",
+	"relevance":5,
+	"text":"Do",
+	"syntax": "Do\n	<code>\nLpWhile <number>",
+	"description": "See LpWhile."
+},{
+	"hex":"F70B",
+	"relevance":5,
+	"text":"LpWhile ",
+	"syntax": "Do\n	<code>\nLpWhile <number>",
+	"description": "The Do/LpWhile loop is different from the While/WhileEnd loop, because the condition check is done at the end, so the code is executed at least once. The loop terminates if the number is 0 (false).",
+	"example": "[code]Do:GetKey:LpWhile GetKey != 31[/code] loops while the user has not pressed [EXE] (id 31)"
+},{
+	"hex":"F70C",
+	"relevance":5,
+	"text":"Return"
+},{
+	"hex":"F70D",
+	"relevance":5,
+	"text":"Break",
+	"description": "Terminates the current loop (While/WhileEnd, For/Next, Do/LpWhile). Note that it only terminates the inner loop, if you are in 2 loops, it only breaks out of the 2nd (like on other programming languages)."
+},{
+	"hex":"F70E",
+	"relevance":0,
+	"text":"Stop"
+},{
+	"hex":"F710",
+	"relevance":5,
+	"text":"Locate "
+},{
+	"hex":"F711",
+	"relevance":0,
+	"text":"Send("
+},{
+	"hex":"F712",
+	"relevance":0,
+	"text":"Receive("
+},{
+	"hex":"F713",
+	"relevance":0,
+	"text":"OpenComport38k"
+},{
+	"hex":"F714",
+	"relevance":0,
+	"text":"CloseComport38k"
+},{
+	"hex":"F715",
+	"relevance":0,
+	"text":"Send38k "
+},{
+	"hex":"F716",
+	"relevance":0,
+	"text":"Receive38k "
+},{
+	"hex":"F718",
+	"relevance":5,
+	"text":"ClrText",
+	"description": "Clears the text screen (Locate)."
+},{
+	"hex":"F719",
+	"relevance":0,
+	"text":"ClrGraph",
+	"description": "Clears the graphical screen, but also reinitializes the ViewWindow.\n\nTo only clear the graphical screen, use [code]Cls[/code]."
+},{
+	"hex":"F71A",
+	"relevance":5,
+	"text":"ClrList ",
+	"syntax": "ClrList\nClrList <listNumber>",
+	"description": "Clears the given list, or all the lists if no list number is given.\nNote that this only affects the current ListFile.",
+	"example": "[code]ClrList 3[/code] clears List 3"
+},{
+	"hex":"F71B",
+	"relevance":0,
+	"text":"LinearReg(a+bx) "
+},{
+	"hex":"F71C",
+	"relevance":0,
+	"text":"S-L-Normal"
+},{
+	"hex":"F71D",
+	"relevance":0,
+	"text":"S-L-Thick"
+},{
+	"hex":"F71E",
+	"relevance":0,
+	"text":"S-L-Broken"
+},{
+	"hex":"F71F",
+	"relevance":0,
+	"text":"S-L-Dot"
+},{
+	"hex":"F720",
+	"relevance":0,
+	"text":"DrawGraph"
+},{
+	"hex":"F721",
+	"relevance":0,
+	"text":"PlotPhase "
+},{
+	"hex":"F722",
+	"relevance":0,
+	"text":"DrawDyna"
+},{
+	"hex":"F723",
+	"relevance":0,
+	"text":"DrawStat"
+},{
+	"hex":"F724",
+	"relevance":0,
+	"text":"DrawFTG-Con"
+},{
+	"hex":"F725",
+	"relevance":0,
+	"text":"DrawFTG-Plt"
+},{
+	"hex":"F726",
+	"relevance":0,
+	"text":"DrawR-Con"
+},{
+	"hex":"F727",
+	"relevance":0,
+	"text":"DrawR-Plt"
+},{
+	"hex":"F728",
+	"relevance":0,
+	"text":"DrawRSum-Con",
+	"unicode":"DrawRΣ-Con"
+},{
+	"hex":"F729",
+	"relevance":0,
+	"text":"DrawRSum-Plt",
+	"unicode":"DrawRΣ-Plt"
+},{
+	"hex":"F72A",
+	"relevance":0,
+	"text":"DrawWeb "
+},{
+	"hex":"F72B",
+	"relevance":0,
+	"text":"NormalG "
+},{
+	"hex":"F72C",
+	"relevance":0,
+	"text":"ThickG "
+},{
+	"hex":"F72D",
+	"relevance":0,
+	"text":"BrokenThickG "
+},{
+	"hex":"F72E",
+	"relevance":0,
+	"text":"DispF-Tbl"
+},{
+	"hex":"F72F",
+	"relevance":0,
+	"text":"DispR-Tbl"
+},{
+	"hex":"F730",
+	"relevance":0,
+	"text":"SimplifyAuto"
+},{
+	"hex":"F731",
+	"relevance":0,
+	"text":"SimplifyMan"
+},{
+	"hex":"F732",
+	"relevance":0,
+	"text":"NPPlot"
+},{
+	"hex":"F733",
+	"relevance":0,
+	"text":"Sinusoidal"
+},{
+	"hex":"F734",
+	"relevance":0,
+	"text":"SinReg "
+},{
+	"hex":"F735",
+	"relevance":0,
+	"text":"Logistic"
+},{
+	"hex":"F736",
+	"relevance":0,
+	"text":"LogisticReg "
+},{
+	"hex":"F73A",
+	"relevance":0,
+	"text":"Pie"
+},{
+	"hex":"F73C",
+	"relevance":0,
+	"text":"Bar"
+},{
+	"hex":"F73F",
+	"relevance":0,
+	"text":"DotG "
+},{
+	"hex":"F740",
+	"relevance":0,
+	"text":"1-Variable "
+},{
+	"hex":"F741",
+	"relevance":0,
+	"text":"2-Variable "
+},{
+	"hex":"F742",
+	"relevance":0,
+	"text":"LinearReg(ax+b) "
+},{
+	"hex":"F743",
+	"relevance":0,
+	"text":"Med-MedLine "
+},{
+	"hex":"F744",
+	"relevance":0,
+	"text":"QuadReg "
+},{
+	"hex":"F745",
+	"relevance":0,
+	"text":"CubicReg "
+},{
+	"hex":"F746",
+	"relevance":0,
+	"text":"QuartReg "
+},{
+	"hex":"F747",
+	"relevance":0,
+	"text":"LogReg "
+},{
+	"hex":"F748",
+	"relevance":0,
+	"text":"ExpReg(a*e^bx) "
+},{
+	"hex":"F749",
+	"relevance":0,
+	"text":"PowerReg "
+},{
+	"hex":"F74A",
+	"relevance":0,
+	"text":"S-Gph1 "
+},{
+	"hex":"F74B",
+	"relevance":0,
+	"text":"S-Gph2 "
+},{
+	"hex":"F74C",
+	"relevance":0,
+	"text":"S-Gph3 "
+},{
+	"hex":"F74D",
+	"relevance":0,
+	"text":"Square"
+},{
+	"hex":"F74E",
+	"relevance":0,
+	"text":"Cross"
+},{
+	"hex":"F74F",
+	"relevance":0,
+	"text":"Dot"
+},{
+	"hex":"F750",
+	"relevance":0,
+	"text":"Scatter"
+},{
+	"hex":"F751",
+	"relevance":0,
+	"text":"xyLine"
+},{
+	"hex":"F752",
+	"relevance":0,
+	"text":"Hist"
+},{
+	"hex":"F753",
+	"relevance":0,
+	"text":"MedBox"
+},{
+	"hex":"F755",
+	"relevance":0,
+	"text":"N-Dist"
+},{
+	"hex":"F756",
+	"relevance":0,
+	"text":"Broken"
+},{
+	"hex":"F757",
+	"relevance":0,
+	"text":"Linear"
+},{
+	"hex":"F758",
+	"relevance":0,
+	"text":"Med-Med"
+},{
+	"hex":"F759",
+	"relevance":0,
+	"text":"Quad"
+},{
+	"hex":"F75A",
+	"relevance":0,
+	"text":"Cubic"
+},{
+	"hex":"F75B",
+	"relevance":0,
+	"text":"Quart"
+},{
+	"hex":"F75C",
+	"relevance":0,
+	"text":"Log"
+},{
+	"hex":"F75D",
+	"relevance":0,
+	"text":"Exp(a*e^bx)"
+},{
+	"hex":"F75E",
+	"relevance":0,
+	"text":"Power"
+},{
+	"hex":"F75F",
+	"relevance":0,
+	"text":"ExpReg(a*b^x) "
+},{
+	"hex":"F760",
+	"relevance":0,
+	"text":"S-WindAuto"
+},{
+	"hex":"F761",
+	"relevance":0,
+	"text":"S-WindMan"
+},{
+	"hex":"F762",
+	"relevance":0,
+	"text":"Graph X="
+},{
+	"hex":"F763",
+	"relevance":0,
+	"text":"Y=Type"
+},{
+	"hex":"F764",
+	"relevance":0,
+	"text":"r=Type"
+},{
+	"hex":"F765",
+	"relevance":0,
+	"text":"ParamType"
+},{
+	"hex":"F767",
+	"relevance":0,
+	"text":"X=Type"
+},{
+	"hex":"F768",
+	"relevance":0,
+	"text":"X>Type"
+},{
+	"hex":"F769",
+	"relevance":0,
+	"text":"X<Type"
+},{
+	"hex":"F76A",
+	"relevance":0,
+	"text":"Y>Type"
+},{
+	"hex":"F76B",
+	"relevance":0,
+	"text":"Y<Type"
+},{
+	"hex":"F76C",
+	"relevance":0,
+	"text":"Y>=Type"
+},{
+	"hex":"F76D",
+	"relevance":0,
+	"text":"Y<=Type"
+},{
+	"hex":"F76E",
+	"relevance":0,
+	"text":"X>=Type"
+},{
+	"hex":"F76F",
+	"relevance":0,
+	"text":"X<=Type"
+},{
+	"hex":"F770",
+	"relevance":0,
+	"text":"G-Connect"
+},{
+	"hex":"F771",
+	"relevance":0,
+	"text":"G-Plot"
+},{
+	"hex":"F776",
+	"relevance":0,
+	"text":"Resid-None"
+},{
+	"hex":"F777",
+	"relevance":0,
+	"text":"Resid-List "
+},{
+	"hex":"F778",
+	"relevance":5,
+	"text":"BG-None",
+	"description":"Disables the picture background. Use it at the end of your programs to avoid setting a background picture in the Graph app."
+},{
+	"hex":"F779",
+	"relevance":5,
+	"text":"BG-Pict ",
+	"syntax": "BG-Pict <1-20>",
+	"description": "Sets the background picture to the number specified.",
+	"example": "[code]BG-Pict 3[/code] sets the background to the Picture 3"
+},{
+	"hex":"F77A",
+	"relevance":0,
+	"text":"GridOff"
+},{
+	"hex":"F77C",
+	"relevance":0,
+	"text":"GridLine"
+},{
+	"hex":"F77D",
+	"relevance":0,
+	"text":"GridOn"
+},{
+	"hex":"F77E",
+	"relevance":0,
+	"text":"Exp(a*b^x)"
+},{
+	"hex":"F780",
+	"relevance":0,
+	"text":"D Var "
+},{
+	"hex":"F787",
+	"relevance":0,
+	"text":"Q1Q3TypeStd"
+},{
+	"hex":"F788",
+	"relevance":0,
+	"text":"VarRange"
+},{
+	"hex":"F789",
+	"relevance":0,
+	"text":"Q1Q3TypeOnData"
+},{
+	"hex":"F78C",
+	"relevance":0,
+	"text":"SketchNormal "
+},{
+	"hex":"F78D",
+	"relevance":0,
+	"text":"SketchThick "
+},{
+	"hex":"F78E",
+	"relevance":0,
+	"text":"SketchBroken "
+},{
+	"hex":"F78F",
+	"relevance":0,
+	"text":"SketchDot "
+},{
+	"hex":"F790",
+	"relevance":0,
+	"text":"anType",
+	"unicode":"aType"
+},{
+	"hex":"F791",
+	"relevance":0,
+	"text":"an+1Type",
+	"unicode":"a₊₁Type"
+},{
+	"hex":"F792",
+	"relevance":0,
+	"text":"an+2Type",
+	"unicode":"a₊₂Type"
+},{
+	"hex":"F793",
+	"relevance":5,
+	"text":"StoPict "
+},{
+	"hex":"F794",
+	"relevance":5,
+	"text":"RclPict "
+},{
+	"hex":"F795",
+	"relevance":0,
+	"text":"StoGMEM "
+},{
+	"hex":"F796",
+	"relevance":0,
+	"text":"RclGMEM "
+},{
+	"hex":"F797",
+	"relevance":0,
+	"text":"StoV-Win "
+},{
+	"hex":"F798",
+	"relevance":0,
+	"text":"RclV-Win "
+},{
+	"hex":"F799",
+	"relevance":0,
+	"text":"&%_disp;"
+},{
+	"hex":"F79A",
+	"relevance":0,
+	"text":"Data"
+},{
+	"hex":"F79E",
+	"relevance":5,
+	"text":"Menu "
+},{
+	"hex":"F79F",
+	"relevance":5,
+	"text":"RclCapt "
+},{
+	"hex":"F7A0",
+	"relevance":0,
+	"text":"Tangent "
+},{
+	"hex":"F7A1",
+	"relevance":0,
+	"text":"Normal "
+},{
+	"hex":"F7A2",
+	"relevance":0,
+	"text":"Inverse "
+},{
+	"hex":"F7A3",
+	"relevance":0,
+	"text":"Vertical "
+},{
+	"hex":"F7A4",
+	"relevance":0,
+	"text":"Horizontal "
+},{
+	"hex":"F7A5",
+	"relevance":5,
+	"text":"Text "
+},{
+	"hex":"F7A6",
+	"relevance":0,
+	"text":"Circle ",
+	"syntax": "Circle <X>, <Y>, <radius>",
+	"description": "Draws a circle at the given coordinates (depends on ViewWindow) with the given radius.\n\nThis function is very slow, it is better to use pre-defined circles with Graph(X,Y).",
+	"example": "[code]Circle 100, 50, 5[/code]"
+},{
+	"hex":"F7A7",
+	"relevance":0,
+	"text":"F-Line ",
+	"syntax": "F-Line x1, y1, x2, y2",
+	"description": "Traces a line from (x1, y1) to (x2, y2) according to the ViewWindow.\n\nIt is advised not to use this function, as Graph(X,Y) is faster, even for single lines.",
+	"example": "[code]F-Line 10, 20, 100, 50[/code]"
+},{
+	"hex":"F7A8",
+	"relevance":0,
+	"text":"PlotOn "
+},{
+	"hex":"F7A9",
+	"relevance":0,
+	"text":"PlotOff "
+},{
+	"hex":"F7AA",
+	"relevance":0,
+	"text":"PlotChg "
+},{
+	"hex":"F7AB",
+	"relevance":0,
+	"text":"PxlOn "
+},{
+	"hex":"F7AC",
+	"relevance":0,
+	"text":"PxlOff "
+},{
+	"hex":"F7AD",
+	"relevance":0,
+	"text":"PxlChg "
+},{
+	"hex":"F7AF",
+	"relevance":0,
+	"text":"PxlTest("
+},{
+	"hex":"F7B0",
+	"relevance":0,
+	"text":"SortA("
+},{
+	"hex":"F7B1",
+	"relevance":0,
+	"text":"SortD("
+},{
+	"hex":"F7B2",
+	"relevance":0,
+	"text":"VarList1"
+},{
+	"hex":"F7B3",
+	"relevance":0,
+	"text":"VarList2"
+},{
+	"hex":"F7B4",
+	"relevance":0,
+	"text":"VarList3"
+},{
+	"hex":"F7B5",
+	"relevance":0,
+	"text":"VarList4"
+},{
+	"hex":"F7B6",
+	"relevance":0,
+	"text":"VarList5"
+},{
+	"hex":"F7B7",
+	"relevance":0,
+	"text":"VarList6"
+},{
+	"hex":"F7B8",
+	"relevance":0,
+	"text":"File1",
+	"description" : "See File."
+},{
+	"hex":"F7B9",
+	"relevance":0,
+	"text":"File2",
+	"description" : "See File."
+},{
+	"hex":"F7BA",
+	"relevance":0,
+	"text":"File3",
+	"description" : "See File."
+},{
+	"hex":"F7BB",
+	"relevance":0,
+	"text":"File4",
+	"description" : "See File."
+},{
+	"hex":"F7BC",
+	"relevance":0,
+	"text":"File5",
+	"description" : "See File."
+},{
+	"hex":"F7BD",
+	"relevance":0,
+	"text":"File6",
+	"description" : "See File."
+},{
+	"hex":"F7BE",
+	"relevance":0,
+	"text":"Y=DrawSpeedNorm"
+},{
+	"hex":"F7BF",
+	"relevance":0,
+	"text":"Y=DrawSpeedHigh"
+},{
+	"hex":"F7C0",
+	"relevance":0,
+	"text":"FuncOn"
+},{
+	"hex":"F7C1",
+	"relevance":0,
+	"text":"SimulOn"
+},{
+	"hex":"F7C2",
+	"relevance":0,
+	"text":"AxesOn",
+	"description": "Enables the drawing of axes on the graphical screen."
+},{
+	"hex":"F7C3",
+	"relevance":0,
+	"text":"CoordOn",
+	"description": "Enables the drawing of cursor coordinates on the graphical screen."
+},{
+	"hex":"F7C4",
+	"relevance":0,
+	"text":"LabelOn"
+},{
+	"hex":"F7C5",
+	"relevance":0,
+	"text":"DerivOn"
+},{
+	"hex":"F7C6",
+	"relevance":0,
+	"text":"LocusOn"
+},{
+	"hex":"F7C7",
+	"relevance":0,
+	"text":"SumDispOn",
+	"unicode":"ΣDispOn"
+},{
+	"hex":"F7C8",
+	"relevance":0,
+	"text":"G SelOn "
+},{
+	"hex":"F7C9",
+	"relevance":0,
+	"text":"T SelOn "
+},{
+	"hex":"F7CA",
+	"relevance":0,
+	"text":"D SelOn "
+},{
+	"hex":"F7CB",
+	"relevance":0,
+	"text":"R SelOn "
+},{
+	"hex":"F7CC",
+	"relevance":0,
+	"text":"DrawOn"
+},{
+	"hex":"F7CD",
+	"relevance":0,
+	"text":"ab/c",
+	"unicode":"abc"
+},{
+	"hex":"F7CE",
+	"relevance":0,
+	"text":"d/c",
+	"unicode":"dc"
+},{
+	"hex":"F7D0",
+	"relevance":0,
+	"text":"FuncOff"
+},{
+	"hex":"F7D1",
+	"relevance":0,
+	"text":"SimulOff"
+},{
+	"hex":"F7D2",
+	"relevance":0,
+	"text":"AxesOff",
+	"description": "Disable drawing of axes on the graphical screen."
+},{
+	"hex":"F7D3",
+	"relevance":0,
+	"text":"CoordOff",
+	"description": "Disable drawing of the cursor coordinates on the graphical screen."
+},{
+	"hex":"F7D4",
+	"relevance":0,
+	"text":"LabelOff"
+},{
+	"hex":"F7D5",
+	"relevance":0,
+	"text":"DerivOff"
+},{
+	"hex":"F7D6",
+	"relevance":0,
+	"text":"LocusOff"
+},{
+	"hex":"F7D7",
+	"relevance":0,
+	"text":"SumDispOff",
+	"unicode":"ΣDispOff"
+},{
+	"hex":"F7D8",
+	"relevance":0,
+	"text":"G SelOff "
+},{
+	"hex":"F7D9",
+	"relevance":0,
+	"text":"T SelOff "
+},{
+	"hex":"F7DA",
+	"relevance":0,
+	"text":"D SelOff "
+},{
+	"hex":"F7DB",
+	"relevance":0,
+	"text":"R SelOff "
+},{
+	"hex":"F7DC",
+	"relevance":0,
+	"text":"DrawOff"
+},{
+	"hex":"F901",
+	"relevance":0,
+	"text":"->Dec"
+},{
+	"hex":"F902",
+	"relevance":0,
+	"text":"->Hex"
+},{
+	"hex":"F903",
+	"relevance":0,
+	"text":"->Bin"
+},{
+	"hex":"F904",
+	"relevance":0,
+	"text":"->Oct"
+},{
+	"hex":"F905",
+	"relevance":0,
+	"text":"->DMS"
+},{
+	"hex":"F906",
+	"relevance":0,
+	"text":"->a+bi",
+	"unicode":"->a+b"
+},{
+	"hex":"F907",
+	"relevance":0,
+	"text":"->r&angle;&theta;",
+	"unicode":"->r∠θ"
+},{
+	"hex":"F908",
+	"relevance":0,
+	"text":"Real"
+},{
+	"hex":"F909",
+	"relevance":0,
+	"text":"a+bi",
+	"unicode":"a+b"
+},{
+	"hex":"F90A",
+	"relevance":0,
+	"text":"r&angle;&theta;",
+	"unicode":"r∠θ"
+},{
+	"hex":"F90B",
+	"relevance":0,
+	"text":"EngOn"
+},{
+	"hex":"F90C",
+	"relevance":0,
+	"text":"EngOff"
+},{
+	"hex":"F910",
+	"relevance":0,
+	"text":"Sel a0",
+	"unicode":"Sel a"
+},{
+	"hex":"F911",
+	"relevance":0,
+	"text":"Sel a1",
+	"unicode":"Sel a"
+},{
+	"hex":"F912",
+	"relevance":0,
+	"text":"c_n",
+	"unicode":"c"
+},{
+	"hex":"F913",
+	"relevance":0,
+	"text":"c_(n+1)",
+	"unicode":"c₊₁"
+},{
+	"hex":"F914",
+	"relevance":0,
+	"text":"c_(n+2)",
+	"unicode":"c₊₂"
+},{
+	"hex":"F915",
+	"relevance":5,
+	"text":"c0",
+	"unicode":"c"
+},{
+	"hex":"F916",
+	"relevance":5,
+	"text":"c1",
+	"unicode":"c"
+},{
+	"hex":"F917",
+	"relevance":5,
+	"text":"c2",
+	"unicode":"c"
+},{
+	"hex":"F918",
+	"relevance":5,
+	"text":"cnStart"
+},{
+	"hex":"F919",
+	"relevance":0,
+	"text":"IneqTypeAnd",
+	"unicode":"IneqTypeIntsect"
+},{
+	"hex":"F91B",
+	"relevance":0,
+	"text":"fn",
+	"unicode":"f"
+},{
+	"hex":"F91C",
+	"relevance":0,
+	"text":"File ",
+	"syntax": "File <1-6>",
+	"description" : "Sets the ListFile to the given number. A ListFile is a set of lists, it is for example useful for saves: instead of saving to List 20, you set the ListFile to 2-6, you save to List 20, then you reset the ListFile to 1. As such, the probability that your save will get overwritten/deleted is smaller.\n\nThe opcodes File1 to File6 have the same function as File 1-6.",
+	"example": "[code]File 2[/code] sets the current ListFile to 2"
+},{
+	"hex":"F91D",
+	"relevance":0,
+	"text":"VarList "
+},{
+	"hex":"F91E",
+	"relevance":5,
+	"text":"ClrMat ",
+	"syntax": "ClrMat\nClrMat <matLetter>",
+	"description": "Deletes the given matrix, or all matrixes if no letter is given.",
+	"example": "[code]ClrMat A[/code] deletes Mat A"
+},{
+	"hex":"F920",
+	"relevance":0,
+	"text":"ZoomAuto"
+},{
+	"hex":"F921",
+	"relevance":0,
+	"text":"Xdot"
+},{
+	"hex":"F922",
+	"relevance":0,
+	"text":"RightXdot"
+},{
+	"hex":"F924",
+	"relevance":0,
+	"text":"DrawDistNorm "
+},{
+	"hex":"F925",
+	"relevance":0,
+	"text":"DrawDistT "
+},{
+	"hex":"F926",
+	"relevance":0,
+	"text":"DrawDistChi "
+},{
+	"hex":"F927",
+	"relevance":0,
+	"text":"DrawDistF "
+},{
+	"hex":"F928",
+	"relevance":0,
+	"text":"None"
+},{
+	"hex":"F929",
+	"relevance":0,
+	"text":"StickLength"
+},{
+	"hex":"F92A",
+	"relevance":0,
+	"text":"StickHoriz"
+},{
+	"hex":"F92B",
+	"relevance":0,
+	"text":"IneqTypeOr",
+	"unicode":"IneqTypeUnion"
+},{
+	"hex":"F92C",
+	"relevance":0,
+	"text":"Graph X>"
+},{
+	"hex":"F92D",
+	"relevance":0,
+	"text":"Graph X<"
+},{
+	"hex":"F92E",
+	"relevance":0,
+	"text":"Graph X>="
+},{
+	"hex":"F92F",
+	"relevance":0,
+	"text":"Graph X<="
+},{
+	"hex":"F930",
+	"relevance":5,
+	"text":"StrJoin("
+},{
+	"hex":"F931",
+	"relevance":5,
+	"text":"StrLen("
+},{
+	"hex":"F932",
+	"relevance":5,
+	"text":"StrCmp("
+},{
+	"hex":"F933",
+	"relevance":5,
+	"text":"StrSrc("
+},{
+	"hex":"F934",
+	"relevance":5,
+	"text":"StrLeft("
+},{
+	"hex":"F935",
+	"relevance":5,
+	"text":"StrRight("
+},{
+	"hex":"F936",
+	"relevance":5,
+	"text":"StrMid("
+},{
+	"hex":"F937",
+	"relevance":5,
+	"text":"Exp->Str("
+},{
+	"hex":"F938",
+	"relevance":0,
+	"text":"Exp(",
+	"syntax": "Exp(Str s)",
+	"description" : "Calculates the given string as if it were a math expression (can be run in the Run-Mat app).\n\nDoes not work as expected with assignments: it performs the calculation, but does not actually assign it.",
+	"example": "[code]Exp(\"1+Dim [[0,0]]\")[/code] returns {2,3}\n[code]Exp(\"1+2->A\")[/code] returns 3 (but the value of A is not changed)",
+	"compat":"OS 2.00"
+},{
+	"hex":"F939",
+	"relevance":5,
+	"text":"StrUpr("
+},{
+	"hex":"F93A",
+	"relevance":5,
+	"text":"StrLwr("
+},{
+	"hex":"F93B",
+	"relevance":5,
+	"text":"StrInv("
+},{
+	"hex":"F93C",
+	"relevance":5,
+	"text":"StrShift("
+},{
+	"hex":"F93D",
+	"relevance":5,
+	"text":"StrRotate("
+},{
+	"hex":"F93E",
+	"relevance":0,
+	"text":"ClrVct ",
+	"syntax": "ClrVct\nClrVct <vctLetter>",
+	"description": "Clears the given vector, or all vectors if no letter is specified.",
+	"example": "[code]ClrVct A[/code] deletes Vct A",
+	"compat": "OS 2.04"
+},{
+	"hex":"F93F",
+	"relevance":5,
+	"text":"Str "
+},{
+	"hex":"F94A",
+	"relevance":0,
+	"text":"CrossP("
+},{
+	"hex":"F94B",
+	"relevance":0,
+	"text":"DotP(",
+	"syntax": "DotP(Vct vct1, Vct vct2)",
+	"description": "Calculates the dot product ([i]produit scalaire[/i] in french) of the given vectors.",
+	"example": "[code]DotP([[1,2]], [[2,3]])[/code] returns 8",
+	"compat": "OS 2.04"
+},{
+	"hex":"F95B",
+	"relevance":0,
+	"text":"Norm("
+},{
+	"hex":"F95E",
+	"relevance":0,
+	"text":"UnitV("
+},{
+	"hex":"F96D",
+	"relevance":0,
+	"text":"Angle(",
+	"syntax":"Angle(Vct vct1, Vct vct2)",
+	"description":"Returns the value of the angle between vct1 and vct2.",
+	"compat":"OS 2.04"
+},{
+	"hex":"F973",
+	"relevance":0,
+	"text":"ColorAuto "
+},{
+	"hex":"F974",
+	"relevance":0,
+	"text":"ColorLighter "
+},{
+	"hex":"F975",
+	"relevance":0,
+	"text":"ColorLinkX&amp;Y"
+},{
+	"hex":"F976",
+	"relevance":0,
+	"text":"ColorLinkOnlyX"
+},{
+	"hex":"F977",
+	"relevance":0,
+	"text":"ColorLinkOnlyY"
+},{
+	"hex":"F978",
+	"relevance":0,
+	"text":"ColorLinkOn"
+},{
+	"hex":"F979",
+	"relevance":0,
+	"text":"ColorLinkOff"
+},{
+	"hex":"F97A",
+	"relevance":0,
+	"text":"ColorNormal "
+},{
+	"hex":"F97B",
+	"relevance":0,
+	"text":"ERROR"
+},{
+	"hex":"F97C",
+	"relevance":0,
+	"text":"BLANK"
+},{
+	"hex":"F97D",
+	"relevance":0,
+	"text":"ColorClr "
+},{
+	"hex":"F97E",
+	"relevance":0,
+	"text":"ColorLinkX&amp;Freq"
+},{
+	"hex":"F980",
+	"relevance":0,
+	"text":"NormPD("
+},{
+	"hex":"F981",
+	"relevance":0,
+	"text":"NormCD("
+},{
+	"hex":"F982",
+	"relevance":0,
+	"text":"InvNormCD("
+},{
+	"hex":"F983",
+	"relevance":0,
+	"text":"tPD("
+},{
+	"hex":"F984",
+	"relevance":0,
+	"text":"tCD("
+},{
+	"hex":"F985",
+	"relevance":0,
+	"text":"InvTCD("
+},{
+	"hex":"F986",
+	"relevance":0,
+	"text":"ChiPD("
+},{
+	"hex":"F987",
+	"relevance":0,
+	"text":"ChiCD("
+},{
+	"hex":"F988",
+	"relevance":0,
+	"text":"InvChiCD("
+},{
+	"hex":"F989",
+	"relevance":0,
+	"text":"&FPD(;"
+},{
+	"hex":"F98A",
+	"relevance":0,
+	"text":"&FCD(;"
+},{
+	"hex":"F98B",
+	"relevance":0,
+	"text":"InvFCD("
+},{
+	"hex":"F98C",
+	"relevance":0,
+	"text":"BinominalPD("
+},{
+	"hex":"F98D",
+	"relevance":0,
+	"text":"BinominalCD("
+},{
+	"hex":"F98E",
+	"relevance":0,
+	"text":"InvBinominalCD("
+},{
+	"hex":"F98F",
+	"relevance":0,
+	"text":"PoissonPD("
+},{
+	"hex":"F990",
+	"relevance":0,
+	"text":"PoissonCD("
+},{
+	"hex":"F991",
+	"relevance":0,
+	"text":"InvPoissonCD("
+},{
+	"hex":"F992",
+	"relevance":0,
+	"text":"GeoPD("
+},{
+	"hex":"F993",
+	"relevance":0,
+	"text":"GeoCD("
+},{
+	"hex":"F994",
+	"relevance":0,
+	"text":"InvGeoCD("
+},{
+	"hex":"F995",
+	"relevance":0,
+	"text":"HypergeoPD("
+},{
+	"hex":"F996",
+	"relevance":0,
+	"text":"HypergeoCD("
+},{
+	"hex":"F997",
+	"relevance":0,
+	"text":"InvHypergeoCD("
+},{
+	"hex":"F998",
+	"relevance":0,
+	"text":"SetG-Color "
+},{
+	"hex":"F999",
+	"relevance":0,
+	"text":"Plot/Line-Color "
+},{
+	"hex":"F99A",
+	"relevance":0,
+	"text":"AxesScale"
+},{
+	"hex":"F99B",
+	"relevance":0,
+	"text":"Black ",
+	"syntax": "Black <graphical function>",
+	"description": "Displays the given graphical function in black (the default color).",
+	"compat": "Prizm/Graph 90+E"
+},{
+	"hex":"F99D",
+	"relevance":0,
+	"text":"Magenta ",
+	"syntax": "Magenta <graphical function>",
+	"description": "Displays the given graphical function in magenta.",
+	"compat": "Prizm/Graph 90+E"
+},{
+	"hex":"F99E",
+	"relevance":0,
+	"text":"Cyan ",
+	"syntax": "Cyan <graphical function>",
+	"description": "Displays the given graphical function in cyan.",
+	"compat": "Prizm/Graph 90+E"
+},{
+	"hex":"F99F",
+	"relevance":0,
+	"text":"Yellow ",
+	"syntax": "Yellow <graphical function>",
+	"description": "Displays the given graphical function in yellow.",
+	"compat": "Prizm/Graph 90+E"
+},{
+	"hex":"F9A0",
+	"relevance":0,
+	"text":"Smpl_SI("
+},{
+	"hex":"F9A1",
+	"relevance":0,
+	"text":"Smpl_SFV("
+},{
+	"hex":"F9A2",
+	"relevance":0,
+	"text":"Cmpd_n("
+},{
+	"hex":"F9A3",
+	"relevance":0,
+	"text":"Cmpd_I%("
+},{
+	"hex":"F9A4",
+	"relevance":0,
+	"text":"Cmpd_PV("
+},{
+	"hex":"F9A5",
+	"relevance":0,
+	"text":"Cmpd_PMT("
+},{
+	"hex":"F9A6",
+	"relevance":0,
+	"text":"Cmpd_FV("
+},{
+	"hex":"F9A7",
+	"relevance":0,
+	"text":"Cash_NPV("
+},{
+	"hex":"F9A8",
+	"relevance":0,
+	"text":"Cash_IRR("
+},{
+	"hex":"F9A9",
+	"relevance":0,
+	"text":"Cash_PBP("
+},{
+	"hex":"F9AA",
+	"relevance":0,
+	"text":"Cash_NFV("
+},{
+	"hex":"F9AB",
+	"relevance":0,
+	"text":"Amt_BAL("
+},{
+	"hex":"F9AC",
+	"relevance":0,
+	"text":"Amt_INT("
+},{
+	"hex":"F9AD",
+	"relevance":0,
+	"text":"Amt_PRN("
+},{
+	"hex":"F9AE",
+	"relevance":0,
+	"text":"AMT_ΣINT(",
+	"unicode":"Amt_SumINT("
+},{
+	"hex":"F9AF",
+	"relevance":0,
+	"text":"AMT_ΣPRN(",
+	"unicode":"Amt_SumPRN("
+},{
+	"hex":"F9B0",
+	"relevance":0,
+	"text":"Cnvt_EFF("
+},{
+	"hex":"F9B1",
+	"relevance":0,
+	"text":"Cnvt_APR("
+},{
+	"hex":"F9B2",
+	"relevance":0,
+	"text":"Cost("
+},{
+	"hex":"F9B3",
+	"relevance":0,
+	"text":"Sell("
+},{
+	"hex":"F9B4",
+	"relevance":0,
+	"text":"Margin("
+},{
+	"hex":"F9B5",
+	"relevance":0,
+	"text":"PmtEnd"
+},{
+	"hex":"F9B6",
+	"relevance":0,
+	"text":"PmtBgn"
+},{
+	"hex":"F9B7",
+	"relevance":0,
+	"text":"Bond_PRC("
+},{
+	"hex":"F9B8",
+	"relevance":0,
+	"text":"Bond_YLD("
+},{
+	"hex":"F9B9",
+	"relevance":0,
+	"text":"DateMode365"
+},{
+	"hex":"F9BA",
+	"relevance":0,
+	"text":"DateMode360"
+},{
+	"hex":"F9BB",
+	"relevance":0,
+	"text":"PeriodsAnnual"
+},{
+	"hex":"F9BC",
+	"relevance":0,
+	"text":"PeriodsSemi"
+},{
+	"hex":"F9BD",
+	"relevance":0,
+	"text":"Days_Prd("
+},{
+	"hex":"F9E0",
+	"relevance":0,
+	"text":"OneSampleZTest "
+},{
+	"hex":"F9E1",
+	"relevance":0,
+	"text":"TwoSampleZTest "
+},{
+	"hex":"F9E2",
+	"relevance":0,
+	"text":"OneProfZTest "
+},{
+	"hex":"F9E3",
+	"relevance":0,
+	"text":"TwoPropZTest "
+},{
+	"hex":"F9E8",
+	"relevance":0,
+	"text":"OneSampleTTest "
+},{
+	"hex":"F9E9",
+	"relevance":0,
+	"text":"TwoSampleTTest "
+},{
+	"hex":"F9EA",
+	"relevance":0,
+	"text":"LinRegTTest "
+},{
+	"hex":"F9EB",
+	"relevance":0,
+	"text":"ChiGOFTest "
+},{
+	"hex":"F9EC",
+	"relevance":0,
+	"text":"ChiTest "
+},{
+	"hex":"F9ED",
+	"relevance":0,
+	"text":"TwoSampleFTest "
+},{
+	"hex":"F9EE",
+	"relevance":0,
+	"text":"OneWayANOVA "
+},{
+	"hex":"F9EF",
+	"relevance":0,
+	"text":"TwoWayANOVA "
+},{
+	"hex":"F9F0",
+	"relevance":0,
+	"text":"x1InvN"
+},{
+	"hex":"F9F1",
+	"relevance":0,
+	"text":"x2InvN"
+},{
+	"hex":"F9F2",
+	"relevance":0,
+	"text":"xInv"
+},{
+	"hex":"F9F3",
+	"relevance":0,
+	"text":"SketchThin "
+},{
+	"hex":"F9F4",
+	"relevance":0,
+	"text":"S-L-Thin"
+},{
+	"hex":"F9F5",
+	"relevance":0,
+	"text":"ThinG "
+},{
+	"hex":"F9FB",
+	"relevance":0,
+	"text":"zLow"
+},{
+	"hex":"F9FC",
+	"relevance":0,
+	"text":"zUp"
+},{
+	"hex":"F9FD",
+	"relevance":0,
+	"text":"tLow"
+},{
+	"hex":"F9FE",
+	"relevance":0,
+	"text":"tUp"
+}]

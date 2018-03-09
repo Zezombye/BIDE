@@ -40,12 +40,13 @@ public class BasicCompletion extends AbstractCompletion {
 		this(provider, replacementText, null);
 	}
 	
-	public BasicCompletion(CompletionProvider provider, String replacementText, int relevance){
+	public BasicCompletion(CompletionProvider provider, String replacementText, int relevance, String summary){
 		
 		this(provider, replacementText, null);
 		//this.initialReplacementText = replacementText;
 		this.setRelevance(relevance);
 		this.initialRelevance = relevance;
+		this.summary = summary;
 		/*if (relevance == 0) {
 			System.out.println("relevance = 0??? for "+replacementText);
 		}*/
@@ -120,6 +121,7 @@ public class BasicCompletion extends AbstractCompletion {
 	@Override
 	public String getSummary() {
 		return summary;
+		//return "testSummary";
 	}
 
 

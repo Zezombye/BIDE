@@ -55,7 +55,7 @@ public class AutoCompletion {
 	/**
 	 * The parent window of {@link #textComponent}.
 	 */
-	private Window parentWindow;
+	public Window parentWindow;
 
 	/**
 	 * The popup window containing completion choices.
@@ -793,6 +793,7 @@ public class AutoCompletion {
 	 */
 	protected int refreshPopupWindow() {
 
+		//System.out.println("Popup window refreshed");
 		// A return value of null => don't suggest completions
 		String text = provider.getAlreadyEnteredText(textComponent);
 		if (text == null && !isPopupVisible()) {
@@ -833,8 +834,7 @@ public class AutoCompletion {
 					popupWindow.setSize(preferredChoicesWindowSize);
 				}
 				if (preferredDescWindowSize != null) {
-					popupWindow
-							.setDescriptionWindowSize(preferredDescWindowSize);
+					popupWindow.setDescriptionWindowSize(preferredDescWindowSize);
 				}
 			}
 			

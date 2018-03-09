@@ -83,7 +83,10 @@ class AutoCompletePopupWindow extends JWindow implements CaretListener,
 	 * selected completion.
 	 */
 	private AutoCompleteDescWindow descWindow;
-
+	
+	//public AutoCompleteDescWindow2 descWindow2 = null;
+	public boolean isCreated = false;
+	
 	/**
 	 * The preferred size of the optional description window.  This field
 	 * only exists because the user may (and usually will) set the size of
@@ -220,6 +223,7 @@ class AutoCompletePopupWindow extends JWindow implements CaretListener,
 		if (size==null) {
 			size = getSize();
 		}
+		//System.out.println("Description window created");
 		dw.setSize(size);
 		return dw;
 	}
@@ -690,17 +694,21 @@ class AutoCompletePopupWindow extends JWindow implements CaretListener,
 		if (visible!=isVisible()) {
 
 			if (visible) {
+				//System.out.println("popup visible");
 				installKeyBindings();
 				lastLine = ac.getLineOfCaret();
 				selectFirstItem();
 				if (descWindow==null && ac.getShowDescWindow()) {
+					//System.out.println("creating desc window");
 					descWindow = createDescriptionWindow();
 					positionDescWindow();
+					
 				}
 				// descWindow needs a kick-start the first time it's displayed.
 				// Also, the newly-selected item in the choices list is
 				// probably different from the previous one anyway.
 				if (descWindow!=null) {
+					//System.out.println("kick start");
 					Completion c = (Completion)list.getSelectedValue();
 					if (c!=null) {
 						descWindow.setDescriptionFor(c);
@@ -708,6 +716,7 @@ class AutoCompletePopupWindow extends JWindow implements CaretListener,
 				}
 			}
 			else {
+				//System.out.println("popup not visible");
 				uninstallKeyBindings();
 			}
 
@@ -723,16 +732,48 @@ class AutoCompletePopupWindow extends JWindow implements CaretListener,
 			// created.  If this window holds on to the previous Completions,
 			// you're getting roughly 2x the necessary Completions in memory
 			// until the Completions are actually passed to this window.
-			if (!visible) { // Do after super.setVisible(false)
+			/*if (!visible) { // Do after super.setVisible(false)
 				lastSelection = (Completion)list.getSelectedValue();
 				model.clear();
-			}
+			}*/
 
 			// Must set descWindow's visibility one way or the other each time,
 			// because of the way child JWindows' visibility is handled - in
 			// some ways it's dependent on the parent, in other ways it's not.
 			if (descWindow!=null) {
-				descWindow.setVisible(visible && ac.getShowDescWindow());
+				if (visible) {
+					new Thread(new Runnable() {
+						public void run() {
+							try {
+								for (int i = 0; i < 2000; i++) {
+									Thread.sleep(1);
+									if (!isVisible()) return;
+								}
+								//System.out.println("setting desc window visible");
+								//ac.setShowDescWindow(true);
+								descWindow.setVisible(true);
+							} catch (Exception e) {}
+						}
+					}).start();
+				} else {
+					//System.out.println("Setting desc window not visible");
+					descWindow.setVisible(false);
+					
+					//Remove ALL description windows because for some reason there are several
+					for (int i = 0; i < Window.getWindows().length; i++) {
+						if (Window.getWindows()[i] instanceof AutoCompleteDescWindow) {
+							//hide temporarily while waiting for garbage collection
+							Window.getWindows()[i].setSize(0,0);
+							Window.getWindows()[i].dispose();
+						}
+					}
+					//this.ac.parentWindow.remove(descWindow);
+					//descWindow.dispose();
+					//System.out.println("parent window : "+this.ac.parentWindow);
+					//System.out.println("parent window : "+this.getParent());
+					//System.out.println(descWindow);
+					descWindow = null;
+				}
 			}
 
 		}
@@ -805,7 +846,16 @@ class AutoCompletePopupWindow extends JWindow implements CaretListener,
 			Object value = list.getSelectedValue();
 			if (value!=null && descWindow!=null) {
 				descWindow.setDescriptionFor((Completion)value);
-				positionDescWindow();
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							Thread.sleep(2000);
+							//System.out.println("positioning desc window");
+							positionDescWindow();
+						} catch (Exception e) {}
+					}
+				}).start();
+				
 			}
 		}
 	}

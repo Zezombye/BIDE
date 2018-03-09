@@ -24,6 +24,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
@@ -36,6 +37,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.TabSet;
 import javax.swing.text.TabStop;
 
+import org.fife.ui.autocomplete.AutoCompleteDescWindow;
 
 import javax.swing.*;
 import javax.swing.*;
@@ -73,7 +75,7 @@ public class UI {
 	        }
 	    }*/
 
-	    UIManager.put("Label.font", new Font(BIDE.options.getProperty("progFontName"), Font.PLAIN, 12));
+	    //UIManager.put("Label.font", new Font(BIDE.options.getProperty("progFontName"), Font.PLAIN, 12));
 	    //UIManager.put("List.font", new Font(BIDE.options.getProperty("progFontName"), Font.PLAIN, 12));
 	    
 		jtp = new JTabbedPane() {
@@ -83,13 +85,14 @@ public class UI {
 				//this.getTabComponentAt(jtp.getTabCount()-1).setFont(BIDE.progFont); //doesn't work
 			}
 		};
-		//jtp.setFont(BIDE.progFont);
+		//Is overridden by the label font at ButtonTabComponent
+		//jtp.setFont(new Font(BIDE.options.getProperty("progFontName"), Font.PLAIN, 12));
 		jfc = new JFileChooser();
 		
 		window = new JFrame();
 		window.setTitle("BIDE v"+BIDE.VERSION+" by Zezombye");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setSize(800, 600);
+		window.setSize(1200, 800);
 		window.setLocationRelativeTo(null);
 		try {
 			window.setIconImage(ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/BIDEicon.png")));
@@ -167,6 +170,15 @@ public class UI {
 			@Override public void actionPerformed(ActionEvent arg0) {
 				createNewTab(BIDE.TYPE_PROG);
 			}
+		});
+		
+		newProg.addMouseListener(new java.awt.event.MouseAdapter() {
+		    public void mouseEntered(java.awt.event.MouseEvent evt) {
+		        System.out.println(Arrays.toString(Window.getWindows()));
+		    }
+
+		    public void mouseExited(java.awt.event.MouseEvent evt) {
+		    }
 		});
 		
 		ToolbarButton newPict = new ToolbarButton("newPict.png", "New Picture");
@@ -645,6 +657,7 @@ class ButtonTabComponent extends JPanel {
                 return null;
             }
         };
+        label.setFont(new Font(BIDE.options.getProperty("progFontName"), Font.PLAIN, 12));
 
         add(label);
         //add more space between the label and the button
@@ -696,14 +709,25 @@ class ButtonTabComponent extends JPanel {
             /*if (getModel().isPressed()) {
                 g2.translate(1, 1);
             }*/
-            g2.setStroke(new BasicStroke(2));
+            g2.setStroke(new BasicStroke(1));
+            
+          
             g2.setColor(Color.GRAY);
             if (getModel().isRollover()) {
                 g2.setColor(Color.BLACK);
             }
-            int delta = 5;
-            g2.drawLine(delta, delta, getWidth() - delta - 1, getHeight() - delta - 1);
-            g2.drawLine(getWidth() - delta - 1, delta, delta, getHeight() - delta - 1);
+            int lmargin = 8;
+            int rmargin = 2;
+            int umargin = 4;
+            int dmargin = 6;
+            
+            g2.drawLine(lmargin, umargin, getWidth()-rmargin+1, getHeight()-dmargin+1);
+            g2.drawLine(lmargin+1, umargin, getWidth()-rmargin+1, getHeight()-dmargin);
+            g2.drawLine(lmargin, umargin+1, getWidth()-rmargin, getHeight()-dmargin+1);
+
+            g2.drawLine(lmargin, getHeight()-dmargin+1, getWidth()-rmargin+1, umargin);
+            g2.drawLine(lmargin+1, getHeight()-dmargin+1, getWidth()-rmargin+1, umargin+1);
+            g2.drawLine(lmargin, getHeight()-dmargin, getWidth()-rmargin, umargin);
             g2.dispose();
         }
     }

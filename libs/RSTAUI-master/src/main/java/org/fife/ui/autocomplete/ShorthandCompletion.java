@@ -35,8 +35,8 @@ public class ShorthandCompletion extends BasicCompletion {
 	 * @param replacementText The replacement text of the completion.
 	 */
 	public ShorthandCompletion(CompletionProvider provider, String inputText,
-								String replacementText, int relevance) {
-		super(provider, replacementText, relevance);
+								String replacementText, int relevance, String summary) {
+		super(provider, replacementText, relevance, summary);
 		this.inputText = inputText;
 		//this.setRelevance(relevance);
 		//this.initialRelevance = relevance;
@@ -53,8 +53,8 @@ public class ShorthandCompletion extends BasicCompletion {
 	 *        displayed in the completion list.  This may be <code>null</code>.
 	 */
 	public ShorthandCompletion(CompletionProvider provider, String inputText,
-								String replacementText, String shortDesc, int relevance) {
-		super(provider, replacementText, shortDesc);
+								String replacementText, String shortDesc, int relevance, String summary) {
+		super(provider, replacementText, shortDesc, summary);
 		this.inputText = inputText;
 		this.setRelevance(relevance);
 		this.initialRelevance = relevance;
@@ -98,12 +98,13 @@ public class ShorthandCompletion extends BasicCompletion {
 	 *         inserted).
 	 * @see #getReplacementText()
 	 */
-	@Override
+	/*@Override
 	public String getSummary() {
 		String summary = super.getSummary();
 		//return summary!=null ? summary : ("<html><body>" + getSummaryBody());
-		return summary!=null ? summary : getSummaryBody();
-	}
+		//return summary!=null ? summary : getSummaryBody();
+		return "testSummary";
+	}*/
 
 
 	/**

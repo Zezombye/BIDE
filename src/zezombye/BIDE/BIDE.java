@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -23,6 +24,10 @@ import org.fife.ui.autocomplete.DefaultCompletionProvider;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 /*
  * TODO:
@@ -40,7 +45,7 @@ public class BIDE {
 	public static final String pathToOptions = System.getProperty("user.home")+"/BIDE/options.txt";
 	public static UI ui = new UI();
 	
-	public final static String VERSION = "3.2";
+	public final static String VERSION = "4.0";
 	
 	public final static int TYPE_PROG = 0;
 	public final static int TYPE_PICT = 3;
@@ -145,7 +150,7 @@ public class BIDE {
 			
 			//ui.jtp.addTab("test", new Program("test1", "", "testcontent", TYPE_PICT).comp);
 			//ui.createNewTab(TYPE_COLORATION);
-			ui.createNewTab(TYPE_COLORATION);
+			ui.createNewTab(TYPE_CHARLIST);
 			//((ProgScrollPane)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
 			
 			//new AutoImport().autoImport("C:\\Users\\Catherine\\Desktop\\PUISS4.g1m");
@@ -440,15 +445,15 @@ public class BIDE {
 	
 	public static String pictToAscii(CasioString content, int type) {
 		//Convert from binary to string
-		String binary = "";
+		StringBuilder binary = new StringBuilder();
 		for (int i = 0; i < content.length(); i++) {
 			int mask = 0b10000000;
 			for (int j = 0; j < 8; j++) {
-				binary += ((content.charAt(i)&mask) != 0 ? "1" : "0");
+				binary.append(((content.charAt(i)&mask) != 0 ? "1" : "0"));
 				mask >>= 1;
 			}
 		}
-		return pictToAscii(binary, type);
+		return pictToAscii(binary.toString(), type);
 	}
 	
 	public static String pictToAscii(String content, int type) {
@@ -628,7 +633,8 @@ public class BIDE {
 					
 					//If string, skip opcodes that are not entities/characters in order to avoid FA-124ing
 					if (allowUnknownOpcodes || currentPosIsString || currentPosIsComment) {
-						if (opcodes.get(j).text.length() != 1 && !opcodes.get(j).text.startsWith("&")
+						if (opcodes.get(j).text.length() != 1
+								&& !opcodes.get(j).text.startsWith("&")
 								&& !opcodes.get(j).text.equals("->")
 								&& !opcodes.get(j).text.equals("=>")
 								&& !opcodes.get(j).text.equals("!=")
@@ -637,7 +643,8 @@ public class BIDE {
 							continue;
 						}
 					}
-					if (lines[h].startsWith(opcodes.get(j).text, i)) {
+					
+					if (lines[h].startsWith(opcodes.get(j).text, i) || (opcodes.get(j).unicode != null && lines[h].startsWith(opcodes.get(j).unicode, i))) {
 						foundMatch = true;
 						
 						if (opcodes.get(j).hex.length() > 2) {
@@ -646,7 +653,11 @@ public class BIDE {
 						} else if (opcodes.get(j).hex.length() > 0) {
 							result.add(Integer.parseInt(opcodes.get(j).hex, 16));
 						}
-						i += opcodes.get(j).text.length()-1;
+						if (lines[h].startsWith(opcodes.get(j).text, i)) {
+							i += opcodes.get(j).text.length()-1;
+						} else { //lines[h].startsWith(opcodes.get(j).unicode, i) == true
+							i += opcodes.get(j).unicode.length()-1;
+						}
 						break;
 					}
 				}
@@ -853,7 +864,11 @@ public class BIDE {
 			//System.out.println("Testing for opcode " + hex);
 			for (int j = 0; j < opcodes.size(); j++) {
 				if (hex.equalsIgnoreCase(opcodes.get(j).hex)) {
-					currentLine += opcodes.get(j).text;
+					if (opcodes.get(j).unicode == null || BIDE.options.getProperty("allowUnicode").equals("false")) {
+						currentLine += opcodes.get(j).text;
+					} else {
+						currentLine += opcodes.get(j).unicode;
+					}
 					foundMatch = true;
 					//System.out.println("Matches opcode " + opcodes.get(j).ascii);
 					break;
@@ -888,64 +903,29 @@ public class BIDE {
 	}
 	
 	public static void getOpcodes() {
-		//String relativePath = IO.getRelativeFilePath("opcodes.txt");
-		String line;
-		int lineNb = 0;
+		
+		GsonBuilder gbuilder = new GsonBuilder();
+		Gson gson = gbuilder.create();
+		
+		StringBuilder sb = new StringBuilder();
+		
 		try {
+			String line;
 			//BufferedReader br = new BufferedReader(new FileReader(new File(relativePath)));
 			BufferedReader br = new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/opcodes.txt"), "UTF-8"));
-			String hex, text;
-			int relevance;
-			boolean escape = false;
-			
 			while ((line = br.readLine()) != null) {
-				lineNb++;
-				if (line.startsWith("#") || line.isEmpty()) {
-					continue;
-				}
-				hex = line.substring(0, line.indexOf(' '));
-				try {
-					Integer.parseInt(hex, 16);
-				} catch (NumberFormatException e) {
-					error("opcodes.txt", lineNb, "Could not parse hex string \"" + hex + "\"");
-				}
-				text = line.substring(line.indexOf(' ')+1, line.lastIndexOf(' '));
-				relevance = Integer.parseInt(line.substring(line.length()-1));
-				
-				if (options.getProperty("allowUnicode").equals("true") || text.matches("([ -~])+")) {
-					opcodes.add(new Opcode(hex, text, relevance));
-				}
-				//Check for correct order
-				if (opcodes.size() > 1 && Integer.parseInt(opcodes.get(opcodes.size()-1).hex, 16) < Integer.parseInt(opcodes.get(opcodes.size()-2).hex, 16)) {
-					error("opcodes.txt", lineNb, "Opcodes must be ascending!");
-				}
-				
-				//This is to allow removal of trailing whitespace when converting ascii->casio
-				//opcodes.add(new Opcode(hex, ascii.replaceAll(" +?$", "")));
-		       
-		       
+				sb.append(line);
+				sb.append("\n");
 			}
 			br.close();
 		    
 		} catch (Exception e) {
-			error("opcodes.txt", lineNb, e.getMessage());
+			e.printStackTrace();
 		}
 		
-		//Add opcodes for variables and operators that are ascii and one character
-		String additionalOpcodes = "\"'(),.0123456789:<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]{}~";
-		for (int i = 0; i < additionalOpcodes.length(); i++) {
-			opcodes.add(new Opcode(Integer.toHexString(additionalOpcodes.charAt(i)), additionalOpcodes.charAt(i)+"", 0));
-		}
-		
-		//Add whitespace
-		opcodes.add(new Opcode("", "\t", 0));
-		//opcodes.add(new Opcode("", " "));
-		
-		//Add newline
-		opcodes.add(new Opcode("D", "\n", 0));
-		
-		//Add disp
-		//opcodes.add(new Opcode("C", "&disp;\n"));
+		String json = sb.toString();
+		Type listType = new TypeToken<List<Opcode>>(){}.getType();
+		opcodes = gson.fromJson(json, listType);
 		
 		//Order opcodes by inverse alphabetical order of their ascii string
 		Collections.sort(opcodes, new Comparator<Opcode>() {
@@ -963,6 +943,7 @@ public class BIDE {
 				}
 			}
 		}
+		
 	}
 	
 	public static void clearMacros() {

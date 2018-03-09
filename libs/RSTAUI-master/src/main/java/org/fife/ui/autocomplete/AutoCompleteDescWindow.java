@@ -51,7 +51,7 @@ import org.fife.ui.rsyntaxtextarea.PopupWindowDecorator;
  * @author Robert Futrell
  * @version 1.0
  */
-class AutoCompleteDescWindow extends JWindow implements HyperlinkListener,
+public class AutoCompleteDescWindow extends JWindow implements HyperlinkListener,
 				DescWindowCallback {
 
 	/**
@@ -124,7 +124,7 @@ class AutoCompleteDescWindow extends JWindow implements HyperlinkListener,
 	 * summary text.
 	 */
 	private static final int INITIAL_TIMER_DELAY			= 120;
-
+	//private static final int INITIAL_TIMER_DELAY = 0;
 	/**
 	 * The resource bundle name.
 	 */
@@ -141,17 +141,21 @@ class AutoCompleteDescWindow extends JWindow implements HyperlinkListener,
 	public AutoCompleteDescWindow(Window owner, AutoCompletion ac) {
 
 		super(owner);
+		
+		//System.out.println("Desc window constructor");
+		
 		this.ac = ac;
-		this.setFont(new java.awt.Font("DejaVu Avec Casio", java.awt.Font.PLAIN, 14));
+		//this.setFont(new java.awt.Font("Courier New", java.awt.Font.PLAIN, 14));
 		ComponentOrientation o = ac.getTextComponentOrientation();
 		
 		JPanel cp = new JPanel(new BorderLayout());
 		cp.setBorder(TipUtil.getToolTipBorder());
 
-		//descArea = new JEditorPane("text/html", null);
-		descArea = new JEditorPane();
-		descArea.setFont(new java.awt.Font("DejaVu Avec Casio", java.awt.Font.PLAIN, 14));
+		descArea = new JEditorPane("text/html", null);
+		//descArea = new JEditorPane();
 		TipUtil.tweakTipEditorPane(descArea);
+		//descArea.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
+		//descArea.setFont(new java.awt.Font("Courier New", java.awt.Font.PLAIN, 14));
 		descArea.addHyperlinkListener(this);
 		scrollPane = new JScrollPane(descArea);
 		Border b = BorderFactory.createEmptyBorder();
@@ -395,12 +399,13 @@ class AutoCompleteDescWindow extends JWindow implements HyperlinkListener,
 	 * Sets the description displayed in this window.
 	 *
 	 * @param item The item whose description you want to display.
-	 * @parma anchor The anchor to jump to, or <code>null</code> if none.
+	 * @param anchor The anchor to jump to, or <code>null</code> if none.
 	 * @param addToHistory Whether to add this page to the page history
 	 *        (as opposed to clearing it and starting anew).
 	 */
 	protected void setDescriptionFor(Completion item, String anchor,
 									boolean addToHistory) {
+		//System.out.println("Setting description");
 		timer.stop();
 		timerAction.setCompletion(item, anchor, addToHistory);
 		timer.start();
@@ -409,7 +414,9 @@ class AutoCompleteDescWindow extends JWindow implements HyperlinkListener,
 
 	private void setDisplayedDesc(Completion completion, final String anchor,
 									boolean addToHistory) {
-
+		
+		//System.out.println("Set displayed desc");
+		
 		String desc = completion==null ? null : completion.getSummary();
 		if (desc==null) {
 			desc = "<html><em>" + getString("NoDescAvailable") + "</em>";
@@ -443,8 +450,13 @@ class AutoCompleteDescWindow extends JWindow implements HyperlinkListener,
 	@Override
 	public void setVisible(boolean visible) {
 		if (!visible) {
+			//System.out.println("desc window not visible anymore");
 			clearHistory();
+		} else {
+			//System.out.println("desc window visible 2");
 		}
+		
+		
 		super.setVisible(visible);
 	}
 
@@ -466,6 +478,7 @@ class AutoCompleteDescWindow extends JWindow implements HyperlinkListener,
 	 * Called by the parent completion popup window the LookAndFeel is updated.
 	 */
 	public void updateUI() {
+		//System.out.println("ui updated");
 		SwingUtilities.updateComponentTreeUI(this);
 		// Update editor pane for new font, bg, selection colors, etc.
 		TipUtil.tweakTipEditorPane(descArea);
@@ -519,6 +532,7 @@ class AutoCompleteDescWindow extends JWindow implements HyperlinkListener,
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			//System.out.println("timer set displayed desc");
 			setDisplayedDesc(completion, anchor, addToHistory);
 		}
 
