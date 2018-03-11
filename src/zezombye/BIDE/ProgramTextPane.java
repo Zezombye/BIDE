@@ -45,6 +45,7 @@ import org.fife.ui.rtextarea.RTextArea;
 public class ProgramTextPane extends RSyntaxTextArea {
 	
 	public static CompletionProvider cp;
+
 	
 	public ProgramTextPane(int type) {
 		super();
@@ -168,6 +169,7 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	    	if (opcodes2.get(i).text.length() > 1 && opcodes2.get(i).text.matches("([ -~])+")) {
 	    		String txt = opcodes2.get(i).text.replaceAll("^ +", "");
 	    		String summary = generateSummary(opcodes2.get(i));
+	    		if (summary == null) continue;
 	    		//Add opcodes with unicode
 	    		if (opcodes2.get(i).unicode != null && BIDE.options.getProperty("allowUnicode").equals("true")) {
 	    			//Add unicode representation of character in description
@@ -204,6 +206,8 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		
 		String result = syntax + desc + example + compatibility;
 		
+		if (result.equals("")) return null;
+		
 		if (o.unicode != null && o.unicode.length() == 1) {
 			result += "<b>Unicode : </b>U+"+Integer.toHexString(o.unicode.codePointAt(0))+"<br>";
 		}
@@ -217,7 +221,11 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		return "<b>"+title+"</b><br>"+content+"<br><br>";
 	}
 	
+
+	public static String relativeImgPath = BIDE.class.getClass().getResource("/doc/").toString();
 	public static String convertToHtml(String str) {
+		
+		
 		return str
 				.replaceAll("&slash;", "")
 				.replaceAll("&mult;", "")
@@ -230,6 +238,8 @@ public class ProgramTextPane extends RSyntaxTextArea {
 				.replaceAll("\\[\\/b\\]", "</b>")
 				.replaceAll("\\[code\\]", "<font face='DejaVu Avec Casio' size='12px'><span style='background-color:rgb(240,240,240);'>")
 				.replaceAll("\\[\\/code\\]", "</span></font>")
+				.replaceAll("(\\[img\\])([\\w\\/\\.]+)", "<img src='"+relativeImgPath+"$2")
+				.replaceAll("\\[\\/img\\]", "'/>")
 				.replaceAll("\n", "<br>");
 	}
 	

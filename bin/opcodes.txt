@@ -555,7 +555,10 @@
 },{
 	"hex":"A6",
 	"relevance":5,
-	"text":"Int "
+	"text":"Int ",
+	"syntax": "Int <number>\nInt <list>\nInt <matrix>",
+	"description": "Returns the given number with the fractional part set to 0. If the number is complex, it also sets the fractional complex part to 0.\n\nIf a list/matrix is given, it returns a list/matrix with the integer part of each case.\n\nSee also : Frac, Intg",
+	"example": "[code]Int {-3.4, 4.5+2.6i}[code] returns {-3, 4+2i}"
 },{
 	"hex":"A7",
 	"relevance":0,
@@ -799,7 +802,10 @@
 },{
 	"hex":"DE",
 	"relevance":0,
-	"text":"Intg "
+	"text":"Intg ",
+	"syntax": "Intg <number>\nIntg <list>\nIntg <matrix>",
+	"description": "Equivalent of the floor() function in other programming languages. Returns the highest integer that is lower than the given number. If the number is complex, it also returns the floor of the complex part.\n\nIf a list/matrix is given, it returns a list/matrix with the floor of each case.\n\nSee also : Int",
+	"example": "[code]Intg {-3.4, 4.5+2.6i}[code] returns {-4, 4+2i}"
 },{
 	"hex":"DF",
 	"relevance":0,
@@ -808,15 +814,23 @@
 },{
 	"hex":"E0",
 	"relevance":0,
-	"text":"Plot "
+	"text":"Plot ",
+	"syntax": "Plot <x>, <y>",
+	"description": "If it is the last instruction of the program, or followed by a Disp (◢), it stops the execution until the user presses [EXE], and positions the graphical cursor at the given coordinates. Else, it draws a pixel at the specified coordinates (according to the ViewWindow), same as PlotOn.",
+	"example": "[code]Plot 10, 50◢[/code] will display the graphical screen, with the cursor positioned as (10, 50) according to the ViewWindow."
 },{
 	"hex":"E1",
 	"relevance":0,
-	"text":"Line"
+	"text":"Line",
+	"description": "Draws a line between two points drawn by Plot in the previous instructions. This function is deprecated; see F-Line to draw lines.",
+	"example": "[code]Plot 1,2\nPlot 3,4\nLine[/code]"
 },{
 	"hex":"E2",
 	"relevance":5,
-	"text":"Lbl "
+	"text":"Lbl ",
+	"syntax": "Lbl <0-9, A-Z, r, theta>",
+	"description": "Used by Goto and Menu functions. There cannot be two labels with the same number in the same program.\n\nSee also : Goto",
+	"example": "[code]Lbl 3[/code] will be jumped to upon executing [code]Goto 3[/code]"
 },{
 	"hex":"E3",
 	"relevance":0,
@@ -853,7 +867,10 @@
 },{
 	"hex":"EC",
 	"relevance":5,
-	"text":"Goto "
+	"text":"Goto ",
+	"syntax": "Goto <0-9, A-Z, r, theta>",
+	"description": "Jumps to the corresponding Lbl, and continues execution from there.\n\nGotos should not be used because excessive use of them make the program flow very difficult to understand. Use subprograms (see Prog), or loops (While/WhileEnd or Do/LpWhile).\n\nGotos are bound to the program, meaning they cannot jump to a label in another program.",
+	"example": "[code]Goto 2[/code] will jump to [code]Lbl 2[/code]"
 },{
 	"hex":"ED",
 	"relevance":5,
@@ -1126,7 +1143,7 @@
 },{
 	"hex":"7F3A",
 	"relevance":5,
-	"text":"&MOD(;"
+	"text":"MOD("
 },{
 	"hex":"7F3B",
 	"relevance":0,
@@ -1134,14 +1151,17 @@
 },{
 	"hex":"7F3C",
 	"relevance":0,
-	"text":"&GCD(;",
-	"syntax": "GCD(int nb1, int nb2(, int ...))\nGCD(List l)\nGCD(int nb, List l)\nGCD(List l, int nb)",
-	"description": "Calculates the Greatest Common Divisor (PGCD in french) between the numbers given.\n\nIf ints (at least 2) or a list (at least 2 cases) of integers is given, it calculates the PGCD of all these numbers. If a list and int is given, it calculates the PGCD between the int and each case of the list (separately).\n\nIn BIDE, the function is written &GCD(; to prevent confusion because it could be interpreted as the product of variables G, C, D, and some parenthesized expression.",
+	"text":"GCD(",
+	"syntax": "GCD(int nb1, int nb2[, int ...])\nGCD(List l)\nGCD(int nb, List l)\nGCD(List l, int nb)",
+	"description": "Calculates the Greatest Common Divisor (PGCD in french) of the given numbers.\n\nIf ints (at least 2) or a list (at least 2 cases) of integers is given, it calculates the GCD of all these numbers. If a list and int is given, it calculates the GCD between the int and each case of the list (separately).",
 	"example": "[code]GCD(12, 48)[/code] = [code]GCD({12, 48})[/code] = 12\n[code]GCD(12, 48, 3)[/code] = 3\n[code]GCD({12, 16}, 3)[/code] = {3, 1}"
 },{
 	"hex":"7F3D",
 	"relevance":0,
-	"text":"&LCM(;"
+	"text":"LCM(",
+	"syntax": "LCM(int nb1, int nb2[, int ...])\nLCM(List l)\nLCM(int nb, List l)\nLCM(List l, int nb)",
+	"description": "Calculates the Lowest Common Multiple (PPCM in french) of the given numbers.\n\nIf ints (at least 2) or a list (at least 2 cases) of integers is given, it calculates the LCM of all these numbers. If a list and int is given, it calculates the LCM between the int and each case of the list (separately).",
+	"example": "[code]LCM(3,4)[/code] = [code]LCM({3,4})[/code] = 12\n[code]LCM(3,4,5)[/code] = 60\n[code]LCM({12, 16}, 3)[/code] = {12, 48}"
 },{
 	"hex":"7F3E",
 	"relevance":0,
@@ -1187,7 +1207,7 @@
 	"text":"Dim ",
 	"syntax": "<number> -> Dim <list>\n<list of 2 cases> -> Dim <mat>\nDim <list&slash;mat>",
 	"description": "Sets (or gets, if there is no assignment) the dimension of the given matrix/list.\n\nIf it assigns a value to the dimension, it creates a new list/matrix of the given dimension, filled with 0's.",
-	"example": "[code]3->Dim List 1[/code] - List 1 is now {0,0,0}\n[code]{2,3}->Dim Mat A[/code] - Mat A is now [[0,0][0,0][0,0]]"
+	"example": "[code]3->Dim List 1[/code] - List 1 is now {0,0,0}\n[code]{2,3}->Dim Mat A[/code] - Mat A is now [[0,0,0][0,0,0]]"
 },{
 	"hex":"7F47",
 	"relevance":0,
@@ -1208,11 +1228,14 @@
 },{
 	"hex":"7F4A",
 	"relevance":0,
-	"text":"List->Mat("
+	"text":"List->Mat(",
+	"syntax": "List->Mat(int&slash;list l1 [, int&slash;list ...])",
+	"description": "Returns a matrix made from the given lists.\n\nIf an integer is given, it takes the list corresponding to that integer (for example, [code]Mat->List(3)[/code] is equivalent to [code]List->Mat(List 3)[/code]).\n\nEach list is [b]one column[/b], not one line! The lists must obviously have the same size.",
+	"example": "[code]List->Mat({1,2,3}{4,5,6})[/code] returns the following matrix:\n[code]1 4\n2 5\n3 6[/code]"
 },{
 	"hex":"7F4B",
 	"relevance":0,
-	"text":"Mat->List"
+	"text":"Mat->List("
 },{
 	"hex":"7F4C",
 	"relevance":0,
@@ -1241,7 +1264,10 @@
 },{
 	"hex":"7F51",
 	"relevance":5,
-	"text":"List "
+	"text":"List ",
+	"syntax": "List <alphaVar, number, str>\nList <alphaVar, number, str>[value]",
+	"description": "A List behaves like an array in other programming languages, except that [b]lists are 1-indexed[/b], and they expand automatically if assigning a value to (length of list + 1).\n\nThe 0th index in a list is not a number, but a string that is the \"name\" of the list. Two lists cannot have the same name, and you can call a list by its name rather than its number.\n\nLists can be hard-coded by wrapping them with '{' and '}', and by separating each case with a comma (,)\n\nAlmost all mathematical operators, and most mathematical functions such as Abs, Int, And, etc, support lists; usually, they apply the mathematical operator/function to each case of the list separately.\n\nSee also : ClrList, Dim, File",
+	"example": "[code]{1,2,3}+List 2[List 3[4]]->List 1\n\"Items\"->List 4[/code] or [code]\"Items\"->List 4[0]\nList \"Items\"[3]->A\n3*{1,2,3}[/code] returns {3,6,9}"
 },{
 	"hex":"7F52",
 	"relevance":0,
@@ -1423,7 +1449,9 @@
 },{
 	"hex":"7F8F",
 	"relevance":5,
-	"text":"GetKey"
+	"text":"GetKey",
+	"description":"[img]getkey.png[/img]\n\nReturns the value of the pressed key (see above image). If multiple keys are pressed at the same time, returns the value of the first pressed key.\n\nBIDE allows the use of macros key_xx, in order not to have to remember each value.",
+	"example": "[code]Do : GetKey : LpWhile Ans != 31[/code] waits until the user has pressed [EXE] (value 31)."
 },{
 	"hex":"7F90",
 	"relevance":0,
@@ -1653,11 +1681,13 @@
 },{
 	"hex":"7FCC",
 	"relevance":0,
-	"text":"&P/Y;"
+	"text":"&P/Y;",
+	"unicode":"PY"
 },{
 	"hex":"7FCD",
 	"relevance":0,
-	"text":"&C/Y;"
+	"text":"&C/Y;",
+	"unicode":"CY"
 },{
 	"hex":"7FCE",
 	"relevance":0,
@@ -4446,38 +4476,47 @@
 },{
 	"hex":"F700",
 	"relevance":5,
-	"text":"If "
+	"text":"If ",
+	"syntax": "If <value>\nThen <code>\n(Else <code>)\nIfEnd",
+	"description": "Behaves like a If in other programming languages. If the value given is non-zero and real, it executes the code in the Then block. Else, it executes the code in the Else block (if it exists).\n\nNote that the Then is required, even though it isn't necessary to parse an If block.\n\nA simpler form of the If is the double arrow (=>), for example:\n[code]If A:Then B:IfEnd[/code] can be replaced by [code]A=>B[/code]. Note that the double arrow does not support multiple instructions after the condition, nor an \"else\" like C's ternary operator.",
+	"example": "[code]If A < 18\nThen \"You are a minor\"\nElse \"You are an adult\"\nIfEnd[/code]"
 },{
 	"hex":"F701",
 	"relevance":5,
-	"text":"Then "
+	"text":"Then ",
+	"description": "See [code]If[/code]."
 },{
 	"hex":"F702",
 	"relevance":5,
-	"text":"Else "
+	"text":"Else ",
+	"description": "See [code]If[/code]."
 },{
 	"hex":"F703",
 	"relevance":5,
-	"text":"IfEnd"
+	"text":"IfEnd",
+	"description": "See [code]If[/code]."
 },{
 	"hex":"F704",
 	"relevance":5,
 	"text":"For ",
-	"syntax": "For <startValue> -> <alphaVar> To <endValue> (Step <stepValue>)\n	<code>\nNext",
-	"description": "For loop. If Step is not specified, it defaults to 1.\n\nStarts by putting startValue into alphaVar, and ends when alphaVar is greater than endValue (or lower than endValue, if stepValue is negative).\n\nIf endValue < startValue and Step is positive (or the opposite), the loop is ignored.\n\nBeware of using empty for loops to simulate Sleep, as your code could run faster or slower on different calculators.",
+	"syntax": "For <startValue> -> <alphaVar> To <endValue> (Step <stepValue>)\n<code>\nNext",
+	"description": "For loop. If Step is not specified, it defaults to 1. It is possible to modify the value of startValue inside the loop, with the expected behavior.\n\nStarts by putting startValue into alphaVar, and ends when alphaVar is greater than endValue (or lower than endValue, if stepValue is negative).\n\nIf endValue < startValue and Step is positive (or the opposite), the loop is ignored.\n\nBeware of using empty for loops to simulate Sleep, as your code could run faster or slower on different calculators.",
 	"example": "[code]For 1->I To 4 Step 2 : \"test\"◢ : Next[/code] will print \"test\" 2 times"
 },{
 	"hex":"F705",
 	"relevance":5,
-	"text":" To "
+	"text":" To ",
+	"description": "See [code]For[/code]."
 },{
 	"hex":"F706",
 	"relevance":5,
-	"text":" Step "
+	"text":" Step ",
+	"description": "See [code]For[/code]."
 },{
 	"hex":"F707",
 	"relevance":5,
-	"text":"Next"
+	"text":"Next",
+	"description": "See [code]For[/code]."
 },{
 	"hex":"F708",
 	"relevance":5,
@@ -4490,14 +4529,14 @@
 	"hex":"F70A",
 	"relevance":5,
 	"text":"Do",
-	"syntax": "Do\n	<code>\nLpWhile <number>",
+	"syntax": "Do\n<code>\nLpWhile <number>",
 	"description": "See LpWhile."
 },{
 	"hex":"F70B",
 	"relevance":5,
 	"text":"LpWhile ",
-	"syntax": "Do\n	<code>\nLpWhile <number>",
-	"description": "The Do/LpWhile loop is different from the While/WhileEnd loop, because the condition check is done at the end, so the code is executed at least once. The loop terminates if the number is 0 (false).",
+	"syntax": "Do\n<code>\nLpWhile <number>",
+	"description": "The Do/LpWhile loop is different from the While/WhileEnd loop, because the condition check is done at the end, so the code is executed at least once. The loop terminates if the number is 0 or non-real.",
 	"example": "[code]Do:GetKey:LpWhile GetKey != 31[/code] loops while the user has not pressed [EXE] (id 31)"
 },{
 	"hex":"F70C",
@@ -4515,7 +4554,10 @@
 },{
 	"hex":"F710",
 	"relevance":5,
-	"text":"Locate "
+	"text":"Locate ",
+	"syntax": "Locate <x>, <y>, <value&slash;str>",
+	"description": "Displays on the text screen the given text/number at the given coordinates. Cannot display complex numbers.\n\nx must be between 1 and 21, and y must be between 1 and 7 (the 8th line is unavailable). Locate does not support line wrap nor line returns.\n\nSee also: Text",
+	"example": "[code]Locate 1,1,A+2\nLocate 1,1,\"Test\"+Str 1[/code]"
 },{
 	"hex":"F711",
 	"relevance":0,
@@ -4870,11 +4912,13 @@
 },{
 	"hex":"F770",
 	"relevance":0,
-	"text":"G-Connect"
+	"text":"G-Connect",
+	"description": "Draws a line between points when tracing a function (enabled by default).\n\nWith G-Connect:\n[img]graphoff.png[/img]\nWith G-Plot:\n[img]gplot.png[/img]"
 },{
 	"hex":"F771",
 	"relevance":0,
-	"text":"G-Plot"
+	"text":"G-Plot",
+	"description": "Disable line drawing between points when tracing a function. See G-Connect."
 },{
 	"hex":"F776",
 	"relevance":0,
@@ -4898,7 +4942,8 @@
 },{
 	"hex":"F77A",
 	"relevance":0,
-	"text":"GridOff"
+	"text":"GridOff",
+	"description": "Disable the grid on the graphical screen. See GridOn."
 },{
 	"hex":"F77C",
 	"relevance":0,
@@ -4906,7 +4951,8 @@
 },{
 	"hex":"F77D",
 	"relevance":0,
-	"text":"GridOn"
+	"text":"GridOn",
+	"description": "Enables the grid on the graphical screen.\n\nWith GridOn:\n[img]gridon.png[/img]\nWith GridOff:\n[img]graphoff.png[/img]"
 },{
 	"hex":"F77E",
 	"relevance":0,
@@ -5017,7 +5063,9 @@
 },{
 	"hex":"F7A4",
 	"relevance":0,
-	"text":"Horizontal "
+	"text":"Horizontal ",
+	"syntax": "Horizontal <y>",
+	"description": "Draws an horizontal line at the given Y coordinate (depends on ViewWindow)."
 },{
 	"hex":"F7A5",
 	"relevance":5,
@@ -5137,7 +5185,8 @@
 },{
 	"hex":"F7C0",
 	"relevance":0,
-	"text":"FuncOn"
+	"text":"FuncOn",
+	"description": "Writes the formula of the function at the top left of the screen.\n\nWith FuncOn:\n[img]funcon.png[/img]\nWith FuncOff:\n[img]graphoff.png[/img]"
 },{
 	"hex":"F7C1",
 	"relevance":0,
@@ -5146,16 +5195,17 @@
 	"hex":"F7C2",
 	"relevance":0,
 	"text":"AxesOn",
-	"description": "Enables the drawing of axes on the graphical screen."
+	"description": "Enables the drawing of axes on the graphical screen.\n\nWith AxesOn:\n[img]axeson.png[/img]\nWith AxesOff:\n[img]graphoff.png[/img]"
 },{
 	"hex":"F7C3",
 	"relevance":0,
 	"text":"CoordOn",
-	"description": "Enables the drawing of cursor coordinates on the graphical screen."
+	"description": "Enables the drawing of cursor coordinates on the graphical screen.\n\nWith CoordOn:\n[img]coordon.png[/img]\nWith CoordOff:\n[img]graphoff.png[/img]"
 },{
 	"hex":"F7C4",
 	"relevance":0,
-	"text":"LabelOn"
+	"text":"LabelOn",
+	"description": "Enables the labeling of axes on the graphical screen (although, since the position of the X and Y are fixed, it is not really useful).\n\nWith LabelOn (and AxesOn):\n[img]labelon.png[/img]\nWith LabelOff:\n[img]axeson.png[/img]"
 },{
 	"hex":"F7C5",
 	"relevance":0,
@@ -5211,16 +5261,17 @@
 	"hex":"F7D2",
 	"relevance":0,
 	"text":"AxesOff",
-	"description": "Disable drawing of axes on the graphical screen."
+	"description": "Disable drawing of axes on the graphical screen. See AxesOn."
 },{
 	"hex":"F7D3",
 	"relevance":0,
 	"text":"CoordOff",
-	"description": "Disable drawing of the cursor coordinates on the graphical screen."
+	"description": "Disable drawing of the cursor coordinates on the graphical screen. See CoordOn."
 },{
 	"hex":"F7D4",
 	"relevance":0,
-	"text":"LabelOff"
+	"text":"LabelOff",
+	"description": "Disable labels of axes on the graphical screen. See LabelOn."
 },{
 	"hex":"F7D5",
 	"relevance":0,
@@ -5597,7 +5648,11 @@
 },{
 	"hex":"F982",
 	"relevance":0,
-	"text":"InvNormCD("
+	"text":"InvNormCD(",
+	"syntax": "InvNormCD(Nbr p, Nbr σ, Nbr µ)\nInvNormCD(int type, Nbr p, Nbr σ, Nbr µ)",
+	"description": "Let X be a random variable that follows the normal distribution N(µ;σ).\n\n- If type is -1, or not specified, calculates A such that [code]P(X ∈ ]-∞; A]) = p[/code].\n- If type is 0, calculates A such that [code]P(X ∈ [-A; +A]) = p[/code].\n- If type is 1, calculates A such that [code]P(X ∈ [A; +∞]) = p[/code].",
+	"example": "Let X be a random variable that follows the normal distribution N(900; 7²).\n\n[code]InvNormCD(0.5, 7, 900)[/code] or [code]InvNormCD(0.5, 7, 900)[/code] calculates A such that P(X < A) = 0.5\n[code]7*InvNormCD(0, 0.99, 7, 900)[/code] calculates A such that P(900-A < X < 900+A) = 0.99 (see your math lesson for why)\n[code]InvNormCD(1, 0.7, 7, 900)[/code] calculates A such that P(X > A) = 0.7",
+	"compatibility":"OS 2.00"
 },{
 	"hex":"F983",
 	"relevance":0,

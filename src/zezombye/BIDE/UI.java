@@ -172,14 +172,14 @@ public class UI {
 			}
 		});
 		
-		newProg.addMouseListener(new java.awt.event.MouseAdapter() {
+		/*newProg.addMouseListener(new java.awt.event.MouseAdapter() {
 		    public void mouseEntered(java.awt.event.MouseEvent evt) {
 		        System.out.println(Arrays.toString(Window.getWindows()));
 		    }
 
 		    public void mouseExited(java.awt.event.MouseEvent evt) {
 		    }
-		});
+		});*/
 		
 		ToolbarButton newPict = new ToolbarButton("newPict.png", "New Picture");
 		newPict.addActionListener(new ActionListener() {

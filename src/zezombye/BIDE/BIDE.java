@@ -90,7 +90,9 @@ public class BIDE {
 		getOpcodes();
 		initMacros();
 		
-		System.out.println(Arrays.toString(args));
+		//System.out.println(BIDE.class.getClass().getResource("/").toString());
+		
+		System.out.println("args : "+Arrays.toString(args));
 		if (args.length > 0) {
 			//CLI
 			isCLI = true;
