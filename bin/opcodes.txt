@@ -779,7 +779,10 @@
 },{
 	"hex":"D9",
 	"relevance":0,
-	"text":"Norm "
+	"text":"Norm ",
+	"syntax": "Norm <1-2>",
+	"description": "Sets the display mode to Normal.\n\nIf Norm 1 is selected, the number will not be converted to scientific notation if 10^-2 ≤ x < 10^10.\nIf Norm 2 is selected, the number will not be converted to scientific notation if 10^-9 ≤ x < 10^10.",
+	"example": "With [code]Norm 1[/code]: [code]0.003[/code] will display as [code]3-03[/code]\nWith [code]Norm 2[/code]: [code]0.003[/code] will display as [code]0.003[/code]"
 },{
 	"hex":"DA",
 	"relevance":0,
@@ -1051,7 +1054,10 @@
 },{
 	"hex":"7F20",
 	"relevance":0,
-	"text":"Max("
+	"text":"Max(",
+	"syntax": "Max(<list>)",
+	"description": "Returns the highest number of the given list. If the list contains complex numbers, the imaginary part is ignored.\n\nNote that this function does not support list expressions; as such, [code]Max({1,2,3}=3)[/code] will give a syntax error.\n\nSee also : Min",
+	"example": "[code]Max({3, 2+i, -6.5})[/code] will return 3"
 },{
 	"hex":"7F21",
 	"relevance":0,
@@ -1106,15 +1112,24 @@
 },{
 	"hex":"7F2D",
 	"relevance":0,
-	"text":"Min("
+	"text":"Min(",
+	"syntax": "Min(<list>)",
+	"description": "Returns the lowest number of the given list. If the list contains complex numbers, the imaginary part is ignored.\n\nNote that this function does not support list expressions; as such, [code]Min({1,2,3}=3)[/code] will give a syntax error.\n\nSee also : Max",
+	"example": "[code]Min({3, 2+i, -6.5})[/code] will return -6.5"
 },{
 	"hex":"7F2E",
 	"relevance":0,
-	"text":"Mean("
+	"text":"Mean(",
+	"syntax": "Mean(<list>)",
+	"description": "Returns the average of the given list (defined as the sum of the numbers in the list, divided by the length of the list). It will give an error if the list contains complex numbers.\n\nNote that this function does not support list expressions; as such, [code]Mean({1,2,3}+1)[/code] will give a syntax error.",
+	"example": "[code]Mean({3, 2, -6.5})[/code] will return -0.5"
 },{
 	"hex":"7F2F",
 	"relevance":0,
-	"text":"Median("
+	"text":"Median(",
+	"syntax": "Median(<list>)",
+	"description": "Returns the median of the given list. The median is defined:\n- If the list has an odd number of elements: the number such that half of the elements are above it, and the other half below it\n- If the list has an even number of elements: the average between the 2 numbers at the \"center\" of the list\n\nIt will give an error if the list contains complex numbers.\n\nNote that this function does not support list expressions; as such, [code]Median({1,2,3}+1)[/code] will give a syntax error.",
+	"example": "[code]Median({1,3,7})[/code] returns 3\n[code]Median({1, 3, 7, 20})[/code] returns 5: (3+7)/2"
 },{
 	"hex":"7F30",
 	"relevance":0,
@@ -1143,7 +1158,10 @@
 },{
 	"hex":"7F3A",
 	"relevance":5,
-	"text":"MOD("
+	"text":"MOD(",
+	"syntax": "MOD(int a, int b)",
+	"description": "Calculates A mod B. MOD() only supports integers.\n\nIt is advised to use Rmdr instead, as it is usable in more places (for example, hardcoded lists).\n\nIf B is a negative number, it seems to have no effect than if it were a positive number.",
+	"example": "[code]MOD(9, 7)[/code] returns 2."
 },{
 	"hex":"7F3B",
 	"relevance":0,
@@ -1173,7 +1191,10 @@
 },{
 	"hex":"7F40",
 	"relevance":5,
-	"text":"Mat "
+	"text":"Mat ",
+	"syntax": "Mat <A-Z, Ans>\nMat <A-Z, Ans>[<line>, <column>]",
+	"description": "Matrixes (or matrices) are 2D arrays, and are often used to store 2D maps in games. Unlike Lists, they do not expand automatically, and have a fixed size (see Dim).\n\nThe linear notation of writing a matrix is such that:\n[code][[1,2,3][4,5,6]][/code]\nmeans, in natural notation:\n[code]1 2 3\n4 5 6[/code]\n\nMatrixes are 1-indexed, and are accessed by (line, column) which is (y, x).\n\nSome mathematical functions such as Abs or Int support matrixes, in which case the function is applied to each case of the matrix. Note that some operators such as multiplication or inverse (^-1) can be applied to matrixes, but behave differently from lists/numbers.",
+	"example": "[code]Mat A+[[1,2][3,4]]->Mat C\nMat A[2, Mat A[3, 4]]+3 -> B[/code]"
 },{
 	"hex":"7F41",
 	"relevance":0,
@@ -1230,12 +1251,15 @@
 	"relevance":0,
 	"text":"List->Mat(",
 	"syntax": "List->Mat(int&slash;list l1 [, int&slash;list ...])",
-	"description": "Returns a matrix made from the given lists.\n\nIf an integer is given, it takes the list corresponding to that integer (for example, [code]Mat->List(3)[/code] is equivalent to [code]List->Mat(List 3)[/code]).\n\nEach list is [b]one column[/b], not one line! The lists must obviously have the same size.",
+	"description": "Returns a matrix made from the given lists.\n\nIf an integer is given, it takes the list corresponding to that integer (for example, [code]List->Mat(3)[/code] is equivalent to [code]List->Mat(List 3)[/code]).\n\nEach list is [b]one column[/b], not one line! The lists must obviously have the same size.",
 	"example": "[code]List->Mat({1,2,3}{4,5,6})[/code] returns the following matrix:\n[code]1 4\n2 5\n3 6[/code]"
 },{
 	"hex":"7F4B",
 	"relevance":0,
-	"text":"Mat->List("
+	"text":"Mat->List(",
+	"syntax": "Mat->List(<matLetter>, <column>)\nMat->List(<matrix>, <column>)",
+	"description": "Converts the given column of the given matrix to a list.",
+	"example": "[code]Mat->List([[1,2,3][4,5,6]], 2)[/code] returns {2, 5}"
 },{
 	"hex":"7F4C",
 	"relevance":0,
@@ -1578,7 +1602,10 @@
 },{
 	"hex":"7FB3",
 	"relevance":5,
-	"text":"Not "
+	"text":"Not ",
+	"syntax": "Not <number>\nNot <list>",
+	"description": "Performs a logical Not on the operands. If there is a list, returns a list with a logical Not performed on each case.",
+	"example": "[code]Not 0[/code] is 1\n[code]Not 1[/code] is 0\nNote that 1 could be replaced by any non-0 value (0.3, -4, etc)."
 },{
 	"hex":"7FB4",
 	"relevance":5,
@@ -5039,7 +5066,11 @@
 },{
 	"hex":"F79E",
 	"relevance":5,
-	"text":"Menu "
+	"text":"Menu ",
+	"syntax": "Menu <title>, <option1>, <lbl1> [, <option2>, <lbl2> [, ..., <option9>, <lbl9>]]",
+	"description": "Displays a graphical menu that can handle from 1 to 9 options (strings). Each option must be followed with a label number (see Lbl).\n\nThe title and options can be either hard-coded strings, or Strs, but no expression such as \"StrInv(Str 1)\".",
+	"example": "[code]Menu \"Title\", \"Option 1\", 1, \"Option 2\", 2, \"Option 3\", 3[/code] will display the following:\n[img]menu.png[/img]\n\nIf the user selects Option 1, the code will continue executing from Lbl 1.",
+	"compat": "OS 2.00"
 },{
 	"hex":"F79F",
 	"relevance":5,
@@ -5565,19 +5596,27 @@
 },{
 	"hex":"F94A",
 	"relevance":0,
-	"text":"CrossP("
+	"text":"CrossP(",
+	"syntax": "CrossP(Vct&slash;Mat vct1, Vct&slash;Mat vct2)",
+	"description": "Calculates the cross product ([i]produit vectoriel[/i] in french) of the given vectors.\n\nIf a matrix is used, it must have either 1 line or 1 column.\n\nNote that if the Z-coordinate is not provided, it will calculate as if it were 0.",
+	"example": "[code]CrossP([[1,2,5]], [[2,3,7]])[/code] returns [-1, 3, -1]",
+	"compat": "OS 2.04"
 },{
 	"hex":"F94B",
 	"relevance":0,
 	"text":"DotP(",
-	"syntax": "DotP(Vct vct1, Vct vct2)",
-	"description": "Calculates the dot product ([i]produit scalaire[/i] in french) of the given vectors.",
+	"syntax": "DotP(Vct&slash;Mat vct1, Vct&slash;Mat vct2)",
+	"description": "Calculates the dot product ([i]produit scalaire[/i] in french) of the given vectors.\n\nIf a matrix is used, it must have either 1 line or 1 column.\n\nNote that if the Z-coordinate is not provided, it will calculate as if it were 0.",
 	"example": "[code]DotP([[1,2]], [[2,3]])[/code] returns 8",
 	"compat": "OS 2.04"
 },{
 	"hex":"F95B",
 	"relevance":0,
-	"text":"Norm("
+	"text":"Norm(",
+	"syntax": "Norm(Vct vct1)\nNorm(Mat mat1)",
+	"description": "Returns the norm (length) of the given vector/matrix.\n\nMore generally, returns the square root of the square of the absolute value of each case of the vector/matrix.",
+	"example": "[code]Norm([[1,2]])[/code] returns √5 which is √(1²+2²)\n[code]Norm([[2, 2+2i]])[/code] returns 2√3 which is √(2²+(2√2)²).",
+	"compat": "OS 2.04"
 },{
 	"hex":"F95E",
 	"relevance":0,
@@ -5586,8 +5625,8 @@
 	"hex":"F96D",
 	"relevance":0,
 	"text":"Angle(",
-	"syntax":"Angle(Vct vct1, Vct vct2)",
-	"description":"Returns the value of the angle between vct1 and vct2.",
+	"syntax":"Angle(Vct&slash;Mat vct1, Vct&slash;Mat vct2)",
+	"description":"Returns the value of the angle between vct1 and vct2.\n\nIf a matrix is used, it must have either 1 line or 1 column.\n\nNote that if the Z-coordinate is not provided, it will calculate as if it were 0.",
 	"compat":"OS 2.04"
 },{
 	"hex":"F973",
@@ -5640,19 +5679,26 @@
 },{
 	"hex":"F980",
 	"relevance":0,
-	"text":"NormPD("
+	"text":"NormPD(",
+	"syntax": "NormPD(a, σ, μ)\nNormPD(<list>, σ, μ)",
+	"description": "Let X be a random variable that follows the normal distribution N(μ;σ²).\n\nCalculates the probability density of A (or, if a list is provided, calculates the probability density of each item in the list).",
+	"example": "[code]NormPD(1, 1, 0)[/code] returns approx. 0.242",
+	"compat": "OS 2.00"
 },{
 	"hex":"F981",
 	"relevance":0,
-	"text":"NormCD("
+	"text":"NormCD(",
+	"syntax": "NormCD(a, b [, σ [, μ]])\nNormCD(listA, listB [, σ [, μ]])",
+	"description": "Let X be a random variable that follows the normal distribution N(μ;σ²).\n\nCalculates P(a < X < b). If σ or µ are not provided, they default to 1 and 0 respectively.\n\nTo calculate P(X > a) or P(X < a), replace a or b with -∞ ([code]-99[/code]) or +∞ ([code]99[/code]).\n\nIf lists are provided, returns the probability for each pair of values in the list (P(listA[1] < X < listB[1], P(listA[2] < X < listB[2]), etc).",
+	"example": "[code]NormCD(2,3)[/code] = [code]NormCD(2,3,1)[/code] = [code]NormCD(2,3,1,0) ≈ 0.0214[/code]"
 },{
 	"hex":"F982",
 	"relevance":0,
 	"text":"InvNormCD(",
 	"syntax": "InvNormCD(Nbr p, Nbr σ, Nbr µ)\nInvNormCD(int type, Nbr p, Nbr σ, Nbr µ)",
-	"description": "Let X be a random variable that follows the normal distribution N(µ;σ).\n\n- If type is -1, or not specified, calculates A such that [code]P(X ∈ ]-∞; A]) = p[/code].\n- If type is 0, calculates A such that [code]P(X ∈ [-A; +A]) = p[/code].\n- If type is 1, calculates A such that [code]P(X ∈ [A; +∞]) = p[/code].",
-	"example": "Let X be a random variable that follows the normal distribution N(900; 7²).\n\n[code]InvNormCD(0.5, 7, 900)[/code] or [code]InvNormCD(0.5, 7, 900)[/code] calculates A such that P(X < A) = 0.5\n[code]7*InvNormCD(0, 0.99, 7, 900)[/code] calculates A such that P(900-A < X < 900+A) = 0.99 (see your math lesson for why)\n[code]InvNormCD(1, 0.7, 7, 900)[/code] calculates A such that P(X > A) = 0.7",
-	"compatibility":"OS 2.00"
+	"description": "Let X be a random variable that follows the normal distribution N(µ;σ²).\n\n- If type is -1, or not specified, calculates A such that [code]P(X ∈ ]-∞; A]) = p[/code].\n- If type is 0, calculates A such that [code]P(X ∈ [-A; +A]) = p[/code].\n- If type is 1, calculates A such that [code]P(X ∈ [A; +∞]) = p[/code].",
+	"example": "Let X be a random variable that follows the normal distribution N(900; 7²).\n\n[code]InvNormCD(0.5, 7, 900)[/code] or [code]InvNormCD(-1, 0.5, 7, 900)[/code] calculates A such that P(X < A) = 0.5\n[code]7*InvNormCD(0, 0.99, 7, 900)[/code] calculates A such that P(900-A < X < 900+A) = 0.99 (see your math lesson for why)\n[code]InvNormCD(1, 0.7, 7, 900)[/code] calculates A such that P(X > A) = 0.7",
+	"compat":"OS 2.00"
 },{
 	"hex":"F983",
 	"relevance":0,
