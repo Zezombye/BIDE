@@ -213,7 +213,7 @@ public abstract class AbstractCompletionProvider
 				}*/
 				
 				text = text.toLowerCase();
-				
+								
 				for (int j = 0; j < text.length(); j++) {
 					
 					//Speed up by ignoring non-starting characters
@@ -228,6 +228,7 @@ public abstract class AbstractCompletionProvider
 						
 						//System.out.println("initRelevance : "+((BasicCompletion)completions.get(i)).initialRelevance);
 						retVal.add(completions.get(i));
+						break;
 					}
 				}
 			}

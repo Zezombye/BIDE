@@ -19,6 +19,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.swing.JComponent;
+
 import org.fife.ui.autocomplete.BasicCompletion;
 import org.fife.ui.autocomplete.DefaultCompletionProvider;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
@@ -118,12 +120,12 @@ public class BIDE {
 					pathToDest += System.getProperty("file.separator");
 				}
 				try {
-					ArrayList<Program> progs = readFromG1M(pathToG1M);
+					ArrayList<Object> parts = readFromG1M(pathToG1M);
 					
-					for (int i = 0; i < progs.size(); i++) {
+					for (int i = 0; i < parts.size(); i++) {
 						//Disallowed chars: <>:"/\|?*
-						String name = progs.get(i).name.replaceAll("<|>|:|\"|\\/|\\\\|\\||\\?|\\*", "_");
-						IO.writeStrToFile(new File(pathToDest+name+".bide"), progs.get(i).content, true);
+						String name = ((Program)parts.get(i)).name.replaceAll("<|>|:|\"|\\/|\\\\|\\||\\?|\\*", "_");
+						IO.writeStrToFile(new File(pathToDest+name+".bide"), ((Program)parts.get(i)).content, true);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -152,7 +154,8 @@ public class BIDE {
 			
 			//ui.jtp.addTab("test", new Program("test1", "", "testcontent", TYPE_PICT).comp);
 			//ui.createNewTab(TYPE_COLORATION);
-			ui.createNewTab(TYPE_CHARLIST);
+			//ui.createNewTab(TYPE_CHARLIST);
+			ui.jtp.addTab("testPict", new PictComp(BIDE.TYPE_PICT, "PICT10", 0x800).jsp);
 			//((ProgScrollPane)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
 			
 			//new AutoImport().autoImport("C:\\Users\\Catherine\\Desktop\\PUISS4.g1m");
@@ -163,7 +166,7 @@ public class BIDE {
 		
 	}
 	
-	public static ArrayList<Program> readFromTxt(String txtPath) throws IOException {
+	public static ArrayList<Object> readFromTxt(String txtPath) throws IOException {
 		byte[] encoded = Files.readAllBytes(Paths.get(txtPath));
 		String content = new String(encoded, "UTF-8");
 		
@@ -212,8 +215,8 @@ public class BIDE {
 		
 	}
 	
-	public static ArrayList<Program> readFromG1M(String g1mpath) throws IOException {
-		ArrayList<Program> progs = new ArrayList<Program>();
+	public static ArrayList<Object> readFromG1M(String g1mpath) throws IOException {
+		ArrayList<Object> parts = new ArrayList<Object>();
 		System.out.println("Reading from g1m at " + g1mpath);
 		G1MParser g1mparser = new G1MParser(g1mpath);
 		g1mparser.readG1M();
@@ -240,7 +243,7 @@ public class BIDE {
 					return null;
 				}
 				
-				progs.add(new Program(progName, progPw, progContent, TYPE_PROG));
+				parts.add(new Program(progName, progPw, progContent, TYPE_PROG));
 			} else if (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PICT || g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_CAPT) {
 				String name = casioToAscii(g1mparser.getPartName(g1mparser.parts.get(h)), false);
 				//TODO: see if the second part of pictures is important or not
@@ -253,17 +256,21 @@ public class BIDE {
 					//Captures have a width and height attribute, skip it
 					content = g1mparser.getPartContent(g1mparser.parts.get(h)).substring(4, 0x404);
 				}
-				String asciiResult = pictToAscii(content, g1mparser.getPartType(g1mparser.parts.get(h)));
+				
+				byte[] result = new byte[content.length()];
+				for (int i = 0; i < content.length(); i++) {
+					result[i] = content.getContent().get(i);
+				}
 				
 				if (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PICT) {
-					progs.add(new Program(name, Integer.toHexString(content.length()), asciiResult, TYPE_PICT));
+					parts.add(new PictComp(TYPE_PICT, name, content.length(), result));
 				} else {
-					progs.add(new Program(name, "", asciiResult, TYPE_CAPT));
+					parts.add(new PictComp(TYPE_CAPT, name, content.length(), result));
 				}
 			}
 		}
 		System.out.println("Loading g1m...");
-		return progs;
+		return parts;
 	}
 	
 	public static void writeToG1M(String destPath) throws IOException {
@@ -960,8 +967,13 @@ public class BIDE {
 		defaultMacros.add(new Macro("&&", " And "));
 		defaultMacros.add(new Macro("||", " Or "));
 		defaultMacros.add(new Macro("%", " Rmdr "));
-		defaultMacros.add(new Macro("beginBenchmark", "ClrText:Locate 1,2,\"Begin\"&disp;"));
-		defaultMacros.add(new Macro("endBenchmark", "ClrText:Locate 1,2,\"End  \"&disp;"));
+		defaultMacros.add(new Macro("beginBenchmark()", "ClrText:Locate 1,2,\"Begin\"&disp;"));
+		defaultMacros.add(new Macro("endBenchmark()", "ClrText:Locate 1,2,\"End  \"&disp;"));
+		defaultMacros.add(new Macro("graphxyVWin()", "ViewWindow 1,127,0,63,1,0,0,1,1"));
+		defaultMacros.add(new Macro("topLeftVWin()", "ViewWindow 1,127,0,63,1,0"));
+		defaultMacros.add(new Macro("bottomLeftVWin()", "ViewWindow 1,127,0,1,63,0"));
+		defaultMacros.add(new Macro("initGraphScreen()", "AxesOff\nLabelOff\nGridOff\nBG-None\nClrGraph\nViewWindow 1,127,0,63,1,0,0,1,1"));
+		//add macro ClrLine(x)
 		
 		Object[] keyCodes = {
 			"key_f1", 79,

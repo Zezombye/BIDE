@@ -45,12 +45,18 @@ import org.fife.ui.rtextarea.RTextArea;
 public class ProgramTextPane extends RSyntaxTextArea {
 	
 	public static CompletionProvider cp;
-
 	
 	public ProgramTextPane(int type) {
 		super();
 		if (type == BIDE.TYPE_CAPT || type == BIDE.TYPE_PICT) {
-        	this.setFont(BIDE.pictFont);
+        	//this.setFont(BIDE.pictFont);
+			BIDE.error("This should not happen");
+			try {
+				throw new Exception();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return;
         } else if (type == BIDE.TYPE_PROG || type == BIDE.TYPE_OPCODE || type == BIDE.TYPE_CHARLIST){
         	this.setFont(BIDE.progFont);
         } else {
@@ -186,11 +192,13 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	    	}
 	    }
 	    for (int i = 0; i < BIDE.macros.size(); i++) {
-	    	if (BIDE.macros.get(i).text.length() > 1 && BIDE.macros.get(i).text.matches("\\w+")) {
+	    	if (BIDE.macros.get(i).text.length() > 1 && BIDE.macros.get(i).text.matches("[\\w\\(\\), ]+")) {
 	    		/*BasicCompletion bc = new BasicCompletion(provider, BIDE.macros.get(i).text, 2);
 	    		provider.addCompletion(bc);
 	    		System.out.println(bc.initialRelevance);*/
-	    		provider.addCompletion(new BasicCompletion(provider, BIDE.macros.get(i).text, 2, "TODO: macro desc"));
+	    		provider.addCompletion(new BasicCompletion(
+	    				provider, BIDE.macros.get(i).text, 2, generateHtmlSection(
+	    						"Resolves to:", convertToHtml("[code]"+BIDE.macros.get(i).replacement+"[/code]"))));
 	    	}
 	    	
 	    }

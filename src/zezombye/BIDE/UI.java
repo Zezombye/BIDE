@@ -336,128 +336,119 @@ public class UI {
 	}
 	
 	public void createNewTab(int type) {
-		String content = "";
-		String option = "";
-		String name = "";
-		if (type == BIDE.TYPE_PROG) {
-			name = JOptionPane.showInputDialog(BIDE.ui.window, "Program name:", "New program", JOptionPane.QUESTION_MESSAGE);
-			option = "<no password>";
-		} else if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
+		
+		if (type == BIDE.TYPE_CAPT || type == BIDE.TYPE_PICT) {
+			String name;
 			if (type == BIDE.TYPE_PICT) {
 				name = "PICT"+JOptionPane.showInputDialog(BIDE.ui.window, "Picture number:", "New picture", JOptionPane.QUESTION_MESSAGE);
-				option = "800";
+				jtp.addTab(name, new PictComp(BIDE.TYPE_PICT, name, 0x800).jsp);
 			} else {
 				name = "CAPT"+JOptionPane.showInputDialog(BIDE.ui.window, "Capture number:", "New capture", JOptionPane.QUESTION_MESSAGE);
+				jtp.addTab(name, new PictComp(BIDE.TYPE_CAPT, name, 0x400).jsp);
 			}
-			String spaces128times = "";
-			for (int i = 0; i < 128; i++) {
-				spaces128times += " ";
-			}
-			for (int h = 0; h < (type == BIDE.TYPE_PICT ? 2 : 1); h++) {
-				if (h == 1) {
-					content += BIDE.pictWarning;
-				}
-				for (int i = 0; i < 130; i++) {
-					content += "▄";
-				}
-				content += "\n";
-				for (int i = 0; i < 32; i++) {
-					content += "█" + spaces128times + "█\n";
-				}
-				for (int i = 0; i < 130; i++) {
-					content += "▀";
-				}
-			}
-				
-		} else if (type == BIDE.TYPE_OPCODE) {
-			name = "Opcodes List";
-			content = "#\n#DO NOT EDIT THIS TAB, changes won't be saved!\n#\n";
-			try {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/opcodes.txt"), "UTF-8"));
-				String line = null;
-			    StringBuilder stringBuilder = new StringBuilder();
-
-			    try {
-			        while((line = reader.readLine()) != null) {
-			            stringBuilder.append(line);
-			            stringBuilder.append("\n");
-			        }
-
-			        content += stringBuilder.toString();
-			    } catch (IOException e) {
-					e.printStackTrace();
-				} finally {
-			        try {
-						reader.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-			    }
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-		
-		} else if (type == BIDE.TYPE_CHARLIST) {
-			name = "All characters";
-			try {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/characters.txt"), "UTF-8"));
-				String line = null;
-			    StringBuilder stringBuilder = new StringBuilder();
-
-			    try {
-			        while((line = reader.readLine()) != null) {
-			            stringBuilder.append(line);
-			            stringBuilder.append("\n");
-			        }
-
-			        content += stringBuilder.toString();
-			    } catch (IOException e) {
-					e.printStackTrace();
-				} finally {
-			        try {
-						reader.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-			    }
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-		
-		} else if (type == BIDE.TYPE_COLORATION) {
-			name = "Syntax coloration test";
-			try {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/testColoration.txt"), "UTF-8"));
-				String line = null;
-			    StringBuilder stringBuilder = new StringBuilder();
-
-			    try {
-			        while((line = reader.readLine()) != null) {
-			            stringBuilder.append(line);
-			            stringBuilder.append("\n");
-			        }
-
-			        content += stringBuilder.toString();
-			    } catch (IOException e) {
-					e.printStackTrace();
-				} finally {
-			        try {
-						reader.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-			    }
-			} catch (UnsupportedEncodingException e1) {
-				e1.printStackTrace();
-			}
-		
+			
 		} else {
-			BIDE.error("Unknown type "+type);
+			String content = "";
+			String option = "";
+			String name = "";
+			if (type == BIDE.TYPE_PROG) {
+				name = JOptionPane.showInputDialog(BIDE.ui.window, "Program name:", "New program", JOptionPane.QUESTION_MESSAGE);
+				option = "<no password>";
+			} else if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
+				
+					
+			} else if (type == BIDE.TYPE_OPCODE) {
+				name = "Opcodes List";
+				content = "#\n#DO NOT EDIT THIS TAB, changes won't be saved!\n#\n";
+				try {
+					BufferedReader reader = new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/opcodes.txt"), "UTF-8"));
+					String line = null;
+				    StringBuilder stringBuilder = new StringBuilder();
+
+				    try {
+				        while((line = reader.readLine()) != null) {
+				            stringBuilder.append(line);
+				            stringBuilder.append("\n");
+				        }
+
+				        content += stringBuilder.toString();
+				    } catch (IOException e) {
+						e.printStackTrace();
+					} finally {
+				        try {
+							reader.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+				    }
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+				}
+			
+			} else if (type == BIDE.TYPE_CHARLIST) {
+				name = "All characters";
+				try {
+					BufferedReader reader = new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/characters.txt"), "UTF-8"));
+					String line = null;
+				    StringBuilder stringBuilder = new StringBuilder();
+
+				    try {
+				        while((line = reader.readLine()) != null) {
+				            stringBuilder.append(line);
+				            stringBuilder.append("\n");
+				        }
+
+				        content += stringBuilder.toString();
+				    } catch (IOException e) {
+						e.printStackTrace();
+					} finally {
+				        try {
+							reader.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+				    }
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+				}
+			
+			} else if (type == BIDE.TYPE_COLORATION) {
+				name = "Syntax coloration test";
+				try {
+					BufferedReader reader = new BufferedReader(new InputStreamReader(BIDE.class.getClass().getResourceAsStream("/testColoration.txt"), "UTF-8"));
+					String line = null;
+				    StringBuilder stringBuilder = new StringBuilder();
+
+				    try {
+				        while((line = reader.readLine()) != null) {
+				            stringBuilder.append(line);
+				            stringBuilder.append("\n");
+				        }
+
+				        content += stringBuilder.toString();
+				    } catch (IOException e) {
+						e.printStackTrace();
+					} finally {
+				        try {
+							reader.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+				    }
+				} catch (UnsupportedEncodingException e1) {
+					e1.printStackTrace();
+				}
+			
+			} else {
+				BIDE.error("Unknown type "+type);
+			}
+			if (name == null || name.endsWith("null")) {
+				return;
+			}
+			jtp.addTab(name, new Program(name, option, content, type).comp);
 		}
-		if (name == null || name.endsWith("null")) {
-			return;
-		}
-		jtp.addTab(name, new Program(name, option, content, type).comp);
+		
+		
 		//jtp.setTabComponentAt(jtp.getTabCount()-1, new ButtonTabComponent(jtp));
 		//((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(jtp.getTabCount()-1)).textPane.getDocument()).getDocumentFilter()).testForLag();
 		jtp.setSelectedIndex(jtp.getTabCount()-1);
@@ -481,19 +472,19 @@ public class UI {
 	    	BIDE.pathToSavedG1M = "";
 	    	new Thread(new Runnable() {
 		    	public void run() {
-				    ArrayList<Program> progs = new ArrayList<Program>();
+				    ArrayList<Object> parts = new ArrayList<Object>();
 				    try {
 				    	G1MParser g1mparser = new G1MParser(BIDE.pathToG1M);
 						g1mparser.readG1M();
 						if (!g1mparser.checkValidity()) {
-							progs = BIDE.readFromTxt(BIDE.pathToG1M);
+							parts = BIDE.readFromTxt(BIDE.pathToG1M);
 				    	} else {
-				    		progs = BIDE.readFromG1M(BIDE.pathToG1M);
+				    		parts = BIDE.readFromG1M(BIDE.pathToG1M);
 				    	}
 				    	BIDE.pathToSavedG1M = "";
 				    	jtp.removeAll();
-			    		for (int i = 0; i < progs.size(); i++) {
-			    			jtp.addTab(progs.get(i).name, progs.get(i).comp);
+			    		for (int i = 0; i < parts.size(); i++) {
+			    			jtp.addTab(parts.get(i).name, parts.get(i).comp);
 			    			//jtp.setTabComponentAt(i, new ButtonTabComponent(jtp));
 			    			try {
 								Thread.sleep(100);
@@ -510,7 +501,7 @@ public class UI {
 				    } catch (IOException e) {
 						e.printStackTrace();
 					}
-				    if (progs != null && progs.size() != 0) {
+				    if (parts != null && parts.size() != 0) {
 					    System.out.println("Finished loading g1m");
 				    	
 				    }

@@ -27,7 +27,7 @@ import javax.swing.text.ViewFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
-public class Program {
+public class Program extends G1MPart {
 	
 	public JComponent comp;
 	public String name = "";
