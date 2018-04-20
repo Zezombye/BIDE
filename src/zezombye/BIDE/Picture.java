@@ -35,13 +35,9 @@ import javax.swing.SwingUtilities;
 	
 }*/
 
-class Picture extends G1MPart {
-	
-	
-	
-}
 
-class PictComp extends JPanel {
+
+public class Picture extends JPanel {
 	
 	int type, size;
 	int zoom;
@@ -57,15 +53,30 @@ class PictComp extends JPanel {
 	JLabel pictTutorial = new JLabel("Left click for black, right click for white, ctrl+scroll to zoom");
 	JLabel pictWarning = new JLabel("Do not edit the picture below unless you know what you are doing!");
 	
-	public PictComp(int type, String name, int size, byte[] data) {
+	public Picture(int type, String name, int size, Byte[] data) {
 		this(type, name, size);
+		
+		System.out.println("byte content 2 : "+Arrays.toString(data));
+		
 		pictPanel.pixels = Arrays.copyOfRange(data, 0, 0x400);
-		if (size > 0x400) {
-			pictPanel2.pixels = Arrays.copyOfRange(data, 0x400, 0x800);
+		for (int i = 0; i < 0x400; i++) {
+			if (pictPanel.pixels[i] == null) {
+				pictPanel.pixels[i] = (byte)0;
+			}
+		}
+		System.out.println("byte content 3 : "+Arrays.toString(pictPanel.pixels));
+		if (size > 0x400 && data.length > 0x400) {
+			pictPanel2.pixels = Arrays.copyOfRange(data, 0x400, size);
+			
+			for (int i = 0; i < 0x400; i++) {
+				if (pictPanel2.pixels[i] == null) {
+					pictPanel2.pixels[i] = (byte)0;
+				}
+			}
 		}
 	}
 	
-	public PictComp(int type, String name, int size) {
+	public Picture(int type, String name, int size) {
 		this.setLayout(null); //Layouts are pure evil, absolute is at least consistent
 		
 		this.add(namePanel);
@@ -135,13 +146,13 @@ class PictComp extends JPanel {
 		this.zoom = zoom;
 		pictPanel.setZoom(zoom);
 		pictPanel2.setZoom(zoom);
-		if (size <= 0x400) {
+		if (size > 0x400) {
 			this.setPreferredSize(new Dimension(pictPanel2.getX()+pictPanel2.getWidth(), pictPanel2.getY()+pictPanel2.getHeight()));
 		} else {
 			this.setPreferredSize(new Dimension(pictPanel.getX()+pictPanel.getWidth(), pictPanel.getY()+pictPanel.getHeight()));
 			
 		}
-	}	
+	}
 	
 	public void setPictSize(int size) {
 		
@@ -161,6 +172,13 @@ class PictComp extends JPanel {
 			} else {
 				pictPanel2.setVisible(true);
 				pictWarning.setVisible(true);
+			}
+			
+			if (size > 0x400) {
+				this.setPreferredSize(new Dimension(pictPanel2.getX()+pictPanel2.getWidth(), pictPanel2.getY()+pictPanel2.getHeight()));
+			} else {
+				this.setPreferredSize(new Dimension(pictPanel.getX()+pictPanel.getWidth(), pictPanel.getY()+pictPanel.getHeight()));
+				
 			}
 		}
 		
@@ -190,12 +208,13 @@ class PictPanel extends JPanel {
 	int id;
 	Dimension size = new Dimension(128*zoom+1, 64*zoom+1);
 	int pictSize;
-	byte[] pixels = new byte[16*64];
+	Byte[] pixels = new Byte[16*64];
 	
 	int xClick=-1, yClick=-1;
 	
 	public PictPanel(int id) {
 		super();
+		Arrays.fill(pixels, (byte)0);
 		this.id = id;
 		setZoom(6);
 		this.setBackground(new Color(0xFFFFFF));
@@ -255,20 +274,21 @@ class PictPanel extends JPanel {
 	
 	public void setPixel(int x, int y, int color) {
 		if (color == 1) {
-			pixels[x/8+16*y] |= 1 << (x%8);
+			pixels[x/8+16*y] = (byte)(pixels[x/8+16*y] | (0b10000000 >> (x%8)));
 		} else {
-			pixels[x/8+16*y] &= ~(1 << (x%8));
+			pixels[x/8+16*y] = (byte)(pixels[x/8+16*y] & ~(0b10000000 << (x%8)));
 		}
 	}
 	
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		//System.out.println(Arrays.toString(pixels));
 		for (int i = 0; i < 128; i++) {
 			for (int j = 0; j < 64; j++) {
 				if (i + 128*j >= pictSize*8) {
 					g.setColor(Color.GRAY);
-				} else if ((pixels[i/8+16*j] & (1 << i%8)) == 0) {
+				} else if ((pixels[i/8+16*j] & (0b10000000 >> i%8)) == 0) {
 					g.setColor(Color.WHITE);
 				} else {
 					g.setColor(Color.BLACK);

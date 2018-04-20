@@ -27,44 +27,45 @@ import javax.swing.text.ViewFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
-public class Program extends G1MPart {
+public class Program {
 	
 	public JComponent comp;
 	public String name = "";
 	public String option = "";
-	public String content = "";
+	public Object content = "";
 	public int type = 0;
 	
 	//Warning: do not use name, option or content to retrieve informations because they may have changed!
 	//For example, if the user modifies the content to modify the name, that change will not be reflected in name (nor in content).
-	public Program(String name, String option, String content, int type) {
+	public Program(String name, String option, Object content, int type) {
 		this.name = name;
 		this.option = option;
 		this.type = type;
 		//this.setViewportView(textPane);
 		//this.setViewportView(new RSyntaxTextArea());
 		//Check if content is missing headers
-		if (!content.startsWith("#")) {
+		if (type != BIDE.TYPE_PICT && type != BIDE.TYPE_CAPT && !((String)content).startsWith("#")) {
 			if (type == BIDE.TYPE_PROG) {
 				content = "#Program name: "+name+"\n#Password: "+option+"\n"+content;
-			} else if (type == BIDE.TYPE_PICT) {
+			} /*else if (type == BIDE.TYPE_PICT) {
 				content = "#Picture name: "+name+"\n#Size: 0x"+option+BIDE.pictTutorial+content;
 			} else if (type == BIDE.TYPE_CAPT) {
 				content = "#Capture name: "+name+"\n"+BIDE.pictTutorial+content;
-			}
+			}*/
 		}
 		this.content = content;
 		
 		if (!BIDE.isCLI) {
-			ProgramTextPane textPane = new ProgramTextPane(type);
-			textPane.setText(content);
-			//if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
-			//	this.comp = new PictPane(type, 0);
-			//} else {
+			
+			if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
+				this.comp = new Picture(type, name, Integer.valueOf(option, 16), (Byte[])content).jsp;
+			} else {
+				ProgramTextPane textPane = new ProgramTextPane(type);
+				textPane.setText((String)content);
 				this.comp = new ProgScrollPane(textPane, type);
 				((JScrollPane)comp).getVerticalScrollBar().setUnitIncrement(30);
 				comp.setBorder(BorderFactory.createEmptyBorder());
-			//}
+			}
 		}
 	}
 }
@@ -78,8 +79,8 @@ class ProgScrollPane extends RTextScrollPane {
 		super(textPane);
 		this.textPane = textPane;
 		this.type = type;
-		if (type == BIDE.TYPE_CAPT || type == BIDE.TYPE_PICT) {
+		/*if (type == BIDE.TYPE_CAPT || type == BIDE.TYPE_PICT) {
 			this.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		}
+		}*/
 	}
 }

@@ -60,6 +60,9 @@ public class CasioString {
 	public void add(byte[] byteArray) {add(byteArrayToList(byteArray));}
 	public void add(CasioString str) {add(str.getContent());}
 	public void add(String str) {add(byteArrayToList(str.getBytes()));}
+	public void add(Byte[] byteArray) {
+		add(Arrays.asList(byteArray));
+	}
 	
 	public void add(int index, List<Byte> lb) {
 		this.content.addAll(index, lb);

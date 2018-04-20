@@ -339,13 +339,18 @@ public class UI {
 		
 		if (type == BIDE.TYPE_CAPT || type == BIDE.TYPE_PICT) {
 			String name;
+			String size;
 			if (type == BIDE.TYPE_PICT) {
 				name = "PICT"+JOptionPane.showInputDialog(BIDE.ui.window, "Picture number:", "New picture", JOptionPane.QUESTION_MESSAGE);
-				jtp.addTab(name, new PictComp(BIDE.TYPE_PICT, name, 0x800).jsp);
+				size = "800";
 			} else {
 				name = "CAPT"+JOptionPane.showInputDialog(BIDE.ui.window, "Capture number:", "New capture", JOptionPane.QUESTION_MESSAGE);
-				jtp.addTab(name, new PictComp(BIDE.TYPE_CAPT, name, 0x400).jsp);
+				size = "400";
 			}
+			if (name.endsWith("null")) return;
+			
+			BIDE.programs.add(new Program(name, size, new Byte[0], type));
+			jtp.addTab(name, BIDE.programs.get(BIDE.programs.size()-1).comp);
 			
 		} else {
 			String content = "";
@@ -354,9 +359,6 @@ public class UI {
 			if (type == BIDE.TYPE_PROG) {
 				name = JOptionPane.showInputDialog(BIDE.ui.window, "Program name:", "New program", JOptionPane.QUESTION_MESSAGE);
 				option = "<no password>";
-			} else if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
-				
-					
 			} else if (type == BIDE.TYPE_OPCODE) {
 				name = "Opcodes List";
 				content = "#\n#DO NOT EDIT THIS TAB, changes won't be saved!\n#\n";
@@ -445,7 +447,8 @@ public class UI {
 			if (name == null || name.endsWith("null")) {
 				return;
 			}
-			jtp.addTab(name, new Program(name, option, content, type).comp);
+			BIDE.programs.add(new Program(name, option, content, type));
+			jtp.addTab(name, BIDE.programs.get(BIDE.programs.size()-1).comp);
 		}
 		
 		
@@ -472,19 +475,20 @@ public class UI {
 	    	BIDE.pathToSavedG1M = "";
 	    	new Thread(new Runnable() {
 		    	public void run() {
-				    ArrayList<Object> parts = new ArrayList<Object>();
+		    		BIDE.programs = new ArrayList<Program>();
 				    try {
 				    	G1MParser g1mparser = new G1MParser(BIDE.pathToG1M);
 						g1mparser.readG1M();
+						
 						if (!g1mparser.checkValidity()) {
-							parts = BIDE.readFromTxt(BIDE.pathToG1M);
+							BIDE.readFromTxt(BIDE.pathToG1M);
 				    	} else {
-				    		parts = BIDE.readFromG1M(BIDE.pathToG1M);
+				    		BIDE.readFromG1M(BIDE.pathToG1M);
 				    	}
 				    	BIDE.pathToSavedG1M = "";
 				    	jtp.removeAll();
-			    		for (int i = 0; i < parts.size(); i++) {
-			    			jtp.addTab(parts.get(i).name, parts.get(i).comp);
+			    		for (int i = 0; i < BIDE.programs.size(); i++) {
+			    			jtp.addTab(BIDE.programs.get(i).name, BIDE.programs.get(i).comp);
 			    			//jtp.setTabComponentAt(i, new ButtonTabComponent(jtp));
 			    			try {
 								Thread.sleep(100);
@@ -501,7 +505,7 @@ public class UI {
 				    } catch (IOException e) {
 						e.printStackTrace();
 					}
-				    if (parts != null && parts.size() != 0) {
+				    if (BIDE.programs.size() != 0) {
 					    System.out.println("Finished loading g1m");
 				    	
 				    }
@@ -588,21 +592,21 @@ public class UI {
 					BIDE.error("Image must be 128*64!");
 					return;
 				}
-				String binary = "";
+				Byte[] binary = new Byte[0x400];
+				Arrays.fill(binary, (byte)0);
 				for (int j = 0; j < 64; j++) {
 					for (int i = 0; i < 128; i++) {
-						if (img.getRGB(i, j) == Color.WHITE.getRGB()) {
-							binary += "0";
-						} else {
+						if (img.getRGB(i, j) == Color.BLACK.getRGB()) {
+							binary[i/8+16*j] = (byte)(binary[i/8+16*j] | (0b10000000 >> (i%8)));
+						} /*else {
 							binary += "1";
 							//System.out.println(img.getRGB(i, j));
-						}
+						}*/
 					}
 				}
 				//System.out.println(binary);
-				String ascii = BIDE.pictToAscii(binary, BIDE.TYPE_PICT);
 				String imgName = input.getName().substring(0, input.getName().lastIndexOf('.'));
-				this.jtp.addTab(imgName, new Program(imgName, "800", ascii, BIDE.TYPE_PICT).comp);
+				this.jtp.addTab(imgName, new Program(imgName, "800", binary, BIDE.TYPE_PICT).comp);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -654,6 +658,7 @@ class ButtonTabComponent extends JPanel {
         //add more space between the label and the button
         //label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         //tab button
+        add(Box.createRigidArea(new Dimension(8,17)));
         JButton button = new TabButton();
         add(button);
         //add more space to the top of the component
@@ -662,8 +667,8 @@ class ButtonTabComponent extends JPanel {
 
     private class TabButton extends JButton implements ActionListener {
         public TabButton() {
-            int size = 17;
-            setPreferredSize(new Dimension(size, size));
+            //int size = 17;
+            setPreferredSize(new Dimension(9, 17));
             //setToolTipText("close this tab");
             //Make the button looks the same for all Laf's
             setUI(new BasicButtonUI());
@@ -672,10 +677,11 @@ class ButtonTabComponent extends JPanel {
             //No need to be focusable
             setFocusable(false);
             //setBorder(BorderFactory.createEtchedBorder());
-            setBorderPainted(false);
+            setBorderPainted(true);
             setRolloverEnabled(true);
             //Close the proper tab by clicking the button
             addActionListener(this);
+            //this.setBorder(BorderFactory.createBevelBorder(1, Color.RED, Color.GREEN));
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -684,6 +690,7 @@ class ButtonTabComponent extends JPanel {
             	int option = JOptionPane.showConfirmDialog(BIDE.ui.window, "Are you sure you want to close this tab?", "BIDE", JOptionPane.YES_NO_OPTION);
                 if (option == JOptionPane.YES_OPTION) {
                 	pane.remove(i);
+                	BIDE.programs.remove(i);
                 }
             }
         }
@@ -707,7 +714,7 @@ class ButtonTabComponent extends JPanel {
             if (getModel().isRollover()) {
                 g2.setColor(Color.BLACK);
             }
-            int lmargin = 8;
+            int lmargin = 0;
             int rmargin = 2;
             int umargin = 4;
             int dmargin = 6;
