@@ -43,7 +43,7 @@ public class BIDE {
 	public static List<Opcode> opcodes = new ArrayList<Opcode>();
 	public static List<Macro> macros = new ArrayList<Macro>();
 	public static List<Macro> defaultMacros = new ArrayList<Macro>();
-	public static List<Program> programs = new ArrayList<Program>();
+	public static List<G1MPart> g1mparts = new ArrayList<G1MPart>();
 	
 	public static String pathToG1M = System.getProperty("user.home")+"/desktop/";
 	public static String pathToSavedG1M = "";
@@ -73,7 +73,7 @@ public class BIDE {
 	static Options options = new Options();
 	public static boolean isCLI = false;
 	
-	public static AutoImport autoImport;
+	public static EmulatorImport autoImport;
 	
 	public static void main(String[] args) {
 		
@@ -124,11 +124,11 @@ public class BIDE {
 				try {
 					readFromG1M(pathToG1M);
 					
-					for (int i = 0; i < programs.size(); i++) {
+					for (int i = 0; i < g1mparts.size(); i++) {
 						//Disallowed chars: <>:"/\|?*
-						String name = programs.get(i).name.replaceAll("<|>|:|\"|\\/|\\\\|\\||\\?|\\*", "_");
+						String name = g1mparts.get(i).name.replaceAll("<|>|:|\"|\\/|\\\\|\\||\\?|\\*", "_");
 						IO.writeStrToFile(new File(pathToDest+name+".bide"), 
-								pictToAscii(new CasioString(Arrays.asList((Byte[])programs.get(i).content)), Integer.parseInt(programs.get(i).option, 16)), true);
+								pictToAscii(new CasioString(Arrays.asList((Byte[])g1mparts.get(i).content)), Integer.parseInt(g1mparts.get(i).option, 16)), true);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -149,7 +149,7 @@ public class BIDE {
 			progFont = new Font(options.getProperty("progFontName"), Font.TRUETYPE_FONT, Integer.parseInt(options.getProperty("progFontSize")));
 			dispFont = progFont;
 			if (options.getProperty("useEmulator").equals("true")) {
-				autoImport = new AutoImport();
+				autoImport = new EmulatorImport();
 			}
 			pictFont = new Font("DejaVu Avec Casio", Font.TRUETYPE_FONT, Integer.parseInt(options.getProperty("pictFontSize")));
 			ui.createAndDisplayUI();
@@ -210,7 +210,7 @@ public class BIDE {
 					error(name, "Picture size undefined!");
 				}
 			}*/
-			programs.add(new Program(name, "", progsTxt[i], type));
+			g1mparts.add(new G1MPart(name, "", progsTxt[i], type));
 		}
 		
 	}
@@ -242,7 +242,7 @@ public class BIDE {
 					return;
 				}
 				
-				programs.add(new Program(progName, progPw, progContent, TYPE_PROG));
+				g1mparts.add(new G1MPart(progName, progPw, progContent, TYPE_PROG));
 			} else if (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PICT || g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_CAPT) {
 				String name = casioToAscii(g1mparser.getPartName(g1mparser.parts.get(h)), false);
 				
@@ -257,11 +257,11 @@ public class BIDE {
 				}
 				
 				Byte[] result = content.getContent().toArray(new Byte[0]);
-				System.out.println("byte content : "+Arrays.toString(result));
+				//System.out.println("byte content : "+Arrays.toString(result));
 				if (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PICT) {
-					programs.add(new Program(name, Integer.toHexString(content.length()), result, TYPE_PICT));
+					g1mparts.add(new G1MPart(name, Integer.toHexString(content.length()), result, TYPE_PICT));
 				} else {
-					programs.add(new Program(name, "400", result, TYPE_CAPT));
+					g1mparts.add(new G1MPart(name, "400", result, TYPE_CAPT));
 				}
 			}
 		}
@@ -300,28 +300,31 @@ public class BIDE {
 	public static void writeToG1M(String destPath) throws IOException {
 		
 		long time = System.currentTimeMillis();
-		System.setOut(System.out);
-		System.setOut(new PrintStream(new CustomOutputStream(BIDE.ui.stdout)));
-		BIDE.ui.stdout.setText("");
+		if (!debug) {
+			System.setOut(System.out);
+			System.setOut(new PrintStream(new CustomOutputStream(BIDE.ui.stdout)));
+			BIDE.ui.stdout.setText("");
+		}
+		
 		System.out.println("Saving to \""+destPath+"\"...");
 		
 		G1MWrapper g1mwrapper = new G1MWrapper();
 		//Parse text file
-		Program currentPart = null;
+		G1MPart currentPart = null;
 		clearMacros();
 		
 		//ArrayList<Macro> macros = new ArrayList<Macro>();
-		for (int h = 0; h < programs.size(); h++) {
-			int type = programs.get(h).type;
+		for (int h = 0; h < g1mparts.size(); h++) {
+			int type = g1mparts.get(h).type;
 			if (type != TYPE_PICT && type != TYPE_CAPT && type != TYPE_PROG) {
 				continue;
 			}
 			
-			currentPart = programs.get(h);
+			currentPart = g1mparts.get(h);
 			currentPart.content = "";
 			if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
 				
-				Picture pict = ((Picture)((JScrollPane)(programs.get(h).comp)).getViewport().getView());
+				Picture pict = ((Picture)((JScrollPane)(g1mparts.get(h).comp)).getViewport().getView());
 				
 				currentPart.name = pict.namejtf.getText();
 				currentPart.content = Stream.concat(Arrays.stream(pict.pictPanel.pixels), Arrays.stream(pict.pictPanel2.pixels)).toArray(Byte[]::new);
@@ -330,13 +333,14 @@ public class BIDE {
 				try {
 					Integer.parseInt(currentPart.option, 16);
 				} catch (NumberFormatException e) {
-					error(currentPart.name, "Invalid picture size!");
+					error(currentPart.name, "Invalid picture size! ("+currentPart.option+")");
 					return;
 				}
 				
+				currentPart.content = Arrays.copyOfRange((Byte[])currentPart.content, 0, Integer.parseInt(currentPart.option, 16));
+				
 			} else {
-				currentPart.content = ((ProgramTextPane)((ProgScrollPane)programs.get(h).comp).getViewport().getView()).getText();
-				String[] lines = ((String)currentPart.content).split("\\n|\\r|\\r\\n");
+				String[] lines = ((ProgramTextPane)((ProgScrollPane)g1mparts.get(h).comp).getViewport().getView()).getText().split("\\n|\\r|\\r\\n");
 				//System.out.println(lines[0]);
 				
 				currentPart.name = lines[0].substring(15);
@@ -348,13 +352,10 @@ public class BIDE {
 						currentPart.option = "";
 					}
 				}
-				if (type == BIDE.TYPE_PICT) {
-					
-				}
 				for (int i = 0; i < lines.length; i++) {
-					if (lines[i].endsWith("Then") || lines[i].endsWith("Else")) {
+					/*if (lines[i].endsWith("Then") || lines[i].endsWith("Else")) {
 						lines[i] += " ";
-					}
+					}*/
 					if (lines[i].startsWith("#define ")) {
 						try {
 							macros.add(new Macro(lines[i].substring(8, lines[i].indexOf(' ', 8)), lines[i].substring(lines[i].indexOf(' ', 8)+1)));
@@ -366,7 +367,7 @@ public class BIDE {
 					currentPart.content += lines[i] + "\n";
 				}
 			}
-			programs.set(h, currentPart);
+			g1mparts.set(h, currentPart);
 			
 		}
 		Collections.sort(macros, new Comparator<Macro>() {
@@ -375,7 +376,7 @@ public class BIDE {
 				return o2.text.compareTo(o1.text);
 			}
 		});
-		if (programs.size() == 0) {
+		if (g1mparts.size() == 0) {
 			error("No programs detected!");
 			return;
 		}
@@ -384,33 +385,33 @@ public class BIDE {
 		}
 		//Add each part (program) of the ascii file
 		byte[] padding = {0,0,0,0,0,0,0,0};
-		for (int i = 0; i < programs.size(); i++) {
+		for (int i = 0; i < g1mparts.size(); i++) {
 			
-			CasioString name = new CasioString(asciiToCasio(programs.get(i).name, true, programs.get(i).name+".name", 1, macros));
+			CasioString name = new CasioString(asciiToCasio(g1mparts.get(i).name, true, g1mparts.get(i).name+".name", 1, macros));
 
-			System.out.println("Parsing \""+programs.get(i).name+"\"");
+			System.out.println("Parsing \""+g1mparts.get(i).name+"\"");
 			
 			if (name.length() > 8) {
-				error("Program \""+programs.get(i).name+"\" has a name too long (8 characters max)!");
+				error("Program \""+g1mparts.get(i).name+"\" has a name too long (8 characters max)!");
 				return;
 			}
 						
-			if (programs.get(i).type == BIDE.TYPE_CAPT && !programs.get(i).name.startsWith("CAPT")) {
-				error("Capture \""+programs.get(i).name+"\"'s name should start with \"CAPT\"!");
+			if (g1mparts.get(i).type == BIDE.TYPE_CAPT && !g1mparts.get(i).name.startsWith("CAPT")) {
+				error("Capture \""+g1mparts.get(i).name+"\"'s name should start with \"CAPT\"!");
 				return;
-			} else if (programs.get(i).type == BIDE.TYPE_PICT && !programs.get(i).name.startsWith("PICT")) {
-				error("Picture \""+programs.get(i).name+"\"'s name should start with \"PICT\"!");
+			} else if (g1mparts.get(i).type == BIDE.TYPE_PICT && !g1mparts.get(i).name.startsWith("PICT")) {
+				error("Picture \""+g1mparts.get(i).name+"\"'s name should start with \"PICT\"!");
 				return;
 			}
-			if (programs.get(i).type == BIDE.TYPE_CAPT || programs.get(i).type == BIDE.TYPE_PICT) {
+			if (g1mparts.get(i).type == BIDE.TYPE_CAPT || g1mparts.get(i).type == BIDE.TYPE_PICT) {
 				try {
-					int nb = Integer.parseInt(programs.get(i).name.substring(4));
+					int nb = Integer.parseInt(g1mparts.get(i).name.substring(4));
 					if (nb < 1 || nb > 20) {
-						error("Number of "+programs.get(i).name+" should be 1-20!");
+						error("Number of "+g1mparts.get(i).name+" should be 1-20!");
 						return;
 					}
 				} catch (NumberFormatException e) {
-					error(programs.get(i).name, "Invalid picture/capture number!");
+					error(g1mparts.get(i).name, "Invalid picture/capture number!");
 					return;
 				}
 			}
@@ -418,25 +419,25 @@ public class BIDE {
 			name.add(Arrays.copyOfRange(padding, 0, 8-name.length()));
 			CasioString part = new CasioString("");
 			
-			if (programs.get(i).type == BIDE.TYPE_PROG) {
-				CasioString password = new CasioString(asciiToCasio(programs.get(i).option, true, programs.get(i).name+".password", 2, macros));
+			if (g1mparts.get(i).type == BIDE.TYPE_PROG) {
+				CasioString password = new CasioString(asciiToCasio(g1mparts.get(i).option, true, g1mparts.get(i).name+".password", 2, macros));
 				if (password.length() > 8) {
-					error("Program \""+programs.get(i).name+"\" has a password too long (8 characters max)!");
+					error("Program \""+g1mparts.get(i).name+"\" has a password too long (8 characters max)!");
 					return;
 				}
 				password.add(Arrays.copyOfRange(padding, 0, 8-password.length()));
 				part.add(password);
 				part.add(new byte[]{0,0});
-				part.add(asciiToCasio((String)programs.get(i).content, false, programs.get(i).name, 1, macros));
+				part.add(asciiToCasio((String)g1mparts.get(i).content, false, g1mparts.get(i).name, 1, macros));
 				part.add(Arrays.copyOfRange(padding, 0, 4-part.length()%4));
-			} else if (programs.get(i).type == BIDE.TYPE_PICT){
-				part.add((Byte[])programs.get(i).content);
+			} else if (g1mparts.get(i).type == BIDE.TYPE_PICT){
+				part.add((Byte[])g1mparts.get(i).content);
 			} else {
 				part.add(new byte[]{0x00, (byte)0x80, 0x00, 0x40});
-				part.add((Byte[])programs.get(i).content);
+				part.add((Byte[])g1mparts.get(i).content);
 			}
 			
-			g1mwrapper.addPart(part, name, programs.get(i).type);
+			g1mwrapper.addPart(part, name, g1mparts.get(i).type);
 		}
 		g1mwrapper.generateG1M(destPath);
 		System.out.println("Finished writing to g1m in "+(System.currentTimeMillis()-time)+"ms");
@@ -569,12 +570,16 @@ public class BIDE {
 		CasioString result = new CasioString();
 		
 		//Optimise for less wasted space
-		content = content.replaceAll("Else \\n", "Else ");
-		content = content.replaceAll(":Then \\n", "\nThen ");
-		content = content.replaceAll("Then \\n", "Then ");
+		
+		//TODO: fix bug with Else messing up line count in errors
+		//content = content.replaceAll("Else ?\\n", "Else ");
+		content = content.replaceAll(":Then ?\\n", "\nThen ");
+		content = content.replaceAll("Then ?\\n", "Then ");
 		
 		String[] lines = content.split("\\n|\\r|\\r\\n");
-				
+		
+		//System.out.println(Arrays.toString(lines));
+		
 		for (int h = 0; h < lines.length; h++) {
 			if (lines[h].startsWith("#") || lines[h].trim().isEmpty()) {
 				continue;
@@ -685,7 +690,7 @@ public class BIDE {
 								i += 15;
 							}
 							String unknownOpcode = lines[h].substring(i, (lines[h].indexOf(' ', i) <= i ? lines[h].length() : lines[h] .indexOf(' ', i)));
-							error(progName, h+startLine, i+1, "Unknown opcode \"" + unknownOpcode + "\". Check the spelling and case.");
+							error(progName, h+startLine, i+1, "Unknown opcode \"" + unknownOpcode + "\". Check the spelling and case.\n"+lines[h]);
 							return null;
 						}
 					} else {
@@ -972,6 +977,13 @@ public class BIDE {
 		defaultMacros.add(new Macro("&&", " And "));
 		defaultMacros.add(new Macro("||", " Or "));
 		defaultMacros.add(new Macro("%", " Rmdr "));
+		
+		defaultMacros.add(new Macro("→", "->"));
+		defaultMacros.add(new Macro("⇒", "=>"));
+		defaultMacros.add(new Macro("≥", ">="));
+		defaultMacros.add(new Macro("≤", ">="));
+		defaultMacros.add(new Macro("≠", "!="));
+		
 		defaultMacros.add(new Macro("beginBenchmark()", "ClrText:Locate 1,2,\"Begin\"&disp;"));
 		defaultMacros.add(new Macro("endBenchmark()", "ClrText:Locate 1,2,\"End  \"&disp;"));
 		defaultMacros.add(new Macro("graphxyVWin()", "ViewWindow 1,127,0,63,1,0,0,1,1"));

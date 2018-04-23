@@ -19,7 +19,7 @@ import com.sun.jna.platform.win32.WinUser.WNDENUMPROC;
 import com.sun.jna.win32.StdCallLibrary;
 
 
-public class AutoImport {
+public class EmulatorImport {
 	
 	public interface User32 extends StdCallLibrary {
 	    User32 INSTANCE = (User32) Native.loadLibrary("user32", User32.class);
@@ -41,7 +41,7 @@ public class AutoImport {
     BufferedImage confirmation, memMenu, complete, beginBenchmark, endBenchmark;
     int screenX, screenY, screenWidth, screenHeight;
     
-    public AutoImport() {
+    public EmulatorImport() {
     	try {
 			confirmation = ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/confirmation.png"));
 			complete = ImageIO.read(BIDE.class.getClass().getResourceAsStream("/images/complete.png"));

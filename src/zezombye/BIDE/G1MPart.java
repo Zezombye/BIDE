@@ -27,7 +27,7 @@ import javax.swing.text.ViewFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
-public class Program {
+public class G1MPart {
 	
 	public JComponent comp;
 	public String name = "";
@@ -37,7 +37,7 @@ public class Program {
 	
 	//Warning: do not use name, option or content to retrieve informations because they may have changed!
 	//For example, if the user modifies the content to modify the name, that change will not be reflected in name (nor in content).
-	public Program(String name, String option, Object content, int type) {
+	public G1MPart(String name, String option, Object content, int type) {
 		this.name = name;
 		this.option = option;
 		this.type = type;

@@ -349,8 +349,8 @@ public class UI {
 			}
 			if (name.endsWith("null")) return;
 			
-			BIDE.programs.add(new Program(name, size, new Byte[0], type));
-			jtp.addTab(name, BIDE.programs.get(BIDE.programs.size()-1).comp);
+			BIDE.g1mparts.add(new G1MPart(name, size, new Byte[0], type));
+			jtp.addTab(name, BIDE.g1mparts.get(BIDE.g1mparts.size()-1).comp);
 			
 		} else {
 			String content = "";
@@ -447,8 +447,8 @@ public class UI {
 			if (name == null || name.endsWith("null")) {
 				return;
 			}
-			BIDE.programs.add(new Program(name, option, content, type));
-			jtp.addTab(name, BIDE.programs.get(BIDE.programs.size()-1).comp);
+			BIDE.g1mparts.add(new G1MPart(name, option, content, type));
+			jtp.addTab(name, BIDE.g1mparts.get(BIDE.g1mparts.size()-1).comp);
 		}
 		
 		
@@ -475,7 +475,7 @@ public class UI {
 	    	BIDE.pathToSavedG1M = "";
 	    	new Thread(new Runnable() {
 		    	public void run() {
-		    		BIDE.programs = new ArrayList<Program>();
+		    		BIDE.g1mparts = new ArrayList<G1MPart>();
 				    try {
 				    	G1MParser g1mparser = new G1MParser(BIDE.pathToG1M);
 						g1mparser.readG1M();
@@ -487,8 +487,8 @@ public class UI {
 				    	}
 				    	BIDE.pathToSavedG1M = "";
 				    	jtp.removeAll();
-			    		for (int i = 0; i < BIDE.programs.size(); i++) {
-			    			jtp.addTab(BIDE.programs.get(i).name, BIDE.programs.get(i).comp);
+			    		for (int i = 0; i < BIDE.g1mparts.size(); i++) {
+			    			jtp.addTab(BIDE.g1mparts.get(i).name, BIDE.g1mparts.get(i).comp);
 			    			//jtp.setTabComponentAt(i, new ButtonTabComponent(jtp));
 			    			try {
 								Thread.sleep(100);
@@ -505,7 +505,7 @@ public class UI {
 				    } catch (IOException e) {
 						e.printStackTrace();
 					}
-				    if (BIDE.programs.size() != 0) {
+				    if (BIDE.g1mparts.size() != 0) {
 					    System.out.println("Finished loading g1m");
 				    	
 				    }
@@ -538,7 +538,7 @@ public class UI {
 				if (input != null) {
 					BIDE.pathToSavedG1M = input.getAbsolutePath();
 					try {
-						if (BIDE.pathToSavedG1M.endsWith(".bide")) {
+						if (BIDE.pathToSavedG1M.endsWith(".bide") || BIDE.pathToSavedG1M.endsWith(".txt")) {
 							BIDE.writeToTxt(input.getPath());
 						} else {
 							BIDE.writeToG1M(input.getPath());
@@ -606,7 +606,7 @@ public class UI {
 				}
 				//System.out.println(binary);
 				String imgName = input.getName().substring(0, input.getName().lastIndexOf('.'));
-				this.jtp.addTab(imgName, new Program(imgName, "800", binary, BIDE.TYPE_PICT).comp);
+				this.jtp.addTab(imgName, new G1MPart(imgName, "800", binary, BIDE.TYPE_PICT).comp);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -690,7 +690,7 @@ class ButtonTabComponent extends JPanel {
             	int option = JOptionPane.showConfirmDialog(BIDE.ui.window, "Are you sure you want to close this tab?", "BIDE", JOptionPane.YES_NO_OPTION);
                 if (option == JOptionPane.YES_OPTION) {
                 	pane.remove(i);
-                	BIDE.programs.remove(i);
+                	BIDE.g1mparts.remove(i);
                 }
             }
         }

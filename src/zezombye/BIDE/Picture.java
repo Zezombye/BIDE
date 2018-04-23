@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.MouseInfo;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -56,7 +57,7 @@ public class Picture extends JPanel {
 	public Picture(int type, String name, int size, Byte[] data) {
 		this(type, name, size);
 		
-		System.out.println("byte content 2 : "+Arrays.toString(data));
+		//System.out.println("byte content 2 : "+Arrays.toString(data));
 		
 		pictPanel.pixels = Arrays.copyOfRange(data, 0, 0x400);
 		for (int i = 0; i < 0x400; i++) {
@@ -64,7 +65,7 @@ public class Picture extends JPanel {
 				pictPanel.pixels[i] = (byte)0;
 			}
 		}
-		System.out.println("byte content 3 : "+Arrays.toString(pictPanel.pixels));
+		//System.out.println("byte content 3 : "+Arrays.toString(pictPanel.pixels));
 		if (size > 0x400 && data.length > 0x400) {
 			pictPanel2.pixels = Arrays.copyOfRange(data, 0x400, size);
 			
@@ -96,15 +97,18 @@ public class Picture extends JPanel {
 		this.add(pictTutorial);
 		
 		this.add(pictPanel);
-		if (type != BIDE.TYPE_CAPT) {
-			this.add(pictWarning);
-			this.add(pictPanel2);
-			this.add(sizePanel);
-			sizePanel.add(new JLabel("Size (hex):"));
-			sizejtf = new JTextField(Integer.toHexString(size));
-			sizejtf.setPreferredSize(new Dimension(25, 20));
-			sizePanel.add(sizejtf);
-			this.add(setSizeButton);
+		this.add(pictWarning);
+		this.add(pictPanel2);
+		this.add(sizePanel);
+		sizePanel.add(new JLabel("Size (hex):"));
+		sizejtf = new JTextField(Integer.toHexString(size));
+		sizejtf.setPreferredSize(new Dimension(25, 20));
+		sizePanel.add(sizejtf);
+		this.add(setSizeButton);
+		
+		if (type == BIDE.TYPE_CAPT) {
+			sizePanel.setVisible(false);
+			setSizeButton.setVisible(false);
 		}
 		
 		this.addMouseWheelListener(new MouseWheelListener() {
@@ -276,7 +280,7 @@ class PictPanel extends JPanel {
 		if (color == 1) {
 			pixels[x/8+16*y] = (byte)(pixels[x/8+16*y] | (0b10000000 >> (x%8)));
 		} else {
-			pixels[x/8+16*y] = (byte)(pixels[x/8+16*y] & ~(0b10000000 << (x%8)));
+			pixels[x/8+16*y] = (byte)(pixels[x/8+16*y] & ~(0b10000000 >> (x%8)));
 		}
 	}
 	
