@@ -127,8 +127,7 @@ public class BIDE {
 					for (int i = 0; i < g1mparts.size(); i++) {
 						//Disallowed chars: <>:"/\|?*
 						String name = g1mparts.get(i).name.replaceAll("<|>|:|\"|\\/|\\\\|\\||\\?|\\*", "_");
-						IO.writeStrToFile(new File(pathToDest+name+".bide"), 
-								pictToAscii(new CasioString(Arrays.asList((Byte[])g1mparts.get(i).content)), Integer.parseInt(g1mparts.get(i).option, 16)), true);
+						//IO.writeStrToFile(new File(pathToDest+name+".bide"), );
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -171,9 +170,9 @@ public class BIDE {
 	
 	public static void readFromTxt(String txtPath) throws IOException {
 		byte[] encoded = Files.readAllBytes(Paths.get(txtPath));
-		String content = new String(encoded, "UTF-8");
-				
-		String[] progsTxt = content.split("\\n#End of part\\n");
+		String fileContent = new String(encoded, "UTF-8");
+		fileContent = fileContent.replaceAll("\r\n", "\n");
+		String[] progsTxt = fileContent.split("\\n#End of part\\n");
 		for (int i = 0; i < progsTxt.length; i++) {
 			int type;
 			if (progsTxt[i].startsWith("#Program")) {
@@ -187,30 +186,53 @@ public class BIDE {
 				return;
 			}
 			
+			//By chance, "Program", "Picture" and "Capture" have the same number of letters.
 			String name = progsTxt[i].substring(15, progsTxt[i].indexOf('\n'));
 			
+			System.out.println("Parsing part \""+name+"\"");
 			//Get 2nd line, which is option
-			/*String option = progsTxt[i].substring(progsTxt[i].indexOf('\n'), progsTxt[i].substring(progsTxt[i].indexOf('\n')).indexOf('\n'));
-			if (type == BIDE.TYPE_PROG && option.startsWith("#Password: ")) {
-				if (!option.substring(11).equals("<no password>")) {
-					option = option.substring(11);
-				} else {
-					option = "";
-				}
+			String option = "";
+			try {
+				//System.out.println(progsTxt[i].indexOf('\n'));
+				//System.out.println(progsTxt[i].substring(progsTxt[i].indexOf('\n')+1).indexOf('\n'));
+				option = progsTxt[i].substring(progsTxt[i].indexOf('\n')+1, progsTxt[i].indexOf('\n')+1 + progsTxt[i].substring(progsTxt[i].indexOf('\n')+1).indexOf('\n'));
+				System.out.println("option = " + option);
+			} catch (Exception e) {
+				error("Invalid option in part "+name);
+				e.printStackTrace();
+				return;
 			}
-			if (type == BIDE.TYPE_PICT) {
-				if (option.startsWith("#Size: 0x")) {
-					option = option.substring(9);
-					try {
-						Integer.parseInt(option, 16);
-					} catch (NumberFormatException e) {
-						error(name, "Invalid picture size!");
+			
+			Object content = "";
+			if (type == BIDE.TYPE_PROG) {
+				if (option.startsWith("#Password: ")) {
+					if (!option.substring(11).equals("<no password>")) {
+						option = option.substring(11);
+					} else {
+						option = "";
 					}
-				} else {
-					error(name, "Picture size undefined!");
+					content = progsTxt[i];
 				}
-			}*/
-			g1mparts.add(new G1MPart(name, "", progsTxt[i], type));
+			} else {
+				if (type == BIDE.TYPE_PICT) {
+					if (option.startsWith("#Size: 0x")) {
+						option = option.substring(9);
+						try {
+							Integer.parseInt(option, 16);
+						} catch (NumberFormatException e) {
+							error(name, "Invalid picture size!");
+						}
+					} else {
+						error(name, "Picture size undefined!");
+					}
+				} else if (type == BIDE.TYPE_CAPT) {
+					option = "400";
+				}
+				
+				content = asciiToPict(progsTxt[i], name, 0, option).getContent().toArray(new Byte[0]);
+			}
+				
+			g1mparts.add(new G1MPart(name, option, content, type));
 		}
 		
 	}
@@ -447,8 +469,24 @@ public class BIDE {
 	public static void writeToTxt(String destPath) {
 		System.out.println("Saving to "+destPath+"...");
 		String result = "";
-		for (int h = 0; h < ui.jtp.getTabCount(); h++) {
-			result += ((ProgScrollPane)ui.jtp.getComponentAt(h)).textPane.getText() + "\n#End of part\n";
+		for (int i = 0; i < g1mparts.size(); i++) {
+			if (g1mparts.get(i).type == BIDE.TYPE_PROG) {
+				result += ((ProgScrollPane)g1mparts.get(i).comp).textPane.getText() + "\n#End of part\n";
+			} else if (g1mparts.get(i).type == BIDE.TYPE_PICT || g1mparts.get(i).type == BIDE.TYPE_CAPT) {
+				Picture pict = ((Picture)((JScrollPane)(g1mparts.get(i).comp)).getViewport().getView());
+				if (g1mparts.get(i).type == BIDE.TYPE_PICT) {
+					result += "#Picture name: ";
+				} else {
+					result += "#Capture name: ";
+				}
+				result += pict.namejtf.getText() + "\n"
+						+ "#Size: 0x" + pict.sizejtf.getText() + "\n"
+						+ pictToAscii(pict.pictPanel.pixels);
+				if (g1mparts.get(i).type != BIDE.TYPE_CAPT) {
+					result += pictWarning + pictToAscii(pict.pictPanel2.pixels);
+				}
+				result += "\n#End of part\n";
+			}
 		}
 		try {
 			IO.writeStrToFile(new File(destPath), result, true);
@@ -458,7 +496,7 @@ public class BIDE {
 		System.out.println("Done!");
 	}
 	
-	public static String pictToAscii(CasioString content, int type) {
+	/*public static String pictToAscii(CasioString content, int type) {
 		//Convert from binary to string
 		StringBuilder binary = new StringBuilder();
 		for (int i = 0; i < content.length(); i++) {
@@ -469,49 +507,47 @@ public class BIDE {
 			}
 		}
 		return pictToAscii(binary.toString(), type);
-	}
+	}*/
 	
-	public static String pictToAscii(String content, int type) {
-		String asciiResult = "";
-		for (int g = 0; g < (type == TYPE_PICT ? 2 : 1); g++) {
-			if (g == 1) {
-				asciiResult += pictWarning;
-			}
-			for (int i = 0; i < 130; i++) {
-				asciiResult += "▄";
-			}
-			asciiResult += "\n";
-			for (int i = 0; i < 32; i++) {
-				asciiResult += "█";
-				for (int j = 0; j < 128; j++) {
-					char pixel, pixel2;
-					try {
-						pixel = content.charAt(i*2*128 + j%128 + g*0x400*8);
-					} catch (IndexOutOfBoundsException e) {
-						pixel = '0';
-					}
-					try {
-						pixel2 = content.charAt((i*2+1)*128 + j%128 + g*0x400*8);
-					} catch (IndexOutOfBoundsException e) {
-						pixel2 = '0';
-					}
-					if (pixel == '0' && pixel2 == '0') {
-						asciiResult += " ";
-					} else if (pixel == '0' && pixel2 == '1') {
-						asciiResult += "▄";
-					} else if (pixel == '1' && pixel2 == '0') {
-						asciiResult += "▀";
-					} else if (pixel == '1' && pixel2 == '1') {
-						asciiResult += "█";
-					}
-				}
-				asciiResult += "█\n";
-			}
-			for (int i = 0; i < 130; i++) {
-				asciiResult += "▀";
-			}
+	public static String pictToAscii(Byte[] content) {
+		StringBuilder asciiResult = new StringBuilder();
+		for (int i = 0; i < 130; i++) {
+			asciiResult.append("▄");
 		}
-		return asciiResult;
+		asciiResult.append("\n");
+		for (int i = 0; i < 64; i+=2) {
+			asciiResult.append("█");
+			for (int j = 0; j < 128; j++) {
+				int pixel, pixel2;
+				try {
+					pixel = (content[j/8+16*i] & (0b10000000 >> j%8)) != 0 ? 1 : 0;
+				} catch (IndexOutOfBoundsException e) {
+					pixel = 0;
+				}
+				try {
+					pixel2 = (content[j/8+16*(i+1)] & (0b10000000 >> j%8)) != 0 ? 1 : 0;
+				} catch (IndexOutOfBoundsException e) {
+					pixel2 = 0;
+				}
+				if (pixel == 0 && pixel2 == 0) {
+					asciiResult.append(" ");
+				} else if (pixel == 0 && pixel2 == 1) {
+					asciiResult.append("▄");
+				} else if (pixel == 1 && pixel2 == 0) {
+					asciiResult.append("▀");
+				} else if (pixel == 1 && pixel2 == 1) {
+					asciiResult.append("█");
+				} else {
+					System.out.println("wtf ?");
+					return null;
+				}
+			}
+			asciiResult.append("█\n");
+		}
+		for (int i = 0; i < 130; i++) {
+			asciiResult.append("▀");
+		}
+		return asciiResult.toString();
 	}
 	
 	public static CasioString asciiToPict(String content, String progName, int startLine, String pictSize) {
@@ -983,6 +1019,10 @@ public class BIDE {
 		defaultMacros.add(new Macro("≥", ">="));
 		defaultMacros.add(new Macro("≤", ">="));
 		defaultMacros.add(new Macro("≠", "!="));
+		
+		defaultMacros.add(new Macro("&MOD(;","MOD("));
+		defaultMacros.add(new Macro("&GCD(;","GCD("));
+		defaultMacros.add(new Macro("&LCM(;","LCM("));
 		
 		defaultMacros.add(new Macro("beginBenchmark()", "ClrText:Locate 1,2,\"Begin\"&disp;"));
 		defaultMacros.add(new Macro("endBenchmark()", "ClrText:Locate 1,2,\"End  \"&disp;"));

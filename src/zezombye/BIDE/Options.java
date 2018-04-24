@@ -7,6 +7,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -15,6 +19,7 @@ public class Options {
 	Properties options = new Properties();
 	
 	public void loadProperties() {
+		
 		try {
 			options.load(new FileInputStream(new File(BIDE.pathToOptions)));
 		} catch (FileNotFoundException e) {
@@ -23,9 +28,19 @@ public class Options {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		if (options.getProperty("version") == null || options.getProperty("version").compareTo(BIDE.VERSION) < 0) {
+			System.out.println("Your option file is outdated, it has been replaced by the default file. Your options have been saved in the file options.txt.backup.");
+			try {
+				Files.copy(Paths.get(BIDE.pathToOptions), Paths.get(BIDE.pathToOptions+".backup"), StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			initProperties();
+		}
 	}
 	
-	//Not needed
+	//Not needed, removes comments
 	/*public void saveProperties() {
 		try {
 			options.store(new FileWriter(new File(BIDE.pathToOptions)), "");

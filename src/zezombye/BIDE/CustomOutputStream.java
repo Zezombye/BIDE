@@ -16,7 +16,8 @@ import javax.swing.JTextArea;
  */
 public class CustomOutputStream extends OutputStream {
 	private JTextArea output;
-    private ArrayList<Byte> bytes = new ArrayList<>();
+    private byte[] bytes = new byte[128000]; //not like 100kb of ram is a lot
+    private int currentBytePos = 0;
 
     public CustomOutputStream(JTextArea ta) {
         this.output = ta;
@@ -24,16 +25,11 @@ public class CustomOutputStream extends OutputStream {
 
     @Override
     public void write(int i) throws IOException {
-        bytes.add((byte)i);
+        currentBytePos++;
+        bytes[i] = (byte)i;
 
-        byte[] array = new byte[bytes.size()];
-        int q = 0;
-        for (Byte current : bytes) {
-            array[q] = current;
-            q++;
-        }
         try {
-            output.setText(new String(array, "UTF-8"));
+            output.setText(new String(bytes, "UTF-8"));
             output.setCaretPosition(output.getText().length());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();

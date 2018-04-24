@@ -200,7 +200,7 @@ public class EmulatorImport {
 	//storeEmuScreenshot() takes a screenshot of the whole emulator, while storeEmuScreen() only takes a screenshot of the calculator screen.
 	public void storeEmuScreenshot() {
 		try {
-			findEmulator();
+			if (findEmulator() == null) return;
 			user32.SetForegroundWindow(emulatorHWND);
 			ImageIO.write(getEmuScreenshot(), "png", new File(System.getProperty("user.home")+"/emulator.png"));
 			System.out.println("Saved emulator screenshot at "+System.getProperty("user.home")+"/emulator.png");
@@ -211,7 +211,7 @@ public class EmulatorImport {
 	
 	public void storeEmuScreen() {
 		try {
-			findEmulator();
+			if (findEmulator() == null) return;
 			user32.SetForegroundWindow(emulatorHWND);
 			ImageIO.write(getEmuScreen(), "png", new File(System.getProperty("user.home")+"/screen.png"));
 			System.out.println("Saved calculator screenshot at " + System.getProperty("user.home")+"/screen.png");

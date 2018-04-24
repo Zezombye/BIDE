@@ -26,12 +26,34 @@ public class G1MParser {
 	public void divideG1MIntoParts() {
 		int fileIndex = 32;
 		while (fileIndex < fileContent.length()) {
-			//Seek the size of the subpart and add size of header which is 44 bytes long
+			
+			//Check if there are subparts
+			//If so, skip them (since they are not a program, capture, or picture)
+			//Note: this is very dirty
+			if (fileContent.charAt(fileIndex+0x13) > 1) {
+				int nbSubparts = fileContent.charAt(fileIndex+0x13);
+				//System.out.println("found something with "+nbSubparts+" subparts");
+				fileIndex += 0x14;
+				for (int h = 0; h < nbSubparts; h++) {
+					//System.out.println("parsing subpart "+fileContent.substring(8+fileIndex, 16+fileIndex));
+					int partSize = 0x18;
+					for (int i = 0; i < 4; i++) {
+						partSize += ((fileContent.charAt(fileIndex+0x11+i)&0xFF)<<(8*(3-i)));
+					}
+					//System.out.println("has part size of "+partSize);
+					fileIndex += partSize;
+				}
+				continue;
+			}
+			
+			//Seek the size of the part and add size of header which is 44 bytes long
 			//Lots of magic numbers in there
 			int partSize = 44;
 			for (int i = 0; i < 4; i++) {
 				partSize += ((fileContent.charAt(fileIndex+37+i)&0xFF)<<(8*(3-i)));
 			}
+			//CasioString currentPart = fileContent.substring(fileIndex);
+			//System.out.println("Parsing current part "+getPartName(currentPart)+", type "+getPartType(currentPart));
 			//fileContent.charAt(fileIndex+37)*16777216 + fileContent.charAt(fileIndex+38)*65536 + fileContent.charAt(fileIndex+39)*256 + fileContent.charAt(fileIndex+40) + 44;
 			parts.add(fileContent.substring(fileIndex, fileIndex+partSize));
 			fileIndex += partSize;

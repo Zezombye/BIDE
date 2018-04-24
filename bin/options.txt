@@ -7,6 +7,9 @@ allowUnicode=true
 #If you don't want auto-completion, set to false
 autocomplete=true
 
+#Set to "true" for various optimizations. Warning: this removes comments, as they slow down the interpreter!
+optimize=false
+
 #Font of programs. Warning: only change if you have a font that supports ALL the glyphs! (or disable unicode)
 #Default font: "DejaVu Avec Casio"
 #Casio font: "Casio Graph"
@@ -16,8 +19,8 @@ progFontName=DejaVu Avec Casio
 #For DejaVu Avec Casio, a minimum of 14 is required for all glyphs to display properly
 progFontSize=14
 
-#Picture font size, if you have a small screen it can help seeing the whole picture.
-pictFontSize=12
+#Default picture zoom size.
+pictZoom=6
 
 #Background color
 bgColor=FFFFFF
@@ -32,8 +35,6 @@ hlColor=EEEEEE
 keywordColor=0000FF
 operatorColor=0080FF
 variableColor=8000FF
-#border color doesn't work for now
-borderColor=808080
 strColor=808080
 entityColor=FF8000
 commentColor=008000
@@ -72,9 +73,10 @@ spacesFor\!\==true
 #=>
 spacesFor\=>=true
 
-#Set to true if, when saving to g1m, you want to test the g1m on the emulator
-#Note that it requires the Manager PLUS emulator.
-useEmulator=false
+#Set to "calculator" to test on the calculator (requires the BIDE Add-In)
+#or to "emulator" to test on the emulator (requires the Manager PLUS emulator).
+#Else, set to "none".
+runOn=none
 
 #If BIDE can't find the emulator screen, you may need to set the dimensions manually.
 #To do that, take a screenshot of the emulator (Tools->Take emulator screenshot).
@@ -86,3 +88,6 @@ screenY=189
 #Note that you must also replace the reference images in the .jar.
 screenWidth=256
 screenHeight=128
+
+#Do not change this!
+version=4.0

@@ -215,7 +215,7 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		String result = syntax + desc + example + compatibility;
 		
 		//Hide opcodes without documentation
-		if (result.equals("")) return null;
+		//if (result.equals("")) return null;
 		
 		if (o.unicode != null && o.unicode.length() == 1) {
 			result += "<b>Unicode : </b>U+"+Integer.toHexString(o.unicode.codePointAt(0))+"<br>";

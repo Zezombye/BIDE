@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
@@ -61,23 +62,6 @@ public class UI {
 			e.printStackTrace();
 		}
 		
-		//Set default font
-		/*java.util.Enumeration<Object> keys = UIManager.getDefaults().keys();
-		FontUIResource fontUI = new FontUIResource(BIDE.progFont);
-	    while (keys.hasMoreElements())
-	    {
-	        Object key = keys.nextElement();
-	        Object value = UIManager.get(key);
-	        if (value instanceof FontUIResource)
-	        {
-	        	System.out.println(key);
-	            UIManager.put(key, BIDE.progFont);
-	        }
-	    }*/
-
-	    //UIManager.put("Label.font", new Font(BIDE.options.getProperty("progFontName"), Font.PLAIN, 12));
-	    //UIManager.put("List.font", new Font(BIDE.options.getProperty("progFontName"), Font.PLAIN, 12));
-	    
 		jtp = new JTabbedPane() {
 			@Override public void addTab(String name, Component comp) {
 				super.addTab(name, comp);
@@ -88,6 +72,7 @@ public class UI {
 		//Is overridden by the label font at ButtonTabComponent
 		//jtp.setFont(new Font(BIDE.options.getProperty("progFontName"), Font.PLAIN, 12));
 		jfc = new JFileChooser();
+		jfc.setMultiSelectionEnabled(true);
 		
 		window = new JFrame();
 		window.setTitle("BIDE v"+BIDE.VERSION+" by Zezombye");
@@ -116,7 +101,7 @@ public class UI {
 			System.setErr(printStream);
 		}
 		stdout.setBackground(Color.ORANGE);
-		stdout.setFont(BIDE.dispFont);
+		stdout.setFont(new Font("DejaVu Avec Casio", 12, Font.PLAIN));
 		stdout.setLineWrap(true);
 		JScrollPane jsp2 = new JScrollPane(stdout);
 		jsp2.setPreferredSize(new Dimension(sidebarWidth, 200));
@@ -154,14 +139,14 @@ public class UI {
 		open.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				openFile();
+				openFile(false);
 			}
 		});
 		ToolbarButton save = new ToolbarButton("saveFile.png", "Save file");
 		save.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				saveFile();
+				saveFile(true);
 			}
 		});
 		
@@ -195,6 +180,13 @@ public class UI {
 			}
 		});
 		
+		ToolbarButton run = new ToolbarButton("run.png", "Save & run");
+		run.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				
+			}
+		});
+		
 		/*ToolbarButton dispOpcodes = new ToolbarButton("opcodes.png", "Show opcodes");
 		dispOpcodes.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
@@ -207,6 +199,9 @@ public class UI {
 		menuBar.add(newProg);
 		menuBar.add(newPict);
 		menuBar.add(newCapt);
+		if (!BIDE.options.getProperty("runOn").equals("none")) {
+			menuBar.add(run);
+		}
 		//menuBar.add(dispOpcodes);
 		
 		menuBar.setPreferredSize(new Dimension(100, 25));
@@ -214,37 +209,43 @@ public class UI {
 		window.add(menuBar, BorderLayout.NORTH);
 		
 		JMenuBar menuBar2 = new JMenuBar();
-		JMenu openMenu = new JMenu("Open");
-		menuBar2.add(openMenu);
+		JMenu fileMenu = new JMenu("File");
+		menuBar2.add(fileMenu);
 		JMenuItem importFile = new JMenuItem("Open Basic Casio file");
 		importFile.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent e) {
-				openFile();
+				openFile(false);
 			}
 		});
-		openMenu.add(importFile);
-		JMenu saveMenu = new JMenu("Save");
-		menuBar2.add(saveMenu);
+		fileMenu.add(importFile);
+		JMenuItem addToFile = new JMenuItem("Open & add to current file");
+		addToFile.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent e) {
+				openFile(true);
+			}
+		});
+		fileMenu.add(addToFile);
+		
 		JMenuItem saveg1m = new JMenuItem("Save to g1m");
 		saveg1m.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent e) {
 				try {
 					BIDE.pathToSavedG1M = BIDE.pathToSavedG1M.substring(0, BIDE.pathToSavedG1M.lastIndexOf("."))+".g1m";
 				} catch (Exception e1) {}
-				saveFile();
+				saveFile(true);
 			}
 		});
-		saveMenu.add(saveg1m);
+		fileMenu.add(saveg1m);
 		JMenuItem saveTxt = new JMenuItem("Save to .bide file");
 		saveTxt.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent e) {
 				try {
 					BIDE.pathToSavedG1M = BIDE.pathToSavedG1M.substring(0, BIDE.pathToSavedG1M.lastIndexOf("."))+".bide";
 				} catch (Exception e1) {}
-				saveFile();
+				saveFile(false);
 			}
 		});
-		saveMenu.add(saveTxt);
+		fileMenu.add(saveTxt);
 		JMenu toolsMenu = new JMenu("Tools");
 		menuBar2.add(toolsMenu);
 		JMenuItem multiDrawstat = new JMenuItem("Multi Drawstat Generator");
@@ -293,20 +294,27 @@ public class UI {
 			}
 		});
 		toolsMenu.add(showColoration);
+		
+		JMenu emulatorMenu = new JMenu("Emulator");
+		
+		if (BIDE.options.getProperty("testOn").equals("emulator")) {
+			menuBar2.add(emulatorMenu);
+		}
+		
 		JMenuItem takeEmuScreenshot = new JMenuItem("Take emulator screenshot");
 		takeEmuScreenshot.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
 				BIDE.autoImport.storeEmuScreenshot();
 			}
 		});
-		toolsMenu.add(takeEmuScreenshot);
+		emulatorMenu.add(takeEmuScreenshot);
 		JMenuItem takeEmuScreenScreenshot = new JMenuItem("Take emulator screen screenshot");
 		takeEmuScreenScreenshot.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
 				BIDE.autoImport.storeEmuScreen();
 			}
 		});
-		toolsMenu.add(takeEmuScreenScreenshot);
+		emulatorMenu.add(takeEmuScreenScreenshot);
 		JMenuItem benchmark = new JMenuItem("Run benchmark");
 		benchmark.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
@@ -317,7 +325,7 @@ public class UI {
 				}).start();
 			}
 		});
-		toolsMenu.add(benchmark);
+		emulatorMenu.add(benchmark);
 		window.setJMenuBar(menuBar2);
 
 		window.setVisible(true);
@@ -341,10 +349,10 @@ public class UI {
 			String name;
 			String size;
 			if (type == BIDE.TYPE_PICT) {
-				name = "PICT"+JOptionPane.showInputDialog(BIDE.ui.window, "Picture number:", "New picture", JOptionPane.QUESTION_MESSAGE);
+				name = "PICT"+JOptionPane.showInputDialog(BIDE.ui.window, "Picture number (1-20):", "New picture", JOptionPane.QUESTION_MESSAGE);
 				size = "800";
 			} else {
-				name = "CAPT"+JOptionPane.showInputDialog(BIDE.ui.window, "Capture number:", "New capture", JOptionPane.QUESTION_MESSAGE);
+				name = "CAPT"+JOptionPane.showInputDialog(BIDE.ui.window, "Capture number (1-20):", "New capture", JOptionPane.QUESTION_MESSAGE);
 				size = "400";
 			}
 			if (name.endsWith("null")) return;
@@ -462,56 +470,85 @@ public class UI {
 	    }
 	}
 	
-	public void openFile() {
+	public void openFile(boolean addToCurrentFile) {
     	jfc.setCurrentDirectory(new File(BIDE.pathToG1M));
 		
-		File input = null; 
+		File[] input = null;
 		if (jfc.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
-			input = jfc.getSelectedFile();
+			input = new File[] {jfc.getSelectedFile()};
 		}
 		
 	    if (input != null) {
-	    	BIDE.pathToG1M = input.getPath();
-	    	BIDE.pathToSavedG1M = "";
+	    	
+	    	final File[] input2 = input;
 	    	new Thread(new Runnable() {
 		    	public void run() {
-		    		BIDE.g1mparts = new ArrayList<G1MPart>();
-				    try {
-				    	G1MParser g1mparser = new G1MParser(BIDE.pathToG1M);
-						g1mparser.readG1M();
-						
-						if (!g1mparser.checkValidity()) {
-							BIDE.readFromTxt(BIDE.pathToG1M);
-				    	} else {
-				    		BIDE.readFromG1M(BIDE.pathToG1M);
-				    	}
-				    	BIDE.pathToSavedG1M = "";
-				    	jtp.removeAll();
-			    		for (int i = 0; i < BIDE.g1mparts.size(); i++) {
-			    			jtp.addTab(BIDE.g1mparts.get(i).name, BIDE.g1mparts.get(i).comp);
-			    			//jtp.setTabComponentAt(i, new ButtonTabComponent(jtp));
-			    			try {
-								Thread.sleep(100);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
+		    		
+		    		for (int i = 0; i < input2.length; i++) {
+				    		BIDE.pathToG1M = input2[i].getPath();
+				    		BIDE.pathToSavedG1M = "";
+			    		if (!addToCurrentFile) {
+			    			BIDE.g1mparts = new ArrayList<G1MPart>();
 			    		}
-				    } catch (NullPointerException e) {
-				    	if (BIDE.debug) e.printStackTrace();
-				    } catch (NoSuchFileException e) {
-				    	BIDE.error("The file at \"" + BIDE.pathToG1M + "\" does not exist.");
-				    } catch (AccessDeniedException e) {
-				    	BIDE.error("BIDE is denied access to the file at \"" + BIDE.pathToG1M + "\"");
-				    } catch (IOException e) {
-						e.printStackTrace();
-					}
-				    if (BIDE.g1mparts.size() != 0) {
-					    System.out.println("Finished loading g1m");
-				    	
-				    }
-				    
+					    try {
+					    	G1MParser g1mparser = new G1MParser(BIDE.pathToG1M);
+							g1mparser.readG1M();
+							
+							if (!g1mparser.checkValidity()) {
+								BIDE.readFromTxt(BIDE.pathToG1M);
+					    	} else {
+					    		BIDE.readFromG1M(BIDE.pathToG1M);
+					    	}
+					    	BIDE.pathToSavedG1M = "";
+					    	
+					    	BIDE.g1mparts.sort(new Comparator<G1MPart>() {
+
+								@Override
+								public int compare(G1MPart arg0, G1MPart arg1) {
+									if (arg0.type == arg1.type) {
+										return arg0.name.compareTo(arg1.name);
+									} else {
+										if (arg0.type < arg1.type) {
+											return -1;
+										} else if (arg0.type > arg1.type){
+											return 1;
+										} else {
+											return 0;
+										}
+									}
+								}
+					    	});
+					    	
+					    	
+					    } catch (NullPointerException e) {
+					    	if (BIDE.debug) e.printStackTrace();
+					    } catch (NoSuchFileException e) {
+					    	BIDE.error("The file at \"" + BIDE.pathToG1M + "\" does not exist.");
+					    } catch (AccessDeniedException e) {
+					    	BIDE.error("BIDE is denied access to the file at \"" + BIDE.pathToG1M + "\"");
+					    } catch (IOException e) {
+							e.printStackTrace();
+						}
+					    if (BIDE.g1mparts.size() != 0) {
+						    System.out.println("Finished loading g1m");
+					    	
+					    }
+					    
+			    	}
+			    	
+			    	jtp.removeAll();
+		    		for (int i = 0; i < BIDE.g1mparts.size(); i++) {
+		    			jtp.addTab(BIDE.g1mparts.get(i).name, BIDE.g1mparts.get(i).comp);
+		    			//jtp.setTabComponentAt(i, new ButtonTabComponent(jtp));
+		    			/*try {
+							Thread.sleep(5);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}*/
+		    		}
 		    	}
 		    }).start();
+	    	
 	    	
 		    try {
 		    	getTextPane().setCaretPosition(0);
@@ -521,7 +558,7 @@ public class UI {
 	    }
     }
 	
-	public void saveFile() {
+	public void saveFile(boolean saveToG1M) {
 		
 		if (BIDE.pathToSavedG1M.isEmpty()) {
 			BIDE.pathToSavedG1M = BIDE.pathToG1M;
@@ -537,11 +574,20 @@ public class UI {
 				
 				if (input != null) {
 					BIDE.pathToSavedG1M = input.getAbsolutePath();
+					
+					//Check for extension
 					try {
-						if (BIDE.pathToSavedG1M.endsWith(".bide") || BIDE.pathToSavedG1M.endsWith(".txt")) {
-							BIDE.writeToTxt(input.getPath());
-						} else {
+						BIDE.pathToSavedG1M.substring(BIDE.pathToSavedG1M.lastIndexOf('.'));
+					} catch (StringIndexOutOfBoundsException e) {
+						BIDE.error("Please input an extension (.bide or .g1m)");
+						return;
+					}
+					
+					try {
+						if (saveToG1M && !BIDE.pathToSavedG1M.endsWith(".bide") && !BIDE.pathToSavedG1M.endsWith(".txt")) {
 							BIDE.writeToG1M(input.getPath());
+						} else {
+							BIDE.writeToTxt(input.getPath());
 						}
 					} catch (NullPointerException e) {
 						if (BIDE.debug) e.printStackTrace();
@@ -556,6 +602,8 @@ public class UI {
 	    	}
 		}).start();
 	}
+	
+	
 	
 	public void importPict() {
 		JFileChooser jfc = new JFileChooser();
@@ -588,13 +636,16 @@ public class UI {
 	    if (input != null) {
 	    	try {
 				BufferedImage img = ImageIO.read(input);
-				if (img.getHeight() != 64 || img.getWidth() != 128) {
-					BIDE.error("Image must be 128*64!");
+				if (img.getWidth() != 128) {
+					BIDE.error("Image must be 128 pixels wide!");
 					return;
 				}
-				Byte[] binary = new Byte[0x400];
+				if (img.getHeight() > 128) {
+					BIDE.error("Image must be a maximum of 128 pixels high!");
+				}
+				Byte[] binary = new Byte[0x800];
 				Arrays.fill(binary, (byte)0);
-				for (int j = 0; j < 64; j++) {
+				for (int j = 0; j < img.getHeight(); j++) {
 					for (int i = 0; i < 128; i++) {
 						if (img.getRGB(i, j) == Color.BLACK.getRGB()) {
 							binary[i/8+16*j] = (byte)(binary[i/8+16*j] | (0b10000000 >> (i%8)));
@@ -606,7 +657,7 @@ public class UI {
 				}
 				//System.out.println(binary);
 				String imgName = input.getName().substring(0, input.getName().lastIndexOf('.'));
-				this.jtp.addTab(imgName, new G1MPart(imgName, "800", binary, BIDE.TYPE_PICT).comp);
+				this.jtp.addTab(imgName, new G1MPart(imgName, Integer.toHexString(128*img.getHeight()), binary, BIDE.TYPE_PICT).comp);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

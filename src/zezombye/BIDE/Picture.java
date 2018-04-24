@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,18 +14,24 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
 
 /*class PictPane extends JScrollPane {
 	
@@ -51,6 +58,7 @@ public class Picture extends JPanel {
 	PictPanel pictPanel = new PictPanel(0);
 	PictPanel pictPanel2 = new PictPanel(1);
 	JButton setSizeButton = new JButton("Set size");
+	JButton exportPictButton = new JButton("Save to .png");
 	JLabel pictTutorial = new JLabel("Left click for black, right click for white, ctrl+scroll to zoom");
 	JLabel pictWarning = new JLabel("Do not edit the picture below unless you know what you are doing!");
 	
@@ -85,6 +93,7 @@ public class Picture extends JPanel {
 		namejtf = new JTextField(name);
 		namejtf.setPreferredSize(new Dimension(50, 20));
 		namePanel.add(namejtf);
+		this.name = name;
 		
 		this.setPreferredSize(new Dimension(1000, 1000));
 		
@@ -105,6 +114,7 @@ public class Picture extends JPanel {
 		sizejtf.setPreferredSize(new Dimension(25, 20));
 		sizePanel.add(sizejtf);
 		this.add(setSizeButton);
+		this.add(exportPictButton);
 		
 		if (type == BIDE.TYPE_CAPT) {
 			sizePanel.setVisible(false);
@@ -140,10 +150,78 @@ public class Picture extends JPanel {
 			
 		});
 		
+		exportPictButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				exportPict();
+			}
+		});
+		
 		positionComponents();
-		setZoom(6);
+		setZoom(Integer.parseInt(BIDE.options.getProperty("pictZoom")));
 		setPictSize(size);
 		this.type = type;
+	}
+	
+	public void exportPict() {
+		JFileChooser jfc = new JFileChooser();
+		jfc.setFileFilter(new FileFilter() {
+			@Override
+			public boolean accept(File file) {
+				if (file.isDirectory()) {
+					return true;
+				}
+				try {
+					String extension = file.getPath().substring(file.getPath().lastIndexOf('.')).toLowerCase();
+					if (extension.equals(".png")) {
+						return true;
+					}
+				} catch (Exception e) {}
+				return false;
+			}
+
+			@Override
+			public String getDescription() {
+				return "PNG files (.png)";
+			}
+		});
+		
+		jfc.setSelectedFile(new File(this.name+".png"));
+		File input = null; 
+		if (jfc.showSaveDialog(BIDE.ui.window) == JFileChooser.APPROVE_OPTION) {
+			input = jfc.getSelectedFile();
+		}
+				
+	    if (input != null) {
+	    	try {
+	    		
+	    		BufferedImage image = new BufferedImage(128, (this.size+15)/16, BufferedImage.TYPE_INT_RGB);
+	    		//System.out.println("pixels = "+Arrays.toString(pictPanel.pixels));
+	    		if (this.size <= 0x400) {
+	    			for (int i = 0; i < this.size*8; i++) {
+		    			if ((pictPanel.pixels[i/8] & (0b10000000 >> i%8)) == 0) {
+		    				image.setRGB(i%128, i/128, Color.WHITE.getRGB());
+		    			}
+		    		}
+	    		} else {
+	    			for (int i = 0; i < 0x400*8; i++) {
+		    			if ((pictPanel.pixels[i/8] & (0b10000000 >> i%8)) == 0) {
+		    				image.setRGB(i%128, i/128, Color.WHITE.getRGB());
+		    			}
+		    		}
+	    			for (int i = 0; i < (this.size-0x400)*8; i++) {
+		    			if ((pictPanel2.pixels[i/8] & (0b10000000 >> i%8)) == 0) {
+		    				image.setRGB(i%128, i/128+64, Color.WHITE.getRGB());
+		    			}
+		    		}
+	    		}
+	    		
+	    		ImageIO.write(image, "png", input);
+	    		
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	    }
 	}
 	
 	public void setZoom(int zoom) {
@@ -192,6 +270,7 @@ public class Picture extends JPanel {
 		namePanel.setBounds(1, 1, namePanel.getPreferredSize().width, namePanel.getPreferredSize().height);
 		sizePanel.setBounds(namePanel.getX()+100, namePanel.getY(), sizePanel.getPreferredSize().width, sizePanel.getPreferredSize().height);
 		setSizeButton.setBounds(sizePanel.getX()+100, sizePanel.getY()+3, setSizeButton.getPreferredSize().width, setSizeButton.getPreferredSize().height);
+		exportPictButton.setBounds(setSizeButton.getX()+setSizeButton.getWidth()+10, sizePanel.getY()+3, exportPictButton.getPreferredSize().width, exportPictButton.getPreferredSize().height);
 		pictTutorial.setBounds(namePanel.getX()+5, namePanel.getY()+34, pictTutorial.getPreferredSize().width, pictTutorial.getPreferredSize().height);
 		pictPanel.setBounds(pictTutorial.getX(), pictTutorial.getY()+16, pictPanel.getPreferredSize().width, pictPanel.getPreferredSize().height);
 		pictWarning.setBounds(pictTutorial.getX(), pictPanel.getY()+pictPanel.getHeight()+12, pictWarning.getPreferredSize().width, pictWarning.getPreferredSize().height);
