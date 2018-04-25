@@ -84,7 +84,7 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		final Color keywordColor = new Color(Integer.parseInt(BIDE.options.getProperty("keywordColor"), 16));
 		final Color operatorColor = new Color(Integer.parseInt(BIDE.options.getProperty("operatorColor"), 16));
 		final Color variableColor = new Color(Integer.parseInt(BIDE.options.getProperty("variableColor"), 16));
-		final Color borderColor = new Color(Integer.parseInt(BIDE.options.getProperty("borderColor"), 16));
+		//final Color borderColor = new Color(Integer.parseInt(BIDE.options.getProperty("borderColor"), 16));
 		final Color strColor = new Color(Integer.parseInt(BIDE.options.getProperty("strColor"), 16));
 		final Color entityColor = new Color(Integer.parseInt(BIDE.options.getProperty("entityColor"), 16));
 		final Color commentColor = new Color(Integer.parseInt(BIDE.options.getProperty("commentColor"), 16));
@@ -100,7 +100,7 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		ss.setStyle(Token.MARKUP_ENTITY_REFERENCE, new Style(entityColor));
 		ss.setStyle(Token.PREPROCESSOR, new Style(preprocessorColor));
 		ss.setStyle(Token.FUNCTION, new Style(new Color(Integer.parseInt(BIDE.options.getProperty("textColor"), 16))));
-		ss.setStyle(Token.DATA_TYPE, new Style(borderColor));
+		//ss.setStyle(Token.DATA_TYPE, new Style(borderColor));
 		
 		
 		

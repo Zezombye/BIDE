@@ -35,7 +35,7 @@ abcdefghijklmnopqrstuvwxyz
 0088 - 
 008B - ²
 008C - 
-0090 - &x;
+(Prizm) 0090 - &x;
 0096 - &cbrt;
 0098 - 
 009B - 

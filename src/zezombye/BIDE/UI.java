@@ -108,6 +108,7 @@ public class UI {
 		//sidebar.setLayout(new BorderLayout());
 		sidebar.add(new JLabel("Console output"));
 		sidebar.add(jsp2);
+		sidebar.add(new CharPicker());
 		if (!BIDE.debug) window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		
 		jfc.setFileFilter(new FileFilter() {
@@ -297,7 +298,7 @@ public class UI {
 		
 		JMenu emulatorMenu = new JMenu("Emulator");
 		
-		if (BIDE.options.getProperty("testOn").equals("emulator")) {
+		if (BIDE.options.getProperty("runOn").equals("emulator")) {
 			menuBar2.add(emulatorMenu);
 		}
 		

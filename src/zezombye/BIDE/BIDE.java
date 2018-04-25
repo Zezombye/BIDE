@@ -60,7 +60,7 @@ public class BIDE {
 	public final static int TYPE_CHARLIST = 7;
 	public static boolean debug = false;
 	//public static Font progFont = new Font("DejaVu Sans Mono", Font.PLAIN, 12);
-	public static Font progFont, pictFont, dispFont;
+	public static Font progFont, dispFont;
 	//public static Font dispFont = new Font("DejaVu Sans Mono", Font.PLAIN, 13);
 	 
 	public final static String pictTutorial = 
@@ -147,17 +147,17 @@ public class BIDE {
 			
 			progFont = new Font(options.getProperty("progFontName"), Font.TRUETYPE_FONT, Integer.parseInt(options.getProperty("progFontSize")));
 			dispFont = progFont;
-			if (options.getProperty("useEmulator").equals("true")) {
+			if (options.getProperty("runOn").equals("emulator")) {
 				autoImport = new EmulatorImport();
 			}
-			pictFont = new Font("DejaVu Avec Casio", Font.TRUETYPE_FONT, Integer.parseInt(options.getProperty("pictFontSize")));
 			ui.createAndDisplayUI();
 			ProgramTextPane.initAutoComplete();
 			
 			//ui.jtp.addTab("test", new Program("test1", "800", "testcontent", TYPE_PICT).comp);
+			
 			//ui.createNewTab(TYPE_COLORATION);
 			//ui.createNewTab(TYPE_PICT);
-			ui.jtp.addTab("testPict", new Picture(BIDE.TYPE_PICT, "PICT10", 0x400, new Byte[] {(byte)0b10001011, 0b00100101, 0b01001010, 0b00010011}).jsp);
+			//ui.jtp.addTab("testPict", new Picture(BIDE.TYPE_PICT, "PICT10", 0x400, new Byte[] {(byte)0b10001011, 0b00100101, 0b01001010, 0b00010011}).jsp);
 			//((ProgScrollPane)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
 			
 			//new AutoImport().autoImport("C:\\Users\\Catherine\\Desktop\\PUISS4.g1m");
@@ -647,7 +647,7 @@ public class BIDE {
 					continue;
 				}
 				
-				if (currentPosIsComment) {
+				if (currentPosIsComment && BIDE.options.getProperty("optimize").equals("true")) {
 					continue;
 				}
 				
