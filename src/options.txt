@@ -90,4 +90,4 @@ screenWidth=256
 screenHeight=128
 
 #Do not change this!
-version=4.0
+version=1.0

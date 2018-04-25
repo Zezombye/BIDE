@@ -380,7 +380,49 @@ public class BIDE {
 					}*/
 					if (lines[i].startsWith("#define ")) {
 						try {
-							macros.add(new Macro(lines[i].substring(8, lines[i].indexOf(' ', 8)), lines[i].substring(lines[i].indexOf(' ', 8)+1)));
+							
+							String macro = lines[i].substring(8);
+							String text, replacement;
+							String[] args = null;
+							if (macro.indexOf(")") > 0 && macro.substring(0, macro.indexOf(")")+1).matches("\\w+\\([\\w, ]+\\)")) {
+								//It's a function macro
+								text = macro.substring(0, macro.indexOf(")")+1);
+								System.out.println("Found function macro "+text);
+								
+								text = text.replaceAll(" ", "");
+								args = text.substring(text.indexOf("(")+1, text.indexOf(")")).split(",");
+								System.out.println("args : "+Arrays.toString(args));
+							} else {
+								try {
+									text = macro.substring(0, macro.indexOf(" "));
+								} catch (StringIndexOutOfBoundsException e) {
+									text = macro;
+								}
+								System.out.println("Found macro "+text);
+							}
+							//Check for empty defines
+							if (macro.length() == text.length()) {
+								replacement = "";
+							} else {
+								replacement = macro.substring(text.length()+1);
+								System.out.println("replacement = "+replacement);
+								if (args != null) {
+									if (replacement.indexOf("%") >= 0) {
+										error(currentPart.name, i+1, "Function macros cannot contain percents! Use hex escape.");
+										return;
+									}
+									for (int j = 0; j < args.length; j++) {
+										String oldReplacement = replacement;
+										replacement = replacement.replaceAll("(?<!\\w)"+args[j]+"(?!\\w)", "%"+args[j]+"%");
+										if (oldReplacement.equals(replacement)) {
+											error(currentPart.name, i+1, "Argument "+args[j]+" is not used in replacement!");
+											return;
+										}
+									}
+								}
+							}
+							System.out.println("replacement = "+replacement);
+							macros.add(new Macro(text, replacement, args));
 						} catch (StringIndexOutOfBoundsException e) {
 							error(currentPart.name, i+1, "Invalid macro declaration!");
 							return;
@@ -670,12 +712,82 @@ public class BIDE {
 				if (!allowUnknownOpcodes && !currentPosIsString && !currentPosIsComment) {
 					boolean foundMacro = false;
 					for (int j = 0; j < macros.size(); j++) {
-						if (lines[h].startsWith(macros.get(j).text, i)) {
-							lines[h] = lines[h].substring(0, i) + macros.get(j).replacement + lines[h].substring(i+macros.get(j).text.length());
-							foundMacro = true;
-							//System.out.println(lines[h]);
-							break;
+						if (macros.get(j).isFunction) {
+							
+							if (lines[h].startsWith(macros.get(j).text.substring(0, macros.get(j).text.indexOf("(")+1), i)) {
+								
+								System.out.println("Found match for function macro "+macros.get(j).text);
+								//Get location of closing parenthesis
+								int depth = 0;
+								int beginParenthesisIndex = lines[h].indexOf("(", i);
+								int k = 0;
+								boolean currentPosIsString2 = false;
+								boolean escapeNextChar2 = false;
+								ArrayList<Integer> commaPos = new ArrayList<Integer>();
+								commaPos.add(beginParenthesisIndex);
+								try {
+									for (k = beginParenthesisIndex+1;; k++) {
+										if (lines[h].charAt(k) == '"' && !escapeNextChar2) {
+											currentPosIsString2 = !currentPosIsString2;
+										}
+										if (lines[h].charAt(k) == '\\' && !escapeNextChar2) {
+											escapeNextChar2 = true;
+										} else {
+											escapeNextChar2 = false;
+										}
+										if (lines[h].charAt(k) == ',' && !currentPosIsString2) {
+											commaPos.add(k);
+										}
+										if (lines[h].charAt(k) == '(' && !currentPosIsString2) {
+											depth++;
+										}
+										if (lines[h].charAt(k) == ')' && !currentPosIsString2) {
+											depth--;
+											if (depth == -1) {
+												break;
+											}
+										}
+									}
+								} catch (StringIndexOutOfBoundsException e) {
+									e.printStackTrace();
+									return null;
+								}
+								
+								commaPos.add(k);
+								
+								int nbArgs = commaPos.size()-1;
+								if (nbArgs != macros.get(j).args.length) {
+									continue;
+								}
+								
+								String[] args = new String[nbArgs];
+								
+								for (int l = 0; l < nbArgs; l++) {
+									args[l] = lines[h].substring(commaPos.get(l)+1, commaPos.get(l+1));
+								}
+								
+								System.out.println("args = "+Arrays.toString(args));
+								String replacement = macros.get(j).replacement;
+								for (int l = 0; l < nbArgs; l++) {
+									replacement = replacement.replaceAll("%"+macros.get(j).args[l]+"%", args[l].replaceAll("\\\\", "\\\\\\\\"));
+								}
+								System.out.println("Replacement : "+replacement);
+								lines[h] = lines[h].substring(0, i) + replacement + lines[h].substring(k+1);
+								foundMacro = true;
+								break;
+								
+							}
+							
+						} else {
+
+							if (lines[h].startsWith(macros.get(j).text, i)) {
+								lines[h] = lines[h].substring(0, i) + macros.get(j).replacement + lines[h].substring(i+macros.get(j).text.length());
+								foundMacro = true;
+								//System.out.println(lines[h]);
+								break;
+							}
 						}
+							
 					}
 					/*if (foundMacro) {
 						i--;
@@ -826,7 +938,7 @@ public class BIDE {
 			if (content.charAt(i) == '\'' && !currentPosIsString) {
 				currentPosIsComment = true;
 			}
-			if (content.charAt(i) == '\r' && !currentPosIsString) {
+			if ((content.charAt(i) == '\r' || content.charAt(i) == ':') && !currentPosIsString) {
 				currentPosIsComment = false;
 			}
 			
@@ -1008,6 +1120,8 @@ public class BIDE {
 	
 	public static void initMacros() {
 		
+		defaultMacros = new ArrayList<Macro>();
+		
 		defaultMacros.add(new Macro("!=", "!="));
 		defaultMacros.add(new Macro("!", "Not "));
 		defaultMacros.add(new Macro("&&", " And "));
@@ -1030,7 +1144,8 @@ public class BIDE {
 		defaultMacros.add(new Macro("topLeftVWin()", "ViewWindow 1,127,0,63,1,0"));
 		defaultMacros.add(new Macro("bottomLeftVWin()", "ViewWindow 1,127,0,1,63,0"));
 		defaultMacros.add(new Macro("initGraphScreen()", "AxesOff\nLabelOff\nGridOff\nBG-None\nClrGraph\nViewWindow 1,127,0,63,1,0,0,1,1"));
-		//add macro ClrLine(x)
+		
+		defaultMacros.add(new Macro("clrLine(i)", "Locate 1,%i%,\"                     \"", new String[]{"i"}));
 		
 		Object[] keyCodes = {
 			"key_f1", 79,

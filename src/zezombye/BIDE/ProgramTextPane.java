@@ -44,7 +44,7 @@ import org.fife.ui.rtextarea.RTextArea;
 
 public class ProgramTextPane extends RSyntaxTextArea {
 	
-	public static CompletionProvider cp;
+	public static DefaultCompletionProvider cp;
 	
 	public ProgramTextPane(int type) {
 		super();
@@ -191,18 +191,22 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	    		}
 	    	}
 	    }
+		cp = provider;
 	    for (int i = 0; i < BIDE.macros.size(); i++) {
 	    	if (BIDE.macros.get(i).text.length() > 1 && BIDE.macros.get(i).text.matches("[\\w\\(\\), ]+")) {
 	    		/*BasicCompletion bc = new BasicCompletion(provider, BIDE.macros.get(i).text, 2);
 	    		provider.addCompletion(bc);
 	    		System.out.println(bc.initialRelevance);*/
-	    		provider.addCompletion(new BasicCompletion(
-	    				provider, BIDE.macros.get(i).text, 2, generateHtmlSection(
-	    						"Resolves to:", convertToHtml("[code]"+BIDE.macros.get(i).replacement+"[/code]"))));
+	    		addMacroToCompletions(BIDE.macros.get(i));
 	    	}
 	    	
 	    }
-		cp = provider;
+	}
+	
+	public static void addMacroToCompletions(Macro macro) {
+		cp.addCompletion(new BasicCompletion(
+				cp, macro.text, 2, generateHtmlSection(
+						"Resolves to:", convertToHtml("[code]"+macro.replacement+"[/code]"))));
 	}
 	
 	public static String generateSummary(Opcode o) {
@@ -249,6 +253,8 @@ public class ProgramTextPane extends RSyntaxTextArea {
 				.replaceAll("\\[\\/code\\]", "</span></font>")
 				.replaceAll("(\\[img\\])([\\w\\/\\.]+)", "<img src='"+relativeImgPath+"$2")
 				.replaceAll("\\[\\/img\\]", "'/>")
+				.replaceAll("  ", "&nbsp;&nbsp;")
+				.replaceAll("\\t", "&#09;")
 				.replaceAll("\n", "<br>");
 	}
 	

@@ -108,6 +108,9 @@ public class UI {
 		//sidebar.setLayout(new BorderLayout());
 		sidebar.add(new JLabel("Console output"));
 		sidebar.add(jsp2);
+		
+		sidebar.add(new JLabel("                                                                                                                                      "));
+		sidebar.add(new JLabel("Character Picker"));
 		sidebar.add(new CharPicker());
 		if (!BIDE.debug) window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		
@@ -231,6 +234,9 @@ public class UI {
 		saveg1m.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent e) {
 				try {
+					if (BIDE.pathToSavedG1M.isEmpty()) {
+						BIDE.pathToSavedG1M = BIDE.pathToG1M;
+					}
 					BIDE.pathToSavedG1M = BIDE.pathToSavedG1M.substring(0, BIDE.pathToSavedG1M.lastIndexOf("."))+".g1m";
 				} catch (Exception e1) {}
 				saveFile(true);
@@ -241,6 +247,9 @@ public class UI {
 		saveTxt.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent e) {
 				try {
+					if (BIDE.pathToSavedG1M.isEmpty()) {
+						BIDE.pathToSavedG1M = BIDE.pathToG1M;
+					}
 					BIDE.pathToSavedG1M = BIDE.pathToSavedG1M.substring(0, BIDE.pathToSavedG1M.lastIndexOf("."))+".bide";
 				} catch (Exception e1) {}
 				saveFile(false);
@@ -476,7 +485,7 @@ public class UI {
 		
 		File[] input = null;
 		if (jfc.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
-			input = new File[] {jfc.getSelectedFile()};
+			input = jfc.getSelectedFiles();
 		}
 		
 	    if (input != null) {
@@ -484,13 +493,13 @@ public class UI {
 	    	final File[] input2 = input;
 	    	new Thread(new Runnable() {
 		    	public void run() {
-		    		
+		    		if (!addToCurrentFile) {
+		    			BIDE.g1mparts = new ArrayList<G1MPart>();
+		    		}
 		    		for (int i = 0; i < input2.length; i++) {
 				    		BIDE.pathToG1M = input2[i].getPath();
 				    		BIDE.pathToSavedG1M = "";
-			    		if (!addToCurrentFile) {
-			    			BIDE.g1mparts = new ArrayList<G1MPart>();
-			    		}
+			    		
 					    try {
 					    	G1MParser g1mparser = new G1MParser(BIDE.pathToG1M);
 							g1mparser.readG1M();
@@ -589,6 +598,9 @@ public class UI {
 							BIDE.writeToG1M(input.getPath());
 						} else {
 							BIDE.writeToTxt(input.getPath());
+						}
+						for (int i = 0; i < jtp.getTabCount(); i++) {
+							jtp.setTitleAt(i, BIDE.g1mparts.get(i).name);
 						}
 					} catch (NullPointerException e) {
 						if (BIDE.debug) e.printStackTrace();

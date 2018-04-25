@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 public class Options {
 	
+	public static final String VERSION = "1.0";
 	Properties options = new Properties();
 	
 	public void loadProperties() {
@@ -29,7 +30,7 @@ public class Options {
 			e.printStackTrace();
 		}
 		
-		if (options.getProperty("version") == null || options.getProperty("version").compareTo(BIDE.VERSION) < 0) {
+		if (options.getProperty("version") == null || options.getProperty("version").compareTo(Options.VERSION) < 0) {
 			System.out.println("Your option file is outdated, it has been replaced by the default file. Your options have been saved in the file options.txt.backup.");
 			try {
 				Files.copy(Paths.get(BIDE.pathToOptions), Paths.get(BIDE.pathToOptions+".backup"), StandardCopyOption.REPLACE_EXISTING);
