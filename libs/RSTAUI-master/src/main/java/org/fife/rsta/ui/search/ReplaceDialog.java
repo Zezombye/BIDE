@@ -461,7 +461,9 @@ public class ReplaceDialog extends AbstractFindReplaceDialog {
 	public void setVisible(boolean visible) {
 
 		if (visible) {
-
+			
+			this.statusBar.setLabel(" ");
+			
 			// Select text entered in the UI
 			String text = searchListener.getSelectedText();
 			if (text!=null) {
@@ -623,23 +625,23 @@ public class ReplaceDialog extends AbstractFindReplaceDialog {
 		}
 
 	}
+	
+	public class StatusBar extends JPanel {
 
+		private JLabel label;
+
+		public StatusBar() {
+			label = new JLabel(" ");
+			setLayout(new BorderLayout());
+			add(label, BorderLayout.LINE_START);
+			//add(new JLabel(new SizeGripIcon()), BorderLayout.LINE_END);
+		}
+
+		public void setLabel(String label) {
+			this.label.setText(label);
+		}
+
+	}
 
 }
 
-class StatusBar extends JPanel {
-
-	private JLabel label;
-
-	public StatusBar() {
-		label = new JLabel("Ready");
-		setLayout(new BorderLayout());
-		add(label, BorderLayout.LINE_START);
-		//add(new JLabel(new SizeGripIcon()), BorderLayout.LINE_END);
-	}
-
-	public void setLabel(String label) {
-		this.label.setText(label);
-	}
-
-}

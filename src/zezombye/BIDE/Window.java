@@ -7,6 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+import javax.swing.text.BadLocationException;
 
 import org.fife.rsta.ui.SizeGripIcon;
 import org.fife.rsta.ui.search.FindDialog;
@@ -58,7 +59,7 @@ public class Window extends JFrame implements SearchListener {
 		}
 		
 		ProgramTextPane textPane = ((ProgScrollPane)BIDE.ui.jtp.getSelectedComponent()).textPane;
-		
+		textPane.getCaret().getMark();
 		switch (type) {
 			default: // Prevent FindBugs warning later
 			case MARK_ALL:
@@ -83,13 +84,13 @@ public class Window extends JFrame implements SearchListener {
 				break;
 		}
 
-		String text = null;
+		String text = "";
 		if (result.wasFound()) {
-			text = "Text found; occurrences marked: " + result.getMarkedCount();
+			text = "Text found";
 		}
 		else if (type==SearchEvent.Type.MARK_ALL) {
 			if (result.getMarkedCount()>0) {
-				text = "Occurrences marked: " + result.getMarkedCount();
+				//text = "Occurrences marked: " + result.getMarkedCount();
 			}
 			else {
 				text = "";
@@ -98,7 +99,7 @@ public class Window extends JFrame implements SearchListener {
 		else {
 			text = "Text not found";
 		}
-		//replaceDialog.statusBar.setLabel(text);
+		replaceDialog.statusBar.setLabel(text);
 
 	}
 

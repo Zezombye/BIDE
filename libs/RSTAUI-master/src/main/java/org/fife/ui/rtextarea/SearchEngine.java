@@ -92,19 +92,28 @@ public final class SearchEngine {
 		boolean forward = context.getSearchForward();
 		int start = forward ? Math.max(c.getDot(), c.getMark()) :
 						Math.min(c.getDot(), c.getMark());
-
+		
+		
+		
 		String findIn = getFindInText(textArea, start, forward);
-		if (findIn==null || findIn.length()==0) {
-			return new SearchResult();
-		}
-
+		
 		int markAllCount = 0;
-		if (doMarkAll) {
+		//if (doMarkAll) {
 			markAllCount = markAllImpl((RTextArea)textArea, context).
 					getMarkedCount();
-		}
+		//}
 
 		SearchResult result = SearchEngine.findImpl(findIn, context);
+		//Try searching instead from other side of document
+		if (!result.wasFound()) {
+			int start2 = 0;
+			if (!forward) start2 = textArea.getText().length();
+			//textArea.setCaretPosition(start2);
+			start = start2;
+			findIn = getFindInText(textArea, start2, forward);
+			result = SearchEngine.findImpl(findIn, context);
+		}
+		
 		if (result.wasFound() && !result.getMatchRange().isZeroLength()) {
 			// Without this, if JTextArea isn't in focus, selection
 			// won't appear selected.
@@ -135,7 +144,11 @@ public final class SearchEngine {
 	 *         but the search text is an invalid regular expression.
 	 */
 	private static SearchResult findImpl(String findIn, SearchContext context) {
-
+	
+		if (findIn==null || findIn.length()==0) {
+			return new SearchResult();
+		}
+		
 		String text = context.getSearchFor();
 		boolean forward = context.getSearchForward();
 
@@ -221,8 +234,8 @@ public final class SearchEngine {
 		String findIn = null;
 		try {
 			if (forward) {
-				findIn = textArea.getText(start,
-							textArea.getDocument().getLength()-start);
+				findIn = textArea.getText(start,textArea.getDocument().getLength()-start);
+				//findIn = textArea.getText();
 			}
 			else { // backward
 				findIn = textArea.getText(0, start);
