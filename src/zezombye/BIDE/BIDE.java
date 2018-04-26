@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import org.fife.ui.autocomplete.BasicCompletion;
 import org.fife.ui.autocomplete.DefaultCompletionProvider;
@@ -78,7 +79,6 @@ public class BIDE {
 	public static void main(String[] args) {
 		
 		if (args.length > 0 && args[0].equals("debug")) {
-			//TODO: change that
 			debug = true;
 			System.out.println("Debug activated");
 			args = new String[0];
@@ -150,7 +150,11 @@ public class BIDE {
 			if (options.getProperty("runOn").equals("emulator")) {
 				autoImport = new EmulatorImport();
 			}
-			ui.createAndDisplayUI();
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					ui.createAndDisplayUI();
+				}
+			});
 			ProgramTextPane.initAutoComplete();
 			
 			//ui.jtp.addTab("test", new Program("test1", "800", "testcontent", TYPE_PICT).comp);

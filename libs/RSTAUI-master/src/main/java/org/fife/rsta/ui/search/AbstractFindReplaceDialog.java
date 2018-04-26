@@ -321,7 +321,7 @@ public abstract class AbstractFindReplaceDialog extends AbstractSearchDialog {
 		temp = new JPanel();
 		temp.setLayout(new BoxLayout(temp, BoxLayout.PAGE_AXIS));
 		temp.add(regexCheckBox);
-		temp.add(markAllCheckBox);
+		//temp.add(markAllCheckBox);
 		searchConditionsPanel.add(temp, BorderLayout.LINE_END);
 
 		// Create the "Find what" label.

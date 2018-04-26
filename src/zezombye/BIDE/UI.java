@@ -4,50 +4,32 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.nio.file.AccessDeniedException;
-import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Scanner;
-
 import javax.imageio.ImageIO;
-import javax.swing.text.AbstractDocument;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.basic.BasicButtonUI;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.TabSet;
-import javax.swing.text.TabStop;
 
-import org.fife.ui.autocomplete.AutoCompleteDescWindow;
+import org.fife.rsta.ui.search.FindDialog;
 
 import javax.swing.*;
-import javax.swing.*;
-import javax.swing.plaf.basic.BasicButtonUI;
 import java.awt.*;
-import java.awt.event.*;
 public class UI {
 	
-	JFrame window = new JFrame();
+	Window window = new Window();
 	JPanel sidebar = new JPanel();
 	JTabbedPane jtp;
 	JFileChooser jfc;
@@ -69,12 +51,13 @@ public class UI {
 				//this.getTabComponentAt(jtp.getTabCount()-1).setFont(BIDE.progFont); //doesn't work
 			}
 		};
+		
 		//Is overridden by the label font at ButtonTabComponent
 		//jtp.setFont(new Font(BIDE.options.getProperty("progFontName"), Font.PLAIN, 12));
 		jfc = new JFileChooser();
 		jfc.setMultiSelectionEnabled(true);
 		
-		window = new JFrame();
+		window = new Window();
 		window.setTitle("BIDE v"+BIDE.VERSION+" by Zezombye");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setSize(1200, 800);
@@ -256,6 +239,53 @@ public class UI {
 			}
 		});
 		fileMenu.add(saveTxt);
+		
+		JMenu editMenu = new JMenu("Edit");
+		menuBar2.add(editMenu);
+		
+		/*JMenuItem showFindDialog = new JMenuItem(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (window.replaceDialog.isVisible()) {
+					window.replaceDialog.setVisible(false);
+				}
+				window.findDialog.setVisible(true);
+				this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F, window.getToolkit().getMenuShortcutKeyMask()));
+			}
+			
+		});
+		showFindDialog.setText("Find");
+		editMenu.add(showFindDialog);*/
+		
+		JMenuItem showReplaceDialog = new JMenuItem(new AbstractAction() {
+			
+			
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				/*if (window.findDialog.isVisible()) {
+					window.findDialog.setVisible(false);
+				}*/
+				window.replaceDialog.setVisible(true);
+			}
+			
+		});
+		((AbstractAction)showReplaceDialog.getActionListeners()[0]).putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F, window.getToolkit().getMenuShortcutKeyMask()));
+		showReplaceDialog.setText("Find/Replace");
+		editMenu.add(showReplaceDialog);
+		/*showFindDialog.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (window.replaceDialog.isVisible()) {
+					window.replaceDialog.setVisible(false);
+				}
+				window.findDialog.setVisible(true);
+				
+				
+			}
+		});*/
+		
 		JMenu toolsMenu = new JMenu("Tools");
 		menuBar2.add(toolsMenu);
 		JMenuItem multiDrawstat = new JMenuItem("Multi Drawstat Generator");
@@ -491,80 +521,75 @@ public class UI {
 	    if (input != null) {
 	    	
 	    	final File[] input2 = input;
-	    	new Thread(new Runnable() {
-		    	public void run() {
-		    		if (!addToCurrentFile) {
-		    			BIDE.g1mparts = new ArrayList<G1MPart>();
-		    		}
-		    		for (int i = 0; i < input2.length; i++) {
-				    		BIDE.pathToG1M = input2[i].getPath();
-				    		BIDE.pathToSavedG1M = "";
-			    		
-					    try {
-					    	G1MParser g1mparser = new G1MParser(BIDE.pathToG1M);
-							g1mparser.readG1M();
-							
-							if (!g1mparser.checkValidity()) {
-								BIDE.readFromTxt(BIDE.pathToG1M);
-					    	} else {
-					    		BIDE.readFromG1M(BIDE.pathToG1M);
-					    	}
-					    	BIDE.pathToSavedG1M = "";
-					    	
-					    	BIDE.g1mparts.sort(new Comparator<G1MPart>() {
-
-								@Override
-								public int compare(G1MPart arg0, G1MPart arg1) {
-									if (arg0.type == arg1.type) {
-										return arg0.name.compareTo(arg1.name);
-									} else {
-										if (arg0.type < arg1.type) {
-											return -1;
-										} else if (arg0.type > arg1.type){
-											return 1;
-										} else {
-											return 0;
-										}
-									}
-								}
-					    	});
-					    	
-					    	
-					    } catch (NullPointerException e) {
-					    	if (BIDE.debug) e.printStackTrace();
-					    } catch (NoSuchFileException e) {
-					    	BIDE.error("The file at \"" + BIDE.pathToG1M + "\" does not exist.");
-					    } catch (AccessDeniedException e) {
-					    	BIDE.error("BIDE is denied access to the file at \"" + BIDE.pathToG1M + "\"");
-					    } catch (IOException e) {
-							e.printStackTrace();
-						}
-					    if (BIDE.g1mparts.size() != 0) {
-						    System.out.println("Finished loading g1m");
-					    	
-					    }
-					    
+	    	if (!addToCurrentFile) {
+    			BIDE.g1mparts = new ArrayList<G1MPart>();
+    		}
+    		for (int i = 0; i < input2.length; i++) {
+		    		BIDE.pathToG1M = input2[i].getPath();
+		    		BIDE.pathToSavedG1M = "";
+	    		
+			    try {
+			    	G1MParser g1mparser = new G1MParser(BIDE.pathToG1M);
+					g1mparser.readG1M();
+					
+					if (!g1mparser.checkValidity()) {
+						BIDE.readFromTxt(BIDE.pathToG1M);
+			    	} else {
+			    		BIDE.readFromG1M(BIDE.pathToG1M);
 			    	}
+			    	BIDE.pathToSavedG1M = "";
 			    	
-			    	jtp.removeAll();
-		    		for (int i = 0; i < BIDE.g1mparts.size(); i++) {
-		    			jtp.addTab(BIDE.g1mparts.get(i).name, BIDE.g1mparts.get(i).comp);
-		    			//jtp.setTabComponentAt(i, new ButtonTabComponent(jtp));
-		    			/*try {
-							Thread.sleep(5);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}*/
-		    		}
-		    	}
-		    }).start();
+			    	BIDE.g1mparts.sort(new Comparator<G1MPart>() {
+
+						@Override
+						public int compare(G1MPart arg0, G1MPart arg1) {
+							if (arg0.type == arg1.type) {
+								return arg0.name.compareTo(arg1.name);
+							} else {
+								if (arg0.type < arg1.type) {
+									return -1;
+								} else if (arg0.type > arg1.type){
+									return 1;
+								} else {
+									return 0;
+								}
+							}
+						}
+			    	});
+			    	
+			    	
+			    } catch (NullPointerException e) {
+			    	if (BIDE.debug) e.printStackTrace();
+			    } catch (NoSuchFileException e) {
+			    	BIDE.error("The file at \"" + BIDE.pathToG1M + "\" does not exist.");
+			    } catch (AccessDeniedException e) {
+			    	BIDE.error("BIDE is denied access to the file at \"" + BIDE.pathToG1M + "\"");
+			    } catch (IOException e) {
+					e.printStackTrace();
+				}
+			    if (BIDE.g1mparts.size() != 0) {
+				    System.out.println("Finished loading g1m");
+			    	
+			    }
+			    
+	    	}
+	    	
+	    	jtp.removeAll();
+    		new SwingWorker<Void, G1MPart>() {
+            	@Override
+                protected Void doInBackground() {
+            		for (int i = 0; i < BIDE.g1mparts.size(); i++) {
+            			jtp.addTab(BIDE.g1mparts.get(i).name, BIDE.g1mparts.get(i).comp);
+            		}
+            		try {
+        		    	getTextPane().setCaretPosition(0);
+        		    } catch (NullPointerException e) {}
+                    return null;
+                }
+            }.execute();
 	    	
 	    	
-		    try {
-		    	getTextPane().setCaretPosition(0);
-		    } catch (NullPointerException e) {
-		    	if (BIDE.debug) e.printStackTrace();
-		    }
+		    
 	    }
     }
 	

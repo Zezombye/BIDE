@@ -30,11 +30,14 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
+import org.fife.rsta.ui.SizeGripIcon;
 import org.fife.rsta.ui.AssistanceIconPanel;
 import org.fife.rsta.ui.ResizableFrameContentPane;
 import org.fife.rsta.ui.UIUtil;
 import org.fife.ui.rtextarea.SearchContext;
 import org.fife.ui.rtextarea.SearchEngine;
+
+
 
 
 /**
@@ -72,7 +75,9 @@ import org.fife.ui.rtextarea.SearchEngine;
 public class ReplaceDialog extends AbstractFindReplaceDialog {
 
 	private static final long serialVersionUID = 1L;
-
+	
+	public StatusBar statusBar;
+	
 	private JButton replaceButton;
 	private JButton replaceAllButton;
 	private JLabel replaceFieldLabel;
@@ -376,7 +381,8 @@ public class ReplaceDialog extends AbstractFindReplaceDialog {
 		buttonPanel.add(cancelButton);		// Defined in superclass.
 		JPanel rightPanel = new JPanel(new BorderLayout());
 		rightPanel.add(buttonPanel, BorderLayout.NORTH);
-
+		
+		
 		// Put it all together!
 		JPanel contentPane = new JPanel(new BorderLayout());
 		contentPane.setBorder(BorderFactory.createEmptyBorder(5,5,0,5));
@@ -384,6 +390,8 @@ public class ReplaceDialog extends AbstractFindReplaceDialog {
 		contentPane.add(rightPanel, BorderLayout.LINE_END);
 		temp = new ResizableFrameContentPane(new BorderLayout());
 		temp.add(contentPane, BorderLayout.NORTH);
+		this.statusBar = new StatusBar();
+		contentPane.add(statusBar, BorderLayout.SOUTH);
 		setContentPane(temp);
 		getRootPane().setDefaultButton(findNextButton);
 		setTitle(getString("ReplaceDialogTitle"));
@@ -616,5 +624,22 @@ public class ReplaceDialog extends AbstractFindReplaceDialog {
 
 	}
 
+
+}
+
+class StatusBar extends JPanel {
+
+	private JLabel label;
+
+	public StatusBar() {
+		label = new JLabel("Ready");
+		setLayout(new BorderLayout());
+		add(label, BorderLayout.LINE_START);
+		//add(new JLabel(new SizeGripIcon()), BorderLayout.LINE_END);
+	}
+
+	public void setLabel(String label) {
+		this.label.setText(label);
+	}
 
 }

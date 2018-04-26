@@ -58,8 +58,8 @@ public class CharPicker extends JPanel {
 			"E5AC","E5AB","E5E8","E5E9","E5EA","E5EB","E5EC","E5ED","E5EE","E5EF","E5AF","E5AE","E5AD","E5E0","E5E1","E5E2","E5E3","E5F0","E5F1",
 			"E5F2","E5F3","E5F4","E5F5","E5FB","E5FC","E5FD","E6AE","90"
 		},{
-			"3",   "CD",  "7",   "8",   "9",   "A",   "B",   "",    "",    "",    "",    "",    "",    "",    "",    "",    "",    "",    "",
-			"1A",  "1B",  "98",  "1D",  "1E",  "1F",  "88",  "7FF4","7FF0","7FF1","",    "",    "",    "",    "",    "",    "",    "",    "",
+			"3",   "CD",  "7",   "8",   "9",   "A",   "B",   null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,
+			"1A",  "1B",  "98",  "1D",  "1E",  "1F",  "88",  "7FF4","7FF0","7FF1",null,  null,  null,  null,  null,  null,  null,  null,  null,
 			"D8",  "E5BD","E5B7","C"
 		}
 	};
