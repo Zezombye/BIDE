@@ -1,8 +1,12 @@
 package zezombye.BIDE;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -81,19 +85,37 @@ public class CharPicker extends JPanel {
 	
 }
 
-class CharPanel extends JLabel {
+class CharPanel extends JPanel {
 	
 	int nb;
+	BufferedImage image;
+	int xMouse, yMouse;
 	
 	public CharPanel(BufferedImage image, int nb) {
-		super(new ImageIcon(image));
+		super();
+		this.image = image;
 		this.nb = nb;
+		this.setPreferredSize(new Dimension(345, 169));
 		//this.setBorder(BorderFactory.createBevelBorder(1, Color.RED, Color.RED));
+		
+		this.addMouseMotionListener(new MouseMotionListener() {
+
+			@Override
+			public void mouseDragged(MouseEvent arg0) {
+			}
+
+			@Override
+			public void mouseMoved(MouseEvent arg0) {
+				xMouse = arg0.getX();
+				yMouse = arg0.getY();
+				repaint();
+			}
+		});
+		
 		this.addMouseListener(new MouseListener() {
 
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				
 			}
 
 			@Override
@@ -102,6 +124,9 @@ class CharPanel extends JLabel {
 
 			@Override
 			public void mouseExited(MouseEvent arg0) {
+				xMouse = -1;
+				yMouse = -1;
+				repaint();
 			}
 
 			@Override
@@ -155,6 +180,25 @@ class CharPanel extends JLabel {
 		});
 	}
 	
+	@Override
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		Graphics2D g2d = (Graphics2D) g.create();
+        g2d.drawImage(image, 0, 1, this);
+        if (xMouse != -1 && yMouse != -1) {
+            int gridX = xMouse/18;
+    		int gridY = yMouse/24;
+    		try {
+    			if (CharPicker.catSymbols[nb][gridX+19*gridY] != null) {
+    				g2d.setColor(Color.RED);
+    				g2d.drawRect(gridX*18, gridY*24, 18, 24);
+    			}
+    		} catch (ArrayIndexOutOfBoundsException e) {}
+	            
+        }
+        
+        g2d.dispose();
+	}
 	
 	
 }

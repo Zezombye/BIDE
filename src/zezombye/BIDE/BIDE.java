@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.swing.JComponent;
@@ -33,6 +34,7 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.sun.xml.internal.ws.util.StringUtils;
 
 /*
  * TODO:
@@ -49,7 +51,7 @@ public class BIDE {
 	public static String pathToG1M = System.getProperty("user.home")+"/desktop/";
 	public static String pathToSavedG1M = "";
 	public static final String pathToOptions = System.getProperty("user.home")+"/BIDE/options.txt";
-	public static final String pathToTmp = System.getProperty("user.home")+"/BIDE/tmp.g1m";
+	//public static final String pathToTmp = System.getProperty("user.home")+"/BIDE/tmp.g1m";
 	public static UI ui = new UI();
 	
 	public static String runOn = "none";
@@ -459,55 +461,61 @@ public class BIDE {
 		for (int i = 0; i < g1mparts.size(); i++) {
 			
 			CasioString name = new CasioString(asciiToCasio(g1mparts.get(i).name, true, g1mparts.get(i).name+".name", 1, macros));
-
-			System.out.println("Parsing \""+g1mparts.get(i).name+"\"");
-			
-			if (name.length() > 8) {
-				error("Program \""+g1mparts.get(i).name+"\" has a name too long (8 characters max)!");
-				return;
-			}
-						
-			if (g1mparts.get(i).type == BIDE.TYPE_CAPT && !g1mparts.get(i).name.startsWith("CAPT")) {
-				error("Capture \""+g1mparts.get(i).name+"\"'s name should start with \"CAPT\"!");
-				return;
-			} else if (g1mparts.get(i).type == BIDE.TYPE_PICT && !g1mparts.get(i).name.startsWith("PICT")) {
-				error("Picture \""+g1mparts.get(i).name+"\"'s name should start with \"PICT\"!");
-				return;
-			}
-			if (g1mparts.get(i).type == BIDE.TYPE_CAPT || g1mparts.get(i).type == BIDE.TYPE_PICT) {
-				try {
-					int nb = Integer.parseInt(g1mparts.get(i).name.substring(4));
-					if (nb < 1 || nb > 20) {
-						error("Number of "+g1mparts.get(i).name+" should be 1-20!");
-						return;
-					}
-				} catch (NumberFormatException e) {
-					error(g1mparts.get(i).name, "Invalid picture/capture number!");
-					return;
-				}
-			}
-			
-			name.add(Arrays.copyOfRange(padding, 0, 8-name.length()));
 			CasioString part = new CasioString("");
 			
-			if (g1mparts.get(i).type == BIDE.TYPE_PROG) {
-				CasioString password = new CasioString(asciiToCasio(g1mparts.get(i).option, true, g1mparts.get(i).name+".password", 2, macros));
-				if (password.length() > 8) {
-					error("Program \""+g1mparts.get(i).name+"\" has a password too long (8 characters max)!");
+			if (!g1mparts.get(i).isEditedSinceLastSave && g1mparts.get(i).type == BIDE.TYPE_PROG) {
+				System.out.println("Already parsed "+g1mparts.get(i).name);
+				part.add(g1mparts.get(i).binaryContent);
+			} else {
+			
+				System.out.println("Parsing \""+g1mparts.get(i).name+"\"");
+				
+				if (name.length() > 8) {
+					error("Program \""+g1mparts.get(i).name+"\" has a name too long (8 characters max)!");
 					return;
 				}
-				password.add(Arrays.copyOfRange(padding, 0, 8-password.length()));
-				part.add(password);
-				part.add(new byte[]{0,0});
-				part.add(asciiToCasio((String)g1mparts.get(i).content, false, g1mparts.get(i).name, 1, macros));
-				part.add(Arrays.copyOfRange(padding, 0, 4-part.length()%4));
-			} else if (g1mparts.get(i).type == BIDE.TYPE_PICT){
-				part.add((Byte[])g1mparts.get(i).content);
-			} else {
-				part.add(new byte[]{0x00, (byte)0x80, 0x00, 0x40});
-				part.add((Byte[])g1mparts.get(i).content);
+							
+				if (g1mparts.get(i).type == BIDE.TYPE_CAPT && !g1mparts.get(i).name.startsWith("CAPT")) {
+					error("Capture \""+g1mparts.get(i).name+"\"'s name should start with \"CAPT\"!");
+					return;
+				} else if (g1mparts.get(i).type == BIDE.TYPE_PICT && !g1mparts.get(i).name.startsWith("PICT")) {
+					error("Picture \""+g1mparts.get(i).name+"\"'s name should start with \"PICT\"!");
+					return;
+				}
+				if (g1mparts.get(i).type == BIDE.TYPE_CAPT || g1mparts.get(i).type == BIDE.TYPE_PICT) {
+					try {
+						int nb = Integer.parseInt(g1mparts.get(i).name.substring(4));
+						if (nb < 1 || nb > 20) {
+							error("Number of "+g1mparts.get(i).name+" should be 1-20!");
+							return;
+						}
+					} catch (NumberFormatException e) {
+						error(g1mparts.get(i).name, "Invalid picture/capture number!");
+						return;
+					}
+				}
+				
+				name.add(Arrays.copyOfRange(padding, 0, 8-name.length()));
+				
+				if (g1mparts.get(i).type == BIDE.TYPE_PROG) {
+					CasioString password = new CasioString(asciiToCasio(g1mparts.get(i).option, true, g1mparts.get(i).name+".password", 2, macros));
+					if (password.length() > 8) {
+						error("Program \""+g1mparts.get(i).name+"\" has a password too long (8 characters max)!");
+						return;
+					}
+					password.add(Arrays.copyOfRange(padding, 0, 8-password.length()));
+					part.add(password);
+					part.add(new byte[]{0,0});
+					part.add(asciiToCasio((String)g1mparts.get(i).content, false, g1mparts.get(i).name, 1, macros));
+					part.add(Arrays.copyOfRange(padding, 0, 4-part.length()%4));
+				} else if (g1mparts.get(i).type == BIDE.TYPE_PICT){
+					part.add((Byte[])g1mparts.get(i).content);
+				} else {
+					part.add(new byte[]{0x00, (byte)0x80, 0x00, 0x40});
+					part.add((Byte[])g1mparts.get(i).content);
+				}
+				g1mparts.get(i).binaryContent = new CasioString(part);
 			}
-			
 			g1mwrapper.addPart(part, name, g1mparts.get(i).type);
 		}
 		g1mwrapper.generateG1M(destPath);
@@ -666,6 +674,11 @@ public class BIDE {
 		//System.out.println(Arrays.toString(lines));
 		
 		for (int h = 0; h < lines.length; h++) {
+			if (lines[h].startsWith("#nocheck")) {
+				allowUnknownOpcodes = true;
+			} else if (lines[h].startsWith("#yescheck")) {
+				allowUnknownOpcodes = false;
+			}
 			if (lines[h].startsWith("#") || lines[h].trim().isEmpty()) {
 				continue;
 			}
@@ -1039,9 +1052,18 @@ public class BIDE {
 			for (int j = 0; j < opcodes.size(); j++) {
 				if (hex.equalsIgnoreCase(opcodes.get(j).hex)) {
 					if (opcodes.get(j).unicode == null || BIDE.options.getProperty("allowUnicode").equals("false")) {
-						currentLine += opcodes.get(j).text;
+						if (!currentPosIsString || opcodes.get(j).text.length() == 1 || opcodes.get(j).text.startsWith("&")
+								|| "->=><=>=!=".contains(opcodes.get(j).text)) {
+							currentLine += opcodes.get(j).text;
+						} else {
+							currentLine += "&#" + opcodes.get(j).hex + ";";
+						}
 					} else {
-						currentLine += opcodes.get(j).unicode;
+						if (!currentPosIsString || opcodes.get(j).unicode.length() == 1) {
+							currentLine += opcodes.get(j).unicode;
+						} else {
+							currentLine += "&#" + opcodes.get(j).hex + ";";
+						}
 					}
 					foundMatch = true;
 					//System.out.println("Matches opcode " + opcodes.get(j).ascii);
@@ -1229,6 +1251,86 @@ public class BIDE {
 				prefix == (byte)0xE7)
 			return true;
 		return false;
+	}
+	
+	public static void cleanupStrings() {
+		
+		String[] pairs = new String[] {
+			"&n_stat;", "n",
+			"&e_reg;", "e",
+			"&#7FD4;", "se",
+			"&fact;", "!",
+			"&#7FE2;", "pa",
+			"&#7FE3;", "pb",
+			"&#7FE4;", "pab",
+			"&#F91B;", "fn",
+			"&#C5;", "sx",
+			"&#C7;", "sy",
+			"&#7FC6;", "sp",
+			"&bitwiseor;", "or",
+			"&bitwiseand;", "and",
+			"&bitwisexor;", "xor",
+			"&bitwisexnor;", "xnor",
+			"&#F752;", "Hist",
+			"&#7FBE;", "Fa",
+			"&#F95B;", "Norm",
+		};
+		
+		for (int g = 0; g < BIDE.g1mparts.size(); g++) {
+			if (BIDE.g1mparts.get(g).comp instanceof ProgScrollPane) {
+				String content = ((ProgScrollPane)BIDE.g1mparts.get(g).comp).textPane.getText();
+				String[] lines = content.split("\\n|\\r|\\r\\n");
+				
+				for (int h = 0; h < lines.length; h++) {
+					if (lines[h].startsWith("#") || lines[h].trim().isEmpty()) {
+						continue;
+					}
+					boolean currentPosIsString = false;
+					boolean escapeNextChar = false;
+					boolean currentPosIsComment = false;
+					
+					for (int i = 0; i < lines[h].length(); i++) {
+						
+						if (lines[h].charAt(i) == '"' && !escapeNextChar) {
+							currentPosIsString = !currentPosIsString;
+						}
+						
+						if (lines[h].charAt(i) == '\\' && !escapeNextChar) {
+							escapeNextChar = true;
+						} else {
+							escapeNextChar = false;
+						}
+						
+						if (lines[h].charAt(i) == '\'' && !currentPosIsString) {
+							currentPosIsComment = true;
+						}
+						
+						if (lines[h].charAt(i) == ':' && !currentPosIsString && currentPosIsComment) {
+							currentPosIsComment = false;
+							continue;
+						}
+						
+						if (currentPosIsComment) {
+							continue;
+						}
+						if (!currentPosIsString) {
+							continue;
+						}
+						
+						for (int j = 0; j < pairs.length; j+=2) {
+							if (lines[h].startsWith(pairs[j], i)) {
+								lines[h] = lines[h].substring(0, i) + pairs[j+1] + lines[h].substring(pairs[j].length()+i);
+								break;
+							}
+						}
+						
+					}
+				}
+				
+				((ProgScrollPane)BIDE.g1mparts.get(g).comp).textPane.setText(Arrays.stream(lines).collect(Collectors.joining("\n")));
+				
+			}
+		}
 	}
 	
 	public static void error(String error) {

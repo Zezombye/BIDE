@@ -9,6 +9,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BoxView;
 import javax.swing.text.ComponentView;
@@ -29,6 +31,8 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 
 public class G1MPart {
 	
+	public CasioString binaryContent = null;
+	public boolean isEditedSinceLastSave = true;
 	public JComponent comp;
 	public String name = "";
 	public String option = "";
@@ -62,6 +66,24 @@ public class G1MPart {
 			} else {
 				ProgramTextPane textPane = new ProgramTextPane(type);
 				textPane.setText((String)content);
+				textPane.getDocument().addDocumentListener(new DocumentListener() {
+
+					@Override
+					public void changedUpdate(DocumentEvent arg0) {
+						isEditedSinceLastSave = true;
+					}
+
+					@Override
+					public void insertUpdate(DocumentEvent arg0) {
+						isEditedSinceLastSave = true;
+					}
+
+					@Override
+					public void removeUpdate(DocumentEvent arg0) {
+						isEditedSinceLastSave = true;
+					}
+					
+				});
 				this.comp = new ProgScrollPane(textPane, type);
 				((JScrollPane)comp).getVerticalScrollBar().setUnitIncrement(30);
 				comp.setBorder(BorderFactory.createEmptyBorder());

@@ -31,6 +31,10 @@ public class EmulatorImport {
 	    int GetWindowTextA(HWND hWnd, byte[] lpString, int nMaxCount);
 	    int GetWindowRect(HWND handle, RECT rekt);
 	    boolean SetForegroundWindow(WinDef.HWND hWnd);
+
+		void BringWindowToTop(HWND emulatorHWND);
+
+		void ShowWindow(HWND emulatorHWND, int i);
 	}
 	
 
@@ -97,6 +101,7 @@ public class EmulatorImport {
 			BIDE.error("Could not find emulator");
 			return null;
 		}
+		user32.ShowWindow(emulatorHWND, 9);
 		user32.SetForegroundWindow(emulatorHWND);
 		return "done";
     }
@@ -135,7 +140,7 @@ public class EmulatorImport {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-    	inputString("                                   "+path, 1);
+    	inputString("                                           "+path.replaceAll("/", "\\\\"), 1);
     	inputKey(KeyEvent.VK_ENTER, 0);
     	
     	//Wait for confirmation screen (copy to main mem/storage mem)

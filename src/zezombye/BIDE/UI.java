@@ -27,6 +27,7 @@ import javax.swing.plaf.synth.SynthTabbedPaneUI;
 import org.fife.rsta.ui.search.FindDialog;
 
 import com.sun.java.swing.plaf.windows.WindowsTabbedPaneUI;
+import com.sun.java.swing.plaf.windows.WindowsTabbedPaneUI2;
 
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -104,15 +105,11 @@ public class UI {
 			}
 		};
 		
-		WindowsTabbedPaneUI btpui = new WindowsTabbedPaneUI() {
-			@Override protected boolean shouldRotateTabRuns(int i) {
-				return false;
-			}
-		};
+		WindowsTabbedPaneUI2 btpui = new WindowsTabbedPaneUI2();
 		
 		jtp.setUI(btpui);
 
-		jtp.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+		//jtp.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 		
 		
 		jfc = new JFileChooser();
@@ -182,20 +179,27 @@ public class UI {
 		JMenuBar menuBar = new JMenuBar();
 		//menuBar.setMargin(new Insets(5, 10, 5, 10));
 		//menuBar.setFloatable(false);
-		ToolbarButton open = new ToolbarButton("openFile.png", "Open file");
+		ToolbarButton open = new ToolbarButton("openFile.png", "Open file (ctrl+O)");
 		open.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				openFile(false);
 			}
 		});
-		ToolbarButton save = new ToolbarButton("saveFile.png", "Save file");
+		
+
+		window.getRootPane().registerKeyboardAction(open.getActionListeners()[0], KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+		
+		ToolbarButton save = new ToolbarButton("saveFile.png", "Save file (ctrl+S)");
 		save.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				saveFile(true, false);
+				saveFile(true, false, false);
 			}
 		});
+		
+		window.getRootPane().registerKeyboardAction(save.getActionListeners()[0], KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+		
 		
 		ToolbarButton newProg = new ToolbarButton("newProg.png", "New Basic Casio program");
 		newProg.addActionListener(new ActionListener() {
@@ -227,12 +231,14 @@ public class UI {
 			}
 		});
 		
-		ToolbarButton run = new ToolbarButton("run.png", "Run file");
+		ToolbarButton run = new ToolbarButton("run.png", "Run file (ctrl+R)");
 		run.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
-				saveFile(true, true);
+				saveFile(true, false, true);
 			}
 		});
+
+		window.getRootPane().registerKeyboardAction(run.getActionListeners()[0], KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
 		
 		/*ToolbarButton dispOpcodes = new ToolbarButton("opcodes.png", "Show opcodes");
 		dispOpcodes.addActionListener(new ActionListener() {
@@ -282,7 +288,7 @@ public class UI {
 					}
 					BIDE.pathToSavedG1M = BIDE.pathToSavedG1M.substring(0, BIDE.pathToSavedG1M.lastIndexOf("."))+".g1m";
 				} catch (Exception e1) {}
-				saveFile(true, false);
+				saveFile(true, true, false);
 			}
 		});
 		fileMenu.add(saveg1m);
@@ -295,7 +301,7 @@ public class UI {
 					}
 					BIDE.pathToSavedG1M = BIDE.pathToSavedG1M.substring(0, BIDE.pathToSavedG1M.lastIndexOf("."))+".bide";
 				} catch (Exception e1) {}
-				saveFile(false, false);
+				saveFile(false, true, false);
 			}
 		});
 		fileMenu.add(saveTxt);
@@ -394,6 +400,14 @@ public class UI {
 			}
 		});
 		toolsMenu.add(showColoration);
+		
+		JMenuItem cleanup = new JMenuItem("Clean up strings");
+		cleanup.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				BIDE.cleanupStrings();
+			}
+		});
+		toolsMenu.add(cleanup);
 		
 		JMenu emulatorMenu = new JMenu("Emulator");
 		
@@ -641,13 +655,13 @@ public class UI {
             		for (int i = 0; i < BIDE.g1mparts.size(); i++) {
             			jtp.addTab(BIDE.g1mparts.get(i).name, BIDE.g1mparts.get(i).comp);
             		}
-            		/*try {
+            		try {
         		    	getTextPane().setCaretPosition(0);
         		    } catch (NullPointerException e) {
         		    	if (BIDE.debug) {
         		    		e.printStackTrace();
         		    	}
-        		    }*/
+        		    }
                     return null;
                 }
             }.execute();
@@ -657,28 +671,27 @@ public class UI {
 	    }
     }
 	
-	public void saveFile(boolean saveToG1M, boolean runFile) {
+	public void saveFile(boolean saveToG1M, boolean saveAs, boolean runFile) {
 		
-		if (BIDE.pathToSavedG1M.isEmpty()) {
-			BIDE.pathToSavedG1M = BIDE.pathToG1M;
-		}
 		new Thread(new Runnable() {
 	    	public void run() {
 
 				try {
-					if (runFile) {
-						BIDE.runOn = BIDE.options.getProperty("runOn");
-						BIDE.writeToG1M(BIDE.pathToTmp);
-						
-		    		} else {
-			    		BIDE.runOn = "none";
-			    		jfc.setSelectedFile(new File(BIDE.pathToSavedG1M));
+					
+					if (saveAs || BIDE.pathToSavedG1M.isEmpty()) {
+						if (BIDE.pathToSavedG1M.isEmpty()) {
+							BIDE.pathToSavedG1M = BIDE.pathToG1M;
+						}
+						jfc.setSelectedFile(new File(BIDE.pathToSavedG1M));
 			    		File input = null;
 						if (jfc.showSaveDialog(window) == JFileChooser.APPROVE_OPTION) {
 							input = jfc.getSelectedFile();
 						}
-						if (input == null) return;
-						
+						if (input == null) {
+							BIDE.pathToSavedG1M = "";
+							return;
+						}
+
 						BIDE.pathToSavedG1M = input.getAbsolutePath();
 						
 						//Check for extension
@@ -689,13 +702,26 @@ public class UI {
 							return;
 						}
 						
+					}
+					
+							
+					if (runFile) {
+						BIDE.runOn = BIDE.options.getProperty("runOn");
+						BIDE.writeToG1M(BIDE.pathToSavedG1M);
+						
+		    		} else {
+			    		BIDE.runOn = "none";
+			    		
 						if (saveToG1M && !BIDE.pathToSavedG1M.endsWith(".bide") && !BIDE.pathToSavedG1M.endsWith(".txt")) {
-							BIDE.writeToG1M(input.getPath());
+							BIDE.writeToG1M(BIDE.pathToSavedG1M);
 						} else {
-							BIDE.writeToTxt(input.getPath());
+							BIDE.writeToTxt(BIDE.pathToSavedG1M);
 						}
 		    		}
-					
+					for (int i = 0; i < BIDE.g1mparts.size(); i++) {
+						BIDE.g1mparts.get(i).isEditedSinceLastSave = false;
+					}
+								
 					//Update names
 					for (int i = 0; i < jtp.getTabCount(); i++) {
 						jtp.setTitleAt(i, BIDE.g1mparts.get(i).name);

@@ -201,6 +201,9 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	    	}
 	    	
 	    }
+	    
+	    cp.addCompletion(new BasicCompletion(cp, "#nocheck", 2, "Tells BIDE to not throw an error if there is a non-existing opcode. Use this to write plain text into programs (such as formulas)."));
+	    cp.addCompletion(new BasicCompletion(cp, "#yescheck", 2, "Tells BIDE to check again for non-existing opcodes. See #nocheck."));
 	}
 	
 	public static void addMacroToCompletions(Macro macro) {
