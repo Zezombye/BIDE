@@ -70,8 +70,10 @@ public class G1MWrapper {
 		}
 		content.add(0, header2);
 		IO.writeToFile(new File(destPath), content.getContent(), true);
-		if (BIDE.options.getProperty("runOn").equals("emulator")) {
+		if (BIDE.runOn.equals("emulator")) {
 			BIDE.autoImport.autoImport(destPath);
+		} else if (BIDE.runOn.equals("calculator")){
+			//TODO
 		}
 	}
 	

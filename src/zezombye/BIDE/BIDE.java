@@ -49,7 +49,10 @@ public class BIDE {
 	public static String pathToG1M = System.getProperty("user.home")+"/desktop/";
 	public static String pathToSavedG1M = "";
 	public static final String pathToOptions = System.getProperty("user.home")+"/BIDE/options.txt";
+	public static final String pathToTmp = System.getProperty("user.home")+"/BIDE/tmp.g1m";
 	public static UI ui = new UI();
+	
+	public static String runOn = "none";
 	
 	public final static String VERSION = "4.0";
 	

@@ -1,9 +1,4 @@
 package zezombye.BIDE;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -19,14 +14,25 @@ import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicButtonUI;
+import javax.swing.plaf.basic.BasicTabbedPaneUI;
+import javax.swing.plaf.multi.MultiTabbedPaneUI;
+import javax.swing.plaf.synth.SynthTabbedPaneUI;
 
 import org.fife.rsta.ui.search.FindDialog;
 
+import com.sun.java.swing.plaf.windows.WindowsTabbedPaneUI;
+
 import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
+
 import java.awt.*;
+
 public class UI {
 	
 	Window window = new Window();
@@ -38,11 +44,57 @@ public class UI {
 	
 	public void createAndDisplayUI() {
 		
+		/*for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+			System.out.println(info.getName());
+		    if ("Nimbus".equals(info.getName())) {
+		        try {
+					UIManager.setLookAndFeel(info.getClassName());
+				} catch (ClassNotFoundException e1) {
+					e1.printStackTrace();
+				} catch (InstantiationException e1) {
+					e1.printStackTrace();
+				} catch (IllegalAccessException e1) {
+					e1.printStackTrace();
+				} catch (UnsupportedLookAndFeelException e1) {
+					e1.printStackTrace();
+				}
+		        break;
+		    }
+		}*/
+		
+		/*HashMap<Object, Object> defaultsToKeep = new HashMap<>();
+		for (Map.Entry<Object, Object> entry : UIManager.getDefaults().entrySet()) {
+		    boolean isStringKey = entry.getKey().getClass() == String.class ;
+		    String key = isStringKey ? ((String) entry.getKey()):"";    
+		    if (key.startsWith("TabbedPane")) {
+		        defaultsToKeep.put(entry.getKey(), entry.getValue());
+		    }
+		}
+		*/
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		UIManager.getDefaults().put("TabbedPane.tabRunOverlay", 0);
+		UIManager.getDefaults().put("TabbedPane.focus", new Color(0, 0, 0, 0));
+		
+		// set back your originals
+		/*for (Map.Entry<Object, Object> entry : defaultsToKeep.entrySet()) {
+		    UIManager.getDefaults().put(entry.getKey(), entry.getValue());
+		}*/
+		
+		// set back your originals
+		//UIManager.getDefaults().put(test[0], test[1]);
+		/*for (i = 0; i < keys.length; i++) {
+			UIManager.getDefaults().put(keys[i], values[i]);
+		   // UIManager.getDefaults().put("TabbedPane.selectionFollowsFocus", true);
+		   // UIManager.getDefaults().put("TabbedPane.labelShift", 1);
+		   // UIManager.getDefaults().put("TabbedPane.selectedLabelShift", -1);
+		}*/
+		
+
 		
 		jtp = new JTabbedPane() {
 			@Override public void addTab(String name, Component comp) {
@@ -52,8 +104,17 @@ public class UI {
 			}
 		};
 		
-		//Is overridden by the label font at ButtonTabComponent
-		//jtp.setFont(new Font(BIDE.options.getProperty("progFontName"), Font.PLAIN, 12));
+		WindowsTabbedPaneUI btpui = new WindowsTabbedPaneUI() {
+			@Override protected boolean shouldRotateTabRuns(int i) {
+				return false;
+			}
+		};
+		
+		jtp.setUI(btpui);
+
+		jtp.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+		
+		
 		jfc = new JFileChooser();
 		jfc.setMultiSelectionEnabled(true);
 		
@@ -67,7 +128,6 @@ public class UI {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
 		//window.add(jsp);
 		window.add(jtp);
 		//jtp.setBorder(BorderFactory.createEmptyBorder());
@@ -133,7 +193,7 @@ public class UI {
 		save.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				saveFile(true);
+				saveFile(true, false);
 			}
 		});
 		
@@ -167,10 +227,10 @@ public class UI {
 			}
 		});
 		
-		ToolbarButton run = new ToolbarButton("run.png", "Save & run");
+		ToolbarButton run = new ToolbarButton("run.png", "Run file");
 		run.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
-				
+				saveFile(true, true);
 			}
 		});
 		
@@ -222,7 +282,7 @@ public class UI {
 					}
 					BIDE.pathToSavedG1M = BIDE.pathToSavedG1M.substring(0, BIDE.pathToSavedG1M.lastIndexOf("."))+".g1m";
 				} catch (Exception e1) {}
-				saveFile(true);
+				saveFile(true, false);
 			}
 		});
 		fileMenu.add(saveg1m);
@@ -235,7 +295,7 @@ public class UI {
 					}
 					BIDE.pathToSavedG1M = BIDE.pathToSavedG1M.substring(0, BIDE.pathToSavedG1M.lastIndexOf("."))+".bide";
 				} catch (Exception e1) {}
-				saveFile(false);
+				saveFile(false, false);
 			}
 		});
 		fileMenu.add(saveTxt);
@@ -581,9 +641,13 @@ public class UI {
             		for (int i = 0; i < BIDE.g1mparts.size(); i++) {
             			jtp.addTab(BIDE.g1mparts.get(i).name, BIDE.g1mparts.get(i).comp);
             		}
-            		try {
+            		/*try {
         		    	getTextPane().setCaretPosition(0);
-        		    } catch (NullPointerException e) {}
+        		    } catch (NullPointerException e) {
+        		    	if (BIDE.debug) {
+        		    		e.printStackTrace();
+        		    	}
+        		    }*/
                     return null;
                 }
             }.execute();
@@ -593,49 +657,57 @@ public class UI {
 	    }
     }
 	
-	public void saveFile(boolean saveToG1M) {
+	public void saveFile(boolean saveToG1M, boolean runFile) {
 		
 		if (BIDE.pathToSavedG1M.isEmpty()) {
 			BIDE.pathToSavedG1M = BIDE.pathToG1M;
 		}
 		new Thread(new Runnable() {
 	    	public void run() {
-	    		
-	    		jfc.setSelectedFile(new File(BIDE.pathToSavedG1M));
-	    		File input = null;
-				if (jfc.showSaveDialog(window) == JFileChooser.APPROVE_OPTION) {
-					input = jfc.getSelectedFile();
-				}
-				
-				if (input != null) {
-					BIDE.pathToSavedG1M = input.getAbsolutePath();
-					
-					//Check for extension
-					try {
-						BIDE.pathToSavedG1M.substring(BIDE.pathToSavedG1M.lastIndexOf('.'));
-					} catch (StringIndexOutOfBoundsException e) {
-						BIDE.error("Please input an extension (.bide or .g1m)");
-						return;
-					}
-					
-					try {
+
+				try {
+					if (runFile) {
+						BIDE.runOn = BIDE.options.getProperty("runOn");
+						BIDE.writeToG1M(BIDE.pathToTmp);
+						
+		    		} else {
+			    		BIDE.runOn = "none";
+			    		jfc.setSelectedFile(new File(BIDE.pathToSavedG1M));
+			    		File input = null;
+						if (jfc.showSaveDialog(window) == JFileChooser.APPROVE_OPTION) {
+							input = jfc.getSelectedFile();
+						}
+						if (input == null) return;
+						
+						BIDE.pathToSavedG1M = input.getAbsolutePath();
+						
+						//Check for extension
+						try {
+							BIDE.pathToSavedG1M.substring(BIDE.pathToSavedG1M.lastIndexOf('.'));
+						} catch (StringIndexOutOfBoundsException e) {
+							BIDE.error("Please input an extension (.bide or .g1m)");
+							return;
+						}
+						
 						if (saveToG1M && !BIDE.pathToSavedG1M.endsWith(".bide") && !BIDE.pathToSavedG1M.endsWith(".txt")) {
 							BIDE.writeToG1M(input.getPath());
 						} else {
 							BIDE.writeToTxt(input.getPath());
 						}
-						for (int i = 0; i < jtp.getTabCount(); i++) {
-							jtp.setTitleAt(i, BIDE.g1mparts.get(i).name);
-						}
-					} catch (NullPointerException e) {
-						if (BIDE.debug) e.printStackTrace();
-					} catch (NoSuchFileException e) {
-				    	BIDE.error("The file at \"" + BIDE.pathToSavedG1M + "\" does not exist.");
-				    } catch (AccessDeniedException e) {
-				    	BIDE.error("BIDE is denied access to the file at \"" + BIDE.pathToSavedG1M + "\"");
-				    } catch (IOException e) {
-						e.printStackTrace();
+		    		}
+					
+					//Update names
+					for (int i = 0; i < jtp.getTabCount(); i++) {
+						jtp.setTitleAt(i, BIDE.g1mparts.get(i).name);
 					}
+				} catch (NullPointerException e) {
+					if (BIDE.debug) e.printStackTrace();
+				} catch (NoSuchFileException e) {
+			    	BIDE.error("The file at \"" + BIDE.pathToSavedG1M + "\" does not exist.");
+			    } catch (AccessDeniedException e) {
+			    	BIDE.error("BIDE is denied access to the file at \"" + BIDE.pathToSavedG1M + "\"");
+			    } catch (IOException e) {
+					e.printStackTrace();
 				}
 	    	}
 		}).start();
