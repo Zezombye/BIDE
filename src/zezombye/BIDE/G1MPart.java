@@ -59,11 +59,10 @@ public class G1MPart {
 		}
 		this.content = content;
 		
-		if (!BIDE.isCLI) {
-			
-			if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
-				this.comp = new Picture(type, name, Integer.valueOf(option, 16), (Byte[])content).jsp;
-			} else {
+		if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
+			this.comp = new Picture(type, name, Integer.valueOf(option, 16), (Byte[])content).jsp;
+		} else {
+			if (!BIDE.isCLI) {
 				ProgramTextPane textPane = new ProgramTextPane(type);
 				textPane.setText((String)content);
 				textPane.getDocument().addDocumentListener(new DocumentListener() {
@@ -88,6 +87,7 @@ public class G1MPart {
 				((JScrollPane)comp).getVerticalScrollBar().setUnitIncrement(30);
 				comp.setBorder(BorderFactory.createEmptyBorder());
 			}
+			
 		}
 	}
 }

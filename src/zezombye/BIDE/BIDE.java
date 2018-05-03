@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -80,8 +81,11 @@ public class BIDE {
 	public static boolean isCLI = false;
 	
 	public static EmulatorImport autoImport;
+	public static String[] args;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args2) {
+		args = args2;
+		
 		
 		if (args.length > 0 && args[0].equals("debug")) {
 			debug = true;
@@ -101,16 +105,32 @@ public class BIDE {
 		initMacros();
 		
 		//System.out.println(BIDE.class.getClass().getResource("/").toString());
-		
+
 		System.out.println("args : "+Arrays.toString(args));
-		if (args.length > 0) {
+		if (args.length > 0 && (args[0].equals("--to-g1m") || args[0].equals("--to-txt") || args[0].equals("--help") || args[0].equals("-help"))) {
 			//CLI
 			isCLI = true;
-			if (args[0].equals("--compile")) {
+			if (args[0].equals("--help") || args[0].equals("-help")) {
+				
+				System.out.println("Syntax:\n"
+						+ "--to-g1m <target> <file1> (<file2> <...>) : creates a g1m file out of the contents of the provided file(s)\n"
+						+ "--to-txt <target> <file1> (<file2> <...>) : creates a txt file out of the contents of the provided file(s)\n"
+						//+ "--run-on-emulator <file> : runs the provided file on the Manager PLUS emulator\n"
+						//+ "--run-on-calculator <file> : runs the provided file on the calculator (requires the BIDE Add-in)\n"
+						+ "<file1> (<file2> <...>) : opens the provided file(s) in GUI");
+				
+			} else if (args[0].equals("--to-g1m")) {
 				String pathToG1M = args[1];
 				for (int i = 2; i < args.length; i++) {
 					try {
-						readFromTxt(args[i]);
+						G1MParser g1mparser = new G1MParser(args[i]);
+						g1mparser.readG1M();
+						
+						if (!g1mparser.checkValidity()) {
+							BIDE.readFromTxt(args[i]);
+				    	} else {
+				    		BIDE.readFromG1M(args[i]);
+				    	}
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -120,24 +140,34 @@ public class BIDE {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			} else if (args[0].equals("--decompile")) {
-				String pathToG1M = args[1];
-				String pathToDest = args[2];
-				if (!pathToDest.endsWith(System.getProperty("file.separator"))) {
+			} else if (args[0].equals("--to-txt")) {
+				String pathToDest = args[1];
+				/*if (!pathToDest.endsWith(System.getProperty("file.separator"))) {
 					pathToDest += System.getProperty("file.separator");
-				}
+				}*/
 				try {
-					readFromG1M(pathToG1M);
-					
-					for (int i = 0; i < g1mparts.size(); i++) {
-						//Disallowed chars: <>:"/\|?*
-						String name = g1mparts.get(i).name.replaceAll("<|>|:|\"|\\/|\\\\|\\||\\?|\\*", "_");
-						//IO.writeStrToFile(new File(pathToDest+name+".bide"), );
+					for (int i = 2; i < args.length; i++) {
+						G1MParser g1mparser = new G1MParser(args[i]);
+						g1mparser.readG1M();
+						
+						if (!g1mparser.checkValidity()) {
+							BIDE.readFromTxt(args[i]);
+				    	} else {
+				    		BIDE.readFromG1M(args[i]);
+				    	}
 					}
+					
+					/*for (int i = 0; i < g1mparts.size(); i++) {
+						//Disallowed chars: <>:"/\|?*
+						g1mparts.get(i).name = g1mparts.get(i).name.replaceAll("<|>|:|\"|\\/|\\\\|\\||\\?|\\*", "_");
+					}*/
+					writeToTxt(pathToDest);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
+
+			System.exit(0);
 			
 		} else {
 			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -158,19 +188,33 @@ public class BIDE {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					ui.createAndDisplayUI();
+					
+					ProgramTextPane.initAutoComplete();
+					
+					//ui.jtp.addTab("test", new Program("test1", "800", "testcontent", TYPE_PICT).comp);
+					
+					//ui.createNewTab(TYPE_COLORATION);
+					//ui.createNewTab(TYPE_PICT);
+					//ui.jtp.addTab("testPict", new Picture(BIDE.TYPE_PICT, "PICT10", 0x400, new Byte[] {(byte)0b10001011, 0b00100101, 0b01001010, 0b00010011}).jsp);
+					//((ProgScrollPane)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
+					
+					//new AutoImport().autoImport("C:\\Users\\Catherine\\Desktop\\PUISS4.g1m");
+					System.out.println("Finished initialization");
+					
+					//Open eventual files provided as arguments
+					
+					if (args.length > 0) {
+						File[] files = new File[args.length];
+						for (int i = 0; i < args.length; i++) {
+							files[i] = new File(args[i]);
+						}
+						ui.openFile(false, files);
+					}
 				}
 			});
-			ProgramTextPane.initAutoComplete();
 			
-			//ui.jtp.addTab("test", new Program("test1", "800", "testcontent", TYPE_PICT).comp);
 			
-			//ui.createNewTab(TYPE_COLORATION);
-			//ui.createNewTab(TYPE_PICT);
-			//ui.jtp.addTab("testPict", new Picture(BIDE.TYPE_PICT, "PICT10", 0x400, new Byte[] {(byte)0b10001011, 0b00100101, 0b01001010, 0b00010011}).jsp);
-			//((ProgScrollPane)ui.jtp.getComponentAt(0)).textPane.setText("testcontent");
 			
-			//new AutoImport().autoImport("C:\\Users\\Catherine\\Desktop\\PUISS4.g1m");
-			System.out.println("Finished initialization");
 		}
 		
 		
@@ -205,7 +249,7 @@ public class BIDE {
 				//System.out.println(progsTxt[i].indexOf('\n'));
 				//System.out.println(progsTxt[i].substring(progsTxt[i].indexOf('\n')+1).indexOf('\n'));
 				option = progsTxt[i].substring(progsTxt[i].indexOf('\n')+1, progsTxt[i].indexOf('\n')+1 + progsTxt[i].substring(progsTxt[i].indexOf('\n')+1).indexOf('\n'));
-				System.out.println("option = " + option);
+				//System.out.println("option = " + option);
 			} catch (Exception e) {
 				error("Invalid option in part "+name);
 				e.printStackTrace();
@@ -332,8 +376,6 @@ public class BIDE {
 		
 		long time = System.currentTimeMillis();
 		if (!debug) {
-			System.setOut(System.out);
-			System.setOut(new PrintStream(new CustomOutputStream(BIDE.ui.stdout)));
 			BIDE.ui.stdout.setText("");
 		}
 		
@@ -352,7 +394,7 @@ public class BIDE {
 			}
 			
 			currentPart = g1mparts.get(h);
-			currentPart.content = "";
+			//currentPart.content = "";
 			if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
 				
 				Picture pict = ((Picture)((JScrollPane)(g1mparts.get(h).comp)).getViewport().getView());
@@ -371,9 +413,13 @@ public class BIDE {
 				currentPart.content = Arrays.copyOfRange((Byte[])currentPart.content, 0, Integer.parseInt(currentPart.option, 16));
 				
 			} else {
-				String[] lines = ((ProgramTextPane)((ProgScrollPane)g1mparts.get(h).comp).getViewport().getView()).getText().split("\\n|\\r|\\r\\n");
-				//System.out.println(lines[0]);
-				
+				String[] lines;
+				if (!isCLI) {
+					lines = ((ProgramTextPane)((ProgScrollPane)g1mparts.get(h).comp).getViewport().getView()).getText().split("\\n|\\r|\\r\\n");
+				} else {
+					lines = ((String)g1mparts.get(h).content).split("\\n|\\r|\\r\\n");
+				}
+				currentPart.content = "";
 				currentPart.name = lines[0].substring(15);
 				
 				if (type == BIDE.TYPE_PROG && lines[1].startsWith("#Password: ")) {
@@ -528,7 +574,12 @@ public class BIDE {
 		String result = "";
 		for (int i = 0; i < g1mparts.size(); i++) {
 			if (g1mparts.get(i).type == BIDE.TYPE_PROG) {
-				result += ((ProgScrollPane)g1mparts.get(i).comp).textPane.getText() + "\n#End of part\n";
+				if (!BIDE.isCLI) {
+					result += ((ProgScrollPane)g1mparts.get(i).comp).textPane.getText();
+				} else {
+					result += g1mparts.get(i).content;
+				}
+				result += "\n#End of part\n";
 			} else if (g1mparts.get(i).type == BIDE.TYPE_PICT || g1mparts.get(i).type == BIDE.TYPE_CAPT) {
 				Picture pict = ((Picture)((JScrollPane)(g1mparts.get(i).comp)).getViewport().getView());
 				if (g1mparts.get(i).type == BIDE.TYPE_PICT) {

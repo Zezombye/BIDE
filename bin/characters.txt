@@ -13,6 +13,7 @@ abcdefghijklmnopqrstuvwxyz
 
 --00XX--
 0003 - 
+0004 - µ
 0007 - 
 0008 - 
 0009 - 

@@ -2,6 +2,9 @@ package zezombye.BIDE;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -106,8 +109,9 @@ public class UI {
 		};
 		
 		WindowsTabbedPaneUI2 btpui = new WindowsTabbedPaneUI2();
-		
 		jtp.setUI(btpui);
+		
+		
 
 		//jtp.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 		
@@ -138,11 +142,13 @@ public class UI {
 		printStream = new PrintStream(new CustomOutputStream(stdout));
 		if (!BIDE.debug) {
 			System.setOut(printStream);
-			System.setErr(printStream);
+			//System.setErr(printStream);
 		}
 		stdout.setBackground(Color.ORANGE);
-		stdout.setFont(new Font("DejaVu Avec Casio", 12, Font.PLAIN));
+		stdout.setCaretColor(stdout.getBackground());
+		stdout.setFont(new Font("DejaVu Avec Casio", Font.TRUETYPE_FONT, 12));
 		stdout.setLineWrap(true);
+				
 		JScrollPane jsp2 = new JScrollPane(stdout);
 		jsp2.setPreferredSize(new Dimension(sidebarWidth, 200));
 		//sidebar.setLayout(new BorderLayout());
@@ -585,90 +591,92 @@ public class UI {
 	}
 	
 	public void openFile(boolean addToCurrentFile) {
-    	jfc.setCurrentDirectory(new File(BIDE.pathToG1M));
+		jfc.setCurrentDirectory(new File(BIDE.pathToG1M));
 		
 		File[] input = null;
 		if (jfc.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
 			input = jfc.getSelectedFiles();
 		}
+		if (input != null) {
+			openFile(addToCurrentFile, input);
+		}
+	}
+	
+	public void openFile(boolean addToCurrentFile, File[] input) {
 		
-	    if (input != null) {
-	    	
-	    	final File[] input2 = input;
-	    	if (!addToCurrentFile) {
-    			BIDE.g1mparts = new ArrayList<G1MPart>();
-    		}
-    		for (int i = 0; i < input2.length; i++) {
-		    		BIDE.pathToG1M = input2[i].getPath();
-		    		BIDE.pathToSavedG1M = "";
-	    		
-			    try {
-			    	G1MParser g1mparser = new G1MParser(BIDE.pathToG1M);
-					g1mparser.readG1M();
-					
-					if (!g1mparser.checkValidity()) {
-						BIDE.readFromTxt(BIDE.pathToG1M);
-			    	} else {
-			    		BIDE.readFromG1M(BIDE.pathToG1M);
-			    	}
-			    	BIDE.pathToSavedG1M = "";
-			    	
-			    	BIDE.g1mparts.sort(new Comparator<G1MPart>() {
+		new Thread(new Runnable() {
+			public void run() {
+				if (!addToCurrentFile) {
+					BIDE.g1mparts = new ArrayList<G1MPart>();
+				}
+				for (int i = 0; i < input.length; i++) {
+			    		BIDE.pathToG1M = input[i].getPath();
+			    		BIDE.pathToSavedG1M = "";
+		    		
+				    try {
+				    	G1MParser g1mparser = new G1MParser(BIDE.pathToG1M);
+						g1mparser.readG1M();
+						
+						if (!g1mparser.checkValidity()) {
+							BIDE.readFromTxt(BIDE.pathToG1M);
+				    	} else {
+				    		BIDE.readFromG1M(BIDE.pathToG1M);
+				    	}
+				    	BIDE.pathToSavedG1M = "";
+				    	
+				    	BIDE.g1mparts.sort(new Comparator<G1MPart>() {
 
-						@Override
-						public int compare(G1MPart arg0, G1MPart arg1) {
-							if (arg0.type == arg1.type) {
-								return arg0.name.compareTo(arg1.name);
-							} else {
-								if (arg0.type < arg1.type) {
-									return -1;
-								} else if (arg0.type > arg1.type){
-									return 1;
+							@Override
+							public int compare(G1MPart arg0, G1MPart arg1) {
+								if (arg0.type == arg1.type) {
+									return arg0.name.compareTo(arg1.name);
 								} else {
-									return 0;
+									if (arg0.type < arg1.type) {
+										return -1;
+									} else if (arg0.type > arg1.type){
+										return 1;
+									} else {
+										return 0;
+									}
 								}
 							}
-						}
-			    	});
-			    	
-			    	
-			    } catch (NullPointerException e) {
-			    	if (BIDE.debug) e.printStackTrace();
-			    } catch (NoSuchFileException e) {
-			    	BIDE.error("The file at \"" + BIDE.pathToG1M + "\" does not exist.");
-			    } catch (AccessDeniedException e) {
-			    	BIDE.error("BIDE is denied access to the file at \"" + BIDE.pathToG1M + "\"");
-			    } catch (IOException e) {
-					e.printStackTrace();
-				}
-			    if (BIDE.g1mparts.size() != 0) {
-				    System.out.println("Finished loading g1m");
-			    	
-			    }
-			    
-	    	}
-	    	
-	    	jtp.removeAll();
-    		new SwingWorker<Void, G1MPart>() {
-            	@Override
-                protected Void doInBackground() {
-            		for (int i = 0; i < BIDE.g1mparts.size(); i++) {
-            			jtp.addTab(BIDE.g1mparts.get(i).name, BIDE.g1mparts.get(i).comp);
-            		}
-            		try {
-        		    	getTextPane().setCaretPosition(0);
-        		    } catch (NullPointerException e) {
-        		    	if (BIDE.debug) {
-        		    		e.printStackTrace();
-        		    	}
-        		    }
-                    return null;
-                }
-            }.execute();
-	    	
-	    	
-		    
-	    }
+				    	});
+				    	
+				    	
+				    } catch (NullPointerException e) {
+				    	if (BIDE.debug) e.printStackTrace();
+				    } catch (NoSuchFileException e) {
+				    	BIDE.error("The file at \"" + BIDE.pathToG1M + "\" does not exist.");
+				    } catch (AccessDeniedException e) {
+				    	BIDE.error("BIDE is denied access to the file at \"" + BIDE.pathToG1M + "\"");
+				    } catch (IOException e) {
+						e.printStackTrace();
+					}
+				    if (BIDE.g1mparts.size() != 0) {
+					    System.out.println("Finished loading g1m");
+				    }
+		    	}
+		    	
+		    	jtp.removeAll();
+				new SwingWorker<Void, G1MPart>() {
+		        	@Override
+		            protected Void doInBackground() {
+		        		for (int i = 0; i < BIDE.g1mparts.size(); i++) {
+		        			jtp.addTab(BIDE.g1mparts.get(i).name, BIDE.g1mparts.get(i).comp);
+		        		}
+		        		try {
+		    		    	getTextPane().setCaretPosition(0);
+		    		    } catch (NullPointerException e) {
+		    		    	if (BIDE.debug) {
+		    		    		e.printStackTrace();
+		    		    	}
+		    		    }
+		                return null;
+		            }
+		        }.execute();
+			}
+		}).start();
+    	
     }
 	
 	public void saveFile(boolean saveToG1M, boolean saveAs, boolean runFile) {
@@ -799,7 +807,15 @@ public class UI {
 			}
 	    }
 	}
-		
+	
+	public void removeTab(int i) {
+		int option = JOptionPane.showConfirmDialog(BIDE.ui.window, "Are you sure you want to close this tab?", "BIDE", JOptionPane.YES_NO_OPTION);
+        if (option == JOptionPane.YES_OPTION) {
+        	jtp.remove(i);
+        	BIDE.g1mparts.remove(i);
+        }
+	}
+	
 }
 
 class ToolbarButton extends JButton {
@@ -874,11 +890,7 @@ class ButtonTabComponent extends JPanel {
         public void actionPerformed(ActionEvent e) {
             int i = pane.indexOfTabComponent(ButtonTabComponent.this);
             if (i != -1) {
-            	int option = JOptionPane.showConfirmDialog(BIDE.ui.window, "Are you sure you want to close this tab?", "BIDE", JOptionPane.YES_NO_OPTION);
-                if (option == JOptionPane.YES_OPTION) {
-                	pane.remove(i);
-                	BIDE.g1mparts.remove(i);
-                }
+            	BIDE.ui.removeTab(i);
             }
         }
 
@@ -916,6 +928,4 @@ class ButtonTabComponent extends JPanel {
             g2.dispose();
         }
     }
-    
-    
 }

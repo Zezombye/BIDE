@@ -91,13 +91,14 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		final Color preprocessorColor = new Color(Integer.parseInt(BIDE.options.getProperty("preprocessorColor"), 16));
 		
 		ss.setStyle(Token.RESERVED_WORD, new Style(keywordColor, this.getFont()));
-		ss.setStyle(Token.RESERVED_WORD_2, new Style(operatorColor));
 		ss.setStyle(Token.OPERATOR, new Style(operatorColor));
 		ss.setStyle(Token.VARIABLE, new Style(variableColor));
+		ss.setStyle(Token.MARKUP_ENTITY_REFERENCE, new Style(entityColor));
+		ss.setStyle(Token.RESERVED_WORD_2, new Style(operatorColor));
 		ss.setStyle(Token.LITERAL_STRING_DOUBLE_QUOTE, new Style(strColor));
 		ss.setStyle(Token.ERROR_STRING_DOUBLE, new Style(strColor));
-		ss.setStyle(Token.COMMENT_EOL, new Style(commentColor, this.getFont().deriveFont(Font.ITALIC)));
-		ss.setStyle(Token.MARKUP_ENTITY_REFERENCE, new Style(entityColor));
+		ss.setStyle(Token.LITERAL_CHAR, new Style(commentColor, this.getFont().deriveFont(Font.ITALIC)));
+		ss.setStyle(Token.ERROR_CHAR, new Style(commentColor, this.getFont().deriveFont(Font.ITALIC)));
 		ss.setStyle(Token.PREPROCESSOR, new Style(preprocessorColor));
 		ss.setStyle(Token.FUNCTION, new Style(new Color(Integer.parseInt(BIDE.options.getProperty("textColor"), 16))));
 		//ss.setStyle(Token.DATA_TYPE, new Style(borderColor));

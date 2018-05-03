@@ -840,7 +840,7 @@ public class FixedTabbedPaneUI extends TabbedPaneUI implements SwingConstants {
 	            }
 	        }
         } catch (ArrayIndexOutOfBoundsException e) {
-        	if (!BIDE.debug) e.printStackTrace();
+        	if (BIDE.debug) e.printStackTrace();
         }
 
         // Paint selected tab if its in the front run
@@ -3644,21 +3644,29 @@ public class FixedTabbedPaneUI extends TabbedPaneUI implements SwingConstants {
             if (!tabPane.isEnabled()) {
                 return;
             }
-            int tabIndex = tabForCoordinate(tabPane, e.getX(), e.getY());
-            if (tabIndex >= 0 && tabPane.isEnabledAt(tabIndex)) {
-                if (tabIndex != tabPane.getSelectedIndex()) {
-                    // Clicking on unselected tab, change selection, do NOT
-                    // request focus.
-                    // This will trigger the focusIndex to change by way
-                    // of stateChanged.
-                    tabPane.setSelectedIndex(tabIndex);
-                }
-                else if (tabPane.isRequestFocusEnabled()) {
-                    // Clicking on selected tab, try and give the tabbedpane
-                    // focus.  Repaint will occur in focusGained.
-                    tabPane.requestFocus();
+        	int tabIndex = tabForCoordinate(tabPane, e.getX(), e.getY());
+            if ( SwingUtilities.isLeftMouseButton ( e ) )
+            {
+                if (tabIndex >= 0 && tabPane.isEnabledAt(tabIndex)) {
+                    if (tabIndex != tabPane.getSelectedIndex()) {
+                        // Clicking on unselected tab, change selection, do NOT
+                        // request focus.
+                        // This will trigger the focusIndex to change by way
+                        // of stateChanged.
+                        tabPane.setSelectedIndex(tabIndex);
+                    }
+                    else if (tabPane.isRequestFocusEnabled()) {
+                        // Clicking on selected tab, try and give the tabbedpane
+                        // focus.  Repaint will occur in focusGained.
+                        tabPane.requestFocus();
+                    }
                 }
             }
+            else if ( SwingUtilities.isMiddleMouseButton ( e ) )
+            {
+                BIDE.ui.removeTab(tabIndex);
+            }
+            
         }
 
         //
