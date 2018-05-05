@@ -487,7 +487,12 @@ public class CompletionCellRenderer extends DefaultListCellRenderer {
 		Completion c, int index, boolean selected, boolean hasFocus) {
 
 		StringBuilder sb = new StringBuilder(PREFIX);
-		sb.append(c.getInputText().replaceAll("&", "&amp;").replaceAll("\\/", "\uE063").replaceAll("\\*", "\uE062"));
+		sb.append(c.getInputText()
+				.replaceAll("&", "&amp;")
+				.replaceAll("\\/", "\uE063")
+				.replaceAll("\\*", "\uE062")
+				.replaceAll("<", "&lt;")
+		);
 		//sb.append(" (r:"+c.getRelevance()+", "+((BasicCompletion)c).initialRelevance+")");
 		if (c instanceof BasicCompletion) {
 			String definition = ((BasicCompletion)c).getShortDescription();

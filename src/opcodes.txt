@@ -675,7 +675,8 @@
 },{
 	"hex":"C1",
 	"relevance":4,
-	"text":"Ran# "
+	"text":"Ran# ",
+	"description": "Returns a random number between 0 (included) and 1 (excluded)."
 },{
 	"hex":"C2",
 	"relevance":0,
@@ -1073,11 +1074,17 @@
 },{
 	"hex":"7F24",
 	"relevance":4,
-	"text":"ReP "
+	"text":"ReP ",
+	"syntax": "ReP <nb&slash;list&slash;mat>",
+	"description": "Returns the real part of the number provided. If a list/mat is provided, returns a list/mat with each number replaced by its real part. Be sure to put parentheses, as [code]ReP 1+2i[/code] is parsed as [code](ReP 1)+2i[/code].",
+	"example": "[code]ReP {1+i, -3i}[/code] returns {1,0}"
 },{
 	"hex":"7F25",
 	"relevance":4,
-	"text":"ImP "
+	"text":"ImP ",
+	"syntax": "ImP <nb&slash;list&slash;mat>",
+	"description": "Returns the real part of the number provided. If a list/mat is provided, returns a list/mat with each number replaced by its real part. Be sure to put parentheses, as [code]ImP 1+2i[/code] is parsed as [code](ImP 1)+2i[/code].",
+	"example": "[code]ImP {1, -3i}[/code] returns {0, -3}"
 },{
 	"hex":"7F26",
 	"relevance":0,
@@ -4568,7 +4575,8 @@
 },{
 	"hex":"F70C",
 	"relevance":5,
-	"text":"Return"
+	"text":"Return",
+	"description": "Stops the execution of the current program, and if the current program has been called by another program, returns to the \"superior\" program."
 },{
 	"hex":"F70D",
 	"relevance":5,
@@ -4577,7 +4585,8 @@
 },{
 	"hex":"F70E",
 	"relevance":0,
-	"text":"Stop"
+	"text":"Stop",
+	"description": "Stops the execution of the current program. Unlike [code]Return[/code], it does not return to the caller program if it is a sub-program."
 },{
 	"hex":"F710",
 	"relevance":5,
@@ -5034,11 +5043,15 @@
 },{
 	"hex":"F793",
 	"relevance":5,
-	"text":"StoPict "
+	"text":"StoPict ",
+	"syntax": "StoPict <1-20>",
+	"description": "Stores what is displayed at the screen in the given picture."
 },{
 	"hex":"F794",
 	"relevance":5,
-	"text":"RclPict "
+	"text":"RclPict ",
+	"syntax": "RclPict <1-20>",
+	"description": "Displays the given picture."
 },{
 	"hex":"F795",
 	"relevance":0,
@@ -5074,7 +5087,9 @@
 },{
 	"hex":"F79F",
 	"relevance":5,
-	"text":"RclCapt "
+	"text":"RclCapt ",
+	"syntax": "RclCapt <1-20>",
+	"description": "Displays the given capture."
 },{
 	"hex":"F7A0",
 	"relevance":0,
@@ -5118,31 +5133,52 @@
 },{
 	"hex":"F7A8",
 	"relevance":0,
-	"text":"PlotOn "
+	"text":"PlotOn ",
+	"syntax": "PlotOn <x>, <y>",
+	"description": "Sets the pixel at x,y to black according to the ViewWindow.",
+	"example": "[code]PlotOn 1,2[/code]"
 },{
 	"hex":"F7A9",
 	"relevance":0,
-	"text":"PlotOff "
+	"text":"PlotOff ",
+	"syntax": "PlotOff <x>, <y>",
+	"description": "Sets the pixel at x,y to white according to the ViewWindow.",
+	"example": "[code]PlotOff 1,2[/code]"
 },{
 	"hex":"F7AA",
 	"relevance":0,
-	"text":"PlotChg "
+	"text":"PlotChg ",
+	"syntax": "PlotChg <x>, <y>",
+	"description": "Changes the color of the pixel at x,y according to the ViewWindow.",
+	"example": "[code]PlotChg 1,2[/code]"
 },{
 	"hex":"F7AB",
 	"relevance":0,
-	"text":"PxlOn "
+	"text":"PxlOn ",
+	"syntax": "PxlOn y,x",
+	"description": "Sets the pixel at x,y to black. This function is independant of the ViewWindow, and has the origin in the top left corner. Be careful: it is y,x and not x,y.",
+	"example": "[code]PxlOn 10,20[/code]"
 },{
 	"hex":"F7AC",
 	"relevance":0,
-	"text":"PxlOff "
+	"text":"PxlOff ",
+	"syntax": "PxlOff y,x",
+	"description": "Sets the pixel at x,y to white. This function is independant of the ViewWindow, and has the origin in the top left corner. Be careful: it is y,x and not x,y.",
+	"example": "[code]PxlOff 10,20[/code]"
 },{
 	"hex":"F7AD",
 	"relevance":0,
-	"text":"PxlChg "
+	"text":"PxlChg ",
+	"syntax": "PxlChg y,x",
+	"description": "Changes the color of the pixel at x,y (white <-> black). This function is independant of the ViewWindow, and has the origin in the top left corner. Be careful: it is y,x and not x,y.",
+	"example": "[code]PxlChg 10,20[/code]"
 },{
 	"hex":"F7AF",
 	"relevance":0,
-	"text":"PxlTest("
+	"text":"PxlTest(",
+	"syntax": "PxlTest(y,x)",
+	"description": "Returns 1 if the pixel at y,x is black, 0 otherwise. This function is independant of the ViewWindow, and has the origin in the top left corner. Be careful: it is y,x and not x,y.\n\nTo use this function, you must initialize the graph memory by drawing something, else this function returns a memory error.",
+	"example": "[code]PxlTest(10,20)[/code]"
 },{
 	"hex":"F7B0",
 	"relevance":0,
@@ -5690,7 +5726,8 @@
 	"text":"NormCD(",
 	"syntax": "NormCD(a, b [, σ [, μ]])\nNormCD(listA, listB [, σ [, μ]])",
 	"description": "Let X be a random variable that follows the normal distribution N(μ;σ²).\n\nCalculates P(a < X < b). If σ or µ are not provided, they default to 1 and 0 respectively.\n\nTo calculate P(X > a) or P(X < a), replace a or b with -∞ ([code]-99[/code]) or +∞ ([code]99[/code]).\n\nIf lists are provided, returns the probability for each pair of values in the list (P(listA[1] < X < listB[1], P(listA[2] < X < listB[2]), etc).",
-	"example": "[code]NormCD(2,3)[/code] = [code]NormCD(2,3,1)[/code] = [code]NormCD(2,3,1,0) ≈ 0.0214[/code]"
+	"example": "[code]NormCD(2,3)[/code] = [code]NormCD(2,3,1)[/code] = [code]NormCD(2,3,1,0) ≈ 0.0214[/code]",
+	"compat":"OS 2.00"
 },{
 	"hex":"F982",
 	"relevance":0,

@@ -73,8 +73,7 @@ spacesFor\!\==true
 #=>
 spacesFor\=>=true
 
-#Set to "calculator" to test on the calculator (requires the BIDE Add-In)
-#or to "emulator" to test on the emulator (requires the Manager PLUS emulator).
+#Set to "emulator" to test on the emulator (requires the Manager PLUS emulator).
 #Else, set to "none".
 runOn=none
 

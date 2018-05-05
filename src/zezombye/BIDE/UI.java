@@ -139,7 +139,11 @@ public class UI {
 		//sidebar.setSize(new Dimension(200, window.getHeight()));
 		window.add(sidebar, BorderLayout.EAST);
 		stdout.setWrapStyleWord(true);
-		printStream = new PrintStream(new CustomOutputStream(stdout));
+		try {
+			printStream = new PrintStream(new CustomOutputStream(stdout), false, "UTF-8");
+		} catch (UnsupportedEncodingException e2) {
+			e2.printStackTrace();
+		}
 		if (!BIDE.debug) {
 			System.setOut(printStream);
 			//System.setErr(printStream);
