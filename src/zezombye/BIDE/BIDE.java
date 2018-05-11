@@ -57,7 +57,7 @@ public class BIDE {
 	
 	public static String runOn = "none";
 	
-	public final static String VERSION = "4.0";
+	public final static String VERSION = "4.1";
 	
 	public final static int TYPE_PROG = 0;
 	public final static int TYPE_PICT = 3;
@@ -1011,6 +1011,9 @@ public class BIDE {
 			}
 			if ((content.charAt(i) == '\r' || content.charAt(i) == ':') && !currentPosIsString) {
 				currentPosIsComment = false;
+			}
+			if (content.charAt(i) == '\r') {
+				currentPosIsString = false;
 			}
 			
 			if (addSpaces && !currentPosIsString && !currentPosIsComment) {

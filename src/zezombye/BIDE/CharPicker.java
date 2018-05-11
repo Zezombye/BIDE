@@ -89,7 +89,7 @@ class CharPanel extends JPanel {
 	
 	int nb;
 	BufferedImage image;
-	int xMouse, yMouse;
+	int xMouse = -1, yMouse = -1;
 	
 	public CharPanel(BufferedImage image, int nb) {
 		super();
