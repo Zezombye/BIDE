@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -22,6 +23,10 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -57,7 +62,7 @@ public class BIDE {
 	
 	public static String runOn = "none";
 	
-	public final static String VERSION = "4.1";
+	public final static String VERSION = "4.2";
 	
 	public final static int TYPE_PROG = 0;
 	public final static int TYPE_PICT = 3;
@@ -200,6 +205,7 @@ public class BIDE {
 					
 					//new AutoImport().autoImport("C:\\Users\\Catherine\\Desktop\\PUISS4.g1m");
 					System.out.println("Finished initialization");
+					if (!debug) checkForNewVersion();
 					
 					//Open eventual files provided as arguments
 					
@@ -509,7 +515,7 @@ public class BIDE {
 			CasioString name = new CasioString(asciiToCasio(g1mparts.get(i).name, true, g1mparts.get(i).name+".name", 1, macros));
 			CasioString part = new CasioString("");
 			
-			if (!g1mparts.get(i).isEditedSinceLastSave && g1mparts.get(i).type == BIDE.TYPE_PROG) {
+			if (!g1mparts.get(i).isEditedSinceLastSaveToG1M && g1mparts.get(i).type == BIDE.TYPE_PROG) {
 				System.out.println("Already parsed "+g1mparts.get(i).name);
 				part.add(g1mparts.get(i).binaryContent);
 			} else {
@@ -565,6 +571,11 @@ public class BIDE {
 			g1mwrapper.addPart(part, name, g1mparts.get(i).type);
 		}
 		g1mwrapper.generateG1M(destPath);
+		
+		for (int i = 0; i < BIDE.g1mparts.size(); i++) {
+			BIDE.g1mparts.get(i).isEditedSinceLastSaveToG1M = false;
+		}
+		
 		System.out.println("Finished writing to g1m in "+(System.currentTimeMillis()-time)+"ms");
 		
 	}
@@ -1384,6 +1395,58 @@ public class BIDE {
 				((ProgScrollPane)BIDE.g1mparts.get(g).comp).textPane.setText(Arrays.stream(lines).collect(Collectors.joining("\n")));
 				
 			}
+		}
+	}
+	
+	public static void checkForNewVersion() {
+		TrustManager[] trustAllCerts = new TrustManager[]{
+    	        new X509TrustManager() {
+    	            public java.security.cert.X509Certificate[] getAcceptedIssuers()
+    	            {
+    	                return null;
+    	            }
+    	            public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
+    	            {
+    	                //No need to implement.
+    	            }
+    	            public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType)
+    	            {
+    	                //No need to implement.
+    	            }
+    	        }
+    	};
+
+    	// Install the all-trusting trust manager
+    	try 
+    	{
+    	    SSLContext sc = SSLContext.getInstance("SSL");
+    	    sc.init(null, trustAllCerts, new java.security.SecureRandom());
+    	    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+    	} 
+    	catch (Exception e) 
+    	{
+    	    System.out.println(e);
+    	}
+    	
+        URL oracle;
+		try {
+			oracle = new URL("https://www.planet-casio.com/Fr/logiciels/voir_un_logiciel_casio.php?cat=6");
+			BufferedReader in = new BufferedReader(new InputStreamReader(oracle.openStream()));
+
+	        String inputLine;
+	        while ((inputLine = in.readLine()) != null) {
+	            if (inputLine.contains("<a href=\"dl_logiciel.php?id=118&file=1\">")) {
+	            	String currentVersion = inputLine.substring(inputLine.indexOf("BIDE")+5, inputLine.indexOf(".zip"));
+	            	if (!currentVersion.equals(BIDE.VERSION)) {
+	            		System.out.println("A new version of BIDE ("+currentVersion+") is available.");
+	            	}
+	            }
+	        	//System.out.println(inputLine);
+	            
+	        }
+	        in.close();
+		} catch (Exception e) {
+			//e.printStackTrace();
 		}
 	}
 	

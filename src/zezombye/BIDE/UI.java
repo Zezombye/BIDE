@@ -586,6 +586,10 @@ public class UI {
 		
 		//jtp.setTabComponentAt(jtp.getTabCount()-1, new ButtonTabComponent(jtp));
 		//((CustomDocumentFilter)((AbstractDocument)((Program)jtp.getComponentAt(jtp.getTabCount()-1)).textPane.getDocument()).getDocumentFilter()).testForLag();
+		selectLastTab();
+	}
+	
+	public void selectLastTab() {
 		jtp.setSelectedIndex(jtp.getTabCount()-1);
 	    try {
 	    	getTextPane().setCaretPosition(0);
@@ -726,13 +730,12 @@ public class UI {
 			    		
 						if (saveToG1M && !BIDE.pathToSavedG1M.endsWith(".bide") && !BIDE.pathToSavedG1M.endsWith(".txt")) {
 							BIDE.writeToG1M(BIDE.pathToSavedG1M);
+							
 						} else {
 							BIDE.writeToTxt(BIDE.pathToSavedG1M);
 						}
 		    		}
-					for (int i = 0; i < BIDE.g1mparts.size(); i++) {
-						BIDE.g1mparts.get(i).isEditedSinceLastSave = false;
-					}
+					
 								
 					//Update names
 					for (int i = 0; i < jtp.getTabCount(); i++) {
@@ -790,6 +793,7 @@ public class UI {
 				}
 				if (img.getHeight() > 128) {
 					BIDE.error("Image must be a maximum of 128 pixels high!");
+					return;
 				}
 				Byte[] binary = new Byte[0x800];
 				Arrays.fill(binary, (byte)0);
@@ -805,7 +809,9 @@ public class UI {
 				}
 				//System.out.println(binary);
 				String imgName = input.getName().substring(0, input.getName().lastIndexOf('.'));
-				this.jtp.addTab(imgName, new G1MPart(imgName, Integer.toHexString(128*img.getHeight()), binary, BIDE.TYPE_PICT).comp);
+				BIDE.g1mparts.add(new G1MPart(imgName, Integer.toHexString(128*img.getHeight()/8), binary, BIDE.TYPE_PICT));
+				jtp.addTab(imgName, BIDE.g1mparts.get(BIDE.g1mparts.size()-1).comp);
+				selectLastTab();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

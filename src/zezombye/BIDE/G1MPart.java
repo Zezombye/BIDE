@@ -32,7 +32,7 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 public class G1MPart {
 	
 	public CasioString binaryContent = null;
-	public boolean isEditedSinceLastSave = true;
+	public boolean isEditedSinceLastSaveToG1M = true;
 	public JComponent comp;
 	public String name = "";
 	public String option = "";
@@ -60,6 +60,7 @@ public class G1MPart {
 		this.content = content;
 		
 		if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
+			System.out.println("Creating new picture");
 			this.comp = new Picture(type, name, Integer.valueOf(option, 16), (Byte[])content).jsp;
 		} else {
 			if (!BIDE.isCLI) {
@@ -69,17 +70,17 @@ public class G1MPart {
 
 					@Override
 					public void changedUpdate(DocumentEvent arg0) {
-						isEditedSinceLastSave = true;
+						isEditedSinceLastSaveToG1M = true;
 					}
 
 					@Override
 					public void insertUpdate(DocumentEvent arg0) {
-						isEditedSinceLastSave = true;
+						isEditedSinceLastSaveToG1M = true;
 					}
 
 					@Override
 					public void removeUpdate(DocumentEvent arg0) {
-						isEditedSinceLastSave = true;
+						isEditedSinceLastSaveToG1M = true;
 					}
 					
 				});

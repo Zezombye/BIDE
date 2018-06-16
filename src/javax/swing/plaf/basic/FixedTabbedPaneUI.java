@@ -840,7 +840,10 @@ public class FixedTabbedPaneUI extends TabbedPaneUI implements SwingConstants {
 	            }
 	        }
         } catch (ArrayIndexOutOfBoundsException e) {
-        	if (BIDE.debug) e.printStackTrace();
+        	if (BIDE.debug) {
+        		System.err.print("debug exception: ");
+        		e.printStackTrace();
+        	}
         }
 
         // Paint selected tab if its in the front run
