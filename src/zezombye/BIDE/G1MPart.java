@@ -60,7 +60,6 @@ public class G1MPart {
 		this.content = content;
 		
 		if (type == BIDE.TYPE_PICT || type == BIDE.TYPE_CAPT) {
-			System.out.println("Creating new picture");
 			this.comp = new Picture(type, name, Integer.valueOf(option, 16), (Byte[])content).jsp;
 		} else {
 			if (!BIDE.isCLI) {

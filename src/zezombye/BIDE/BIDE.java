@@ -30,6 +30,7 @@ import javax.net.ssl.X509TrustManager;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import org.fife.ui.autocomplete.BasicCompletion;
 import org.fife.ui.autocomplete.DefaultCompletionProvider;
@@ -62,7 +63,7 @@ public class BIDE {
 	
 	public static String runOn = "none";
 	
-	public final static String VERSION = "4.2";
+	public final static String VERSION = "4.3";
 	
 	public final static int TYPE_PROG = 0;
 	public final static int TYPE_PICT = 3;
@@ -90,6 +91,7 @@ public class BIDE {
 	
 	public static void main(String[] args2) {
 		args = args2;
+				
 		
 		
 		if (args.length > 0 && args[0].equals("debug")) {
@@ -97,13 +99,8 @@ public class BIDE {
 			System.out.println("Debug activated");
 			args = new String[0];
 		}
-		
+				
 		options.loadProperties();
-		
-		//progFont = progFont.deriveFont(30);
-		//System.out.println(progFont.getSize());
-		//System.setProperty("awt.useSystemAAFontSettings","none");
-		//System.setProperty("swing.aatext", "false");
 		
 		//options.initProperties();
 		getOpcodes();
@@ -147,9 +144,6 @@ public class BIDE {
 				}
 			} else if (args[0].equals("--to-txt")) {
 				String pathToDest = args[1];
-				/*if (!pathToDest.endsWith(System.getProperty("file.separator"))) {
-					pathToDest += System.getProperty("file.separator");
-				}*/
 				try {
 					for (int i = 2; i < args.length; i++) {
 						G1MParser g1mparser = new G1MParser(args[i]);
@@ -162,10 +156,6 @@ public class BIDE {
 				    	}
 					}
 					
-					/*for (int i = 0; i < g1mparts.size(); i++) {
-						//Disallowed chars: <>:"/\|?*
-						g1mparts.get(i).name = g1mparts.get(i).name.replaceAll("<|>|:|\"|\\/|\\\\|\\||\\?|\\*", "_");
-					}*/
 					writeToTxt(pathToDest);
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -222,9 +212,7 @@ public class BIDE {
 			
 			
 		}
-		
-		
-		
+				
 	}
 	
 	public static void readFromTxt(String txtPath) throws IOException {
@@ -310,12 +298,22 @@ public class BIDE {
 			if (g1mparser.getPartType(g1mparser.parts.get(h)) == TYPE_PROG) {
 				
 				String progName = casioToAscii(g1mparser.getPartName(g1mparser.parts.get(h)), false);
+				//Check for "base" program
+				boolean isBaseProgram = false;
+				if (g1mparser.parts.get(h).charAt(52) == 0x01) {
+					if (BIDE.options.getProperty("allowUnicode").equals("true")) {
+						progName += "";
+					} else {
+						progName += "&negative_B;";
+					}
+					isBaseProgram = true;
+				}
 				String progPw = casioToAscii(g1mparser.parts.get(h).substring(44, 52), false);
 
 				if (progPw.isEmpty()) {
 					progPw = "<no password>";
 				}
-				System.out.println("Found program \"" + progName + "\"");
+				System.out.println("Found program \"" + progName + "\"" + (isBaseProgram ? " (base program)" : ""));
 				
 				String progContent = casioToAscii(g1mparser.getPartContent(g1mparser.parts.get(h)).substring(10), true);
 				
@@ -348,36 +346,7 @@ public class BIDE {
 		}
 		System.out.println("Loading g1m...");
 	}
-	
-	/*public static void writeToG1M(String destPath) throws IOException {
-		//Parse programs from UI
-		List<Program> parts = new ArrayList<Program>();
-		//Parse text file
-		for (int h = 0; h < ui.jtp.getTabCount(); h++) {
-			
-			parts.add((Program)ui.jtp.getComponentAt(h));
-			
-			int type = ((ProgScrollPane)ui.jtp.getComponentAt(h)).type;
-			if (type != TYPE_PROG && type != TYPE_PICT && type != TYPE_CAPT) {
-				continue;
-			}
-			
-			String[] lines = ((ProgScrollPane)ui.jtp.getComponentAt(h)).textPane.getText().split("\\n|\\r|\\r\\n");
-
-			if (type == TYPE_PICT || type == TYPE_CAPT) {
-				parts.add(new Program("", "", ))
-			} else {
-				if (type == TYPE_PROG && !lines[0].startsWith("#Program name: ")) {
-					error("Program "+ ui.jtp.getComponentAt(h).getName() + " must include the directive \"#Program name: \" at the beginning!");
-				}
-				parts.add(new Program("", "", ((ProgScrollPane)ui.jtp.getComponentAt(h)).textPane.getText(), type));
-			}
-			
-			//System.out.println("Program text="+((Program)ui.jtp.getComponentAt(h)).textPane.getText());
-		}
-		writeToG1M(destPath, parts);
-	}*/
-	
+		
 	public static void writeToG1M(String destPath) throws IOException {
 		
 		long time = System.currentTimeMillis();
@@ -522,7 +491,13 @@ public class BIDE {
 			
 				System.out.println("Parsing \""+g1mparts.get(i).name+"\"");
 				
-				if (name.length() > 8) {
+				boolean isBaseProgram = false;
+				if (name.endsWith(new CasioString(new byte[]{(byte)0xE5, (byte)0xB5}))) {
+					name = name.substring(0, name.length()-2);
+					isBaseProgram = true;
+				}
+				
+				if (name.length() > 8 && !(name.length() == 10 && name.charAt(8) == 0xE5 && name.charAt(9) == 0xB5)) {
 					error("Program \""+g1mparts.get(i).name+"\" has a name too long (8 characters max)!");
 					return;
 				}
@@ -557,7 +532,12 @@ public class BIDE {
 					}
 					password.add(Arrays.copyOfRange(padding, 0, 8-password.length()));
 					part.add(password);
-					part.add(new byte[]{0,0});
+					
+					if (isBaseProgram) {
+						part.add(new byte[]{1,0});
+					} else {
+						part.add(new byte[]{0,0});
+					}
 					part.add(asciiToCasio((String)g1mparts.get(i).content, false, g1mparts.get(i).name, 1, macros));
 					part.add(Arrays.copyOfRange(padding, 0, 4-part.length()%4));
 				} else if (g1mparts.get(i).type == BIDE.TYPE_PICT){

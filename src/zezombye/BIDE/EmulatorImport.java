@@ -140,7 +140,7 @@ public class EmulatorImport {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-    	inputString("                                           "+path.replaceAll("/", "\\\\"), 1);
+    	inputString("                                                                           "+path.replaceAll("/", "\\\\"), 1);
     	inputKey(KeyEvent.VK_ENTER, 0);
     	
     	//Wait for confirmation screen (copy to main mem/storage mem)

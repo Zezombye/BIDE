@@ -58,7 +58,7 @@ public class Picture extends JPanel {
 	PictPanel pictPanel = new PictPanel(0);
 	PictPanel pictPanel2 = new PictPanel(1);
 	JButton setSizeButton = new JButton("Set size");
-	JButton exportPictButton = new JButton("Save to .png");
+	JButton exportPictButton = new JButton("Export to .png");
 	JLabel pictTutorial = new JLabel("Left click for black, right click for white, ctrl+scroll to zoom");
 	JLabel pictWarning = new JLabel("Do not edit the picture below unless you know what you are doing!");
 	
@@ -77,7 +77,7 @@ public class Picture extends JPanel {
 		if (size > 0x400 && data.length > 0x400) {
 			pictPanel2.pixels = Arrays.copyOfRange(data, 0x400, size);
 			
-			for (int i = 0; i < 0x400; i++) {
+			for (int i = 0; i < size-0x400; i++) {
 				if (pictPanel2.pixels[i] == null) {
 					pictPanel2.pixels[i] = (byte)0;
 				}
@@ -122,7 +122,10 @@ public class Picture extends JPanel {
 		}
 		
 		this.addMouseWheelListener(new MouseWheelListener() {
-			@Override public void mouseWheelMoved(MouseWheelEvent e) { 
+			@Override public void mouseWheelMoved(MouseWheelEvent e) {
+				//e.obey();
+				//e.conform();
+				e.consume();
 			    if (e.isControlDown()) {
 			        if (e.getWheelRotation() < 0) {            
 			            setZoom(zoom + 1);

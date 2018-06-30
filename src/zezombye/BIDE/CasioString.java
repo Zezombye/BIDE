@@ -51,6 +51,10 @@ public class CasioString {
 		content.set(index, char_);
 	}
 	
+	public boolean endsWith(CasioString str) {
+		return this.substring(this.length()-str.length()).equals(str);
+	}
+	
 	public void add(int i) {this.content.add((byte)i);}
 	public void add(byte b) {this.content.add(b);}
 	

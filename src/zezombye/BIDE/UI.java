@@ -48,33 +48,6 @@ public class UI {
 	
 	public void createAndDisplayUI() {
 		
-		/*for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-			System.out.println(info.getName());
-		    if ("Nimbus".equals(info.getName())) {
-		        try {
-					UIManager.setLookAndFeel(info.getClassName());
-				} catch (ClassNotFoundException e1) {
-					e1.printStackTrace();
-				} catch (InstantiationException e1) {
-					e1.printStackTrace();
-				} catch (IllegalAccessException e1) {
-					e1.printStackTrace();
-				} catch (UnsupportedLookAndFeelException e1) {
-					e1.printStackTrace();
-				}
-		        break;
-		    }
-		}*/
-		
-		/*HashMap<Object, Object> defaultsToKeep = new HashMap<>();
-		for (Map.Entry<Object, Object> entry : UIManager.getDefaults().entrySet()) {
-		    boolean isStringKey = entry.getKey().getClass() == String.class ;
-		    String key = isStringKey ? ((String) entry.getKey()):"";    
-		    if (key.startsWith("TabbedPane")) {
-		        defaultsToKeep.put(entry.getKey(), entry.getValue());
-		    }
-		}
-		*/
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
@@ -371,13 +344,20 @@ public class UI {
 			}
 		});
 		toolsMenu.add(multiDrawstat);
-		JMenuItem imgToPict = new JMenuItem("Convert image to picture");
+		JMenuItem imgToPict = new JMenuItem("Image to picture");
 		imgToPict.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
-				importPict();
+				importImage(true);
 			}
 		});
 		toolsMenu.add(imgToPict);
+		JMenuItem imgToMultiDrawstat = new JMenuItem("Image to Multi Drawstat");
+		imgToMultiDrawstat.addActionListener(new ActionListener() {
+			@Override public void actionPerformed(ActionEvent arg0) {
+				importImage(false);
+			}
+		});
+		//toolsMenu.add(imgToMultiDrawstat);
 		JMenuItem showOptions = new JMenuItem("Show/Edit options");
 		showOptions.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent arg0) {
@@ -618,8 +598,8 @@ public class UI {
 					BIDE.g1mparts = new ArrayList<G1MPart>();
 				}
 				for (int i = 0; i < input.length; i++) {
-			    		BIDE.pathToG1M = input[i].getPath();
-			    		BIDE.pathToSavedG1M = "";
+		    		BIDE.pathToG1M = input[i].getPath();
+		    		
 		    		
 				    try {
 				    	G1MParser g1mparser = new G1MParser(BIDE.pathToG1M);
@@ -630,8 +610,11 @@ public class UI {
 				    	} else {
 				    		BIDE.readFromG1M(BIDE.pathToG1M);
 				    	}
-				    	BIDE.pathToSavedG1M = "";
 				    	
+						if (!addToCurrentFile) {
+			    			BIDE.pathToSavedG1M = BIDE.pathToG1M;
+			    		}
+						
 				    	BIDE.g1mparts.sort(new Comparator<G1MPart>() {
 
 							@Override
@@ -652,7 +635,10 @@ public class UI {
 				    	
 				    	
 				    } catch (NullPointerException e) {
-				    	if (BIDE.debug) e.printStackTrace();
+				    	if (BIDE.debug) {
+				    		System.err.print("debug exception: ");
+				    		e.printStackTrace();
+				    	}
 				    } catch (NoSuchFileException e) {
 				    	BIDE.error("The file at \"" + BIDE.pathToG1M + "\" does not exist.");
 				    } catch (AccessDeniedException e) {
@@ -676,6 +662,7 @@ public class UI {
 		    		    	getTextPane().setCaretPosition(0);
 		    		    } catch (NullPointerException e) {
 		    		    	if (BIDE.debug) {
+		    		    		System.err.print("debug exception: ");
 		    		    		e.printStackTrace();
 		    		    	}
 		    		    }
@@ -715,6 +702,7 @@ public class UI {
 							BIDE.pathToSavedG1M.substring(BIDE.pathToSavedG1M.lastIndexOf('.'));
 						} catch (StringIndexOutOfBoundsException e) {
 							BIDE.error("Please input an extension (.bide or .g1m)");
+							BIDE.pathToSavedG1M = "";
 							return;
 						}
 						
@@ -756,7 +744,7 @@ public class UI {
 	
 	
 	
-	public void importPict() {
+	public void importImage(boolean convertToPict) {
 		JFileChooser jfc = new JFileChooser();
 		jfc.setFileFilter(new FileFilter() {
 			@Override
@@ -787,31 +775,73 @@ public class UI {
 	    if (input != null) {
 	    	try {
 				BufferedImage img = ImageIO.read(input);
-				if (img.getWidth() != 128) {
-					BIDE.error("Image must be 128 pixels wide!");
-					return;
-				}
-				if (img.getHeight() > 128) {
-					BIDE.error("Image must be a maximum of 128 pixels high!");
-					return;
-				}
-				Byte[] binary = new Byte[0x800];
-				Arrays.fill(binary, (byte)0);
-				for (int j = 0; j < img.getHeight(); j++) {
-					for (int i = 0; i < 128; i++) {
-						if (img.getRGB(i, j) == Color.BLACK.getRGB()) {
-							binary[i/8+16*j] = (byte)(binary[i/8+16*j] | (0b10000000 >> (i%8)));
-						} /*else {
-							binary += "1";
-							//System.out.println(img.getRGB(i, j));
-						}*/
+				
+				if (convertToPict) {
+					if (img.getWidth() != 128) {
+						BIDE.error("Image must be 128 pixels wide!");
+						return;
 					}
+					if (img.getHeight() > 128) {
+						BIDE.error("Image must be a maximum of 128 pixels high!");
+						return;
+					}
+					Byte[] binary = new Byte[0x800];
+					Arrays.fill(binary, (byte)0);
+					for (int j = 0; j < img.getHeight(); j++) {
+						for (int i = 0; i < 128; i++) {
+							if (img.getRGB(i, j) == Color.BLACK.getRGB()) {
+								binary[i/8+16*j] = (byte)(binary[i/8+16*j] | (0b10000000 >> (i%8)));
+							} /*else {
+								binary += "1";
+								//System.out.println(img.getRGB(i, j));
+							}*/
+						}
+					}
+					//System.out.println(binary);
+					int size = 128*img.getHeight()/8;
+					if (size == 0x400) {
+						int option = JOptionPane.showConfirmDialog(BIDE.ui.window, "Do you want to import this picture with a size of 0x800?\nIf you don't understand the consequences, click yes.", "BIDE", JOptionPane.YES_NO_OPTION);
+						size = 0x800;
+				        if (option == JOptionPane.NO_OPTION) {
+				        	size = 0x400;
+				        }
+					}
+					
+					String imgName = input.getName().substring(0, input.getName().lastIndexOf('.'));
+					BIDE.g1mparts.add(new G1MPart(imgName, Integer.toHexString(size), binary, BIDE.TYPE_PICT));
+					jtp.addTab(imgName, BIDE.g1mparts.get(BIDE.g1mparts.size()-1).comp);
+					selectLastTab();
+				} else {
+					
+					/*//Image to multi drawstat
+					//Divides the image into multiple horizontal lines, or multiple vertical lines.
+					//It can be improved but that's all I've got.
+					//Scrapped for now because I don't want unoptimized sprites into programs.
+					
+					ArrayList<Line> verticalLines = new ArrayList<Line>();
+					ArrayList<Line> horizontalLines = new ArrayList<Line>();
+					
+					for (int i = 0; i < img.getWidth(); i++) {
+						int y1 = i;
+						int y2 = i;
+						int x1 = 0, x2 = 0;
+						boolean foundLine = false;
+						for (int j = 0; j < img.getHeight(); j++) {
+							if (img.getRGB(i, j) == Color.BLACK.getRGB()) {
+								foundLine = true;
+								x1 = j;
+							} else if (foundLine) {
+								foundLine = false;
+								x2 = j;
+								verticalLines.add(new Line(x1, y1, x2, y2));
+							}
+							
+						}
+					}*/
+					
 				}
-				//System.out.println(binary);
-				String imgName = input.getName().substring(0, input.getName().lastIndexOf('.'));
-				BIDE.g1mparts.add(new G1MPart(imgName, Integer.toHexString(128*img.getHeight()/8), binary, BIDE.TYPE_PICT));
-				jtp.addTab(imgName, BIDE.g1mparts.get(BIDE.g1mparts.size()-1).comp);
-				selectLastTab();
+				
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

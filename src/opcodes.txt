@@ -3572,21 +3572,12 @@
 	"text":"&up_white_triangle;",
 	"unicode":"△"
 },{
-	"hex":"E6AD",
-	"relevance":0,
-	"text":"&down_white_triangle;",
-	"unicode":"▽"
-},{
 	"hex":"E6AE",
 	"relevance":0,
 	"text":"&bold_cross;",
 	"unicode":"✖"
 },{
-	"hex":"E6AF",
-	"relevance":0,
-	"text":"&left_white_triangle;",
-	"unicode":"◁"
-},{
+
 	"hex":"E6B0",
 	"relevance":0,
 	"text":"&equal_with_dots;",
