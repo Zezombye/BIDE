@@ -52,6 +52,7 @@ public class CasioString {
 	}
 	
 	public boolean endsWith(CasioString str) {
+		if (this.length() < str.length()) return false;
 		return this.substring(this.length()-str.length()).equals(str);
 	}
 	

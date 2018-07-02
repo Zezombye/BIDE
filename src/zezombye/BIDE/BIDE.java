@@ -208,9 +208,6 @@ public class BIDE {
 					}
 				}
 			});
-			
-			
-			
 		}
 				
 	}
