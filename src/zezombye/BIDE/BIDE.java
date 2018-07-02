@@ -63,7 +63,7 @@ public class BIDE {
 	
 	public static String runOn = "none";
 	
-	public final static String VERSION = "4.3";
+	public final static String VERSION = "4.3.1";
 	
 	public final static int TYPE_PROG = 0;
 	public final static int TYPE_PICT = 3;
