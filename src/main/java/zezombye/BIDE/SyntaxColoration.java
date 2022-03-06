@@ -1,9 +1,5 @@
 package zezombye.BIDE;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.text.Segment;
 
 import org.fife.ui.rsyntaxtextarea.AbstractTokenMaker;

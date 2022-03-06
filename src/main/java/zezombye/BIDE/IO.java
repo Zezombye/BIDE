@@ -1,21 +1,15 @@
 package zezombye.BIDE;
 //Taken from B2C
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * ONLY EVER USE CASIOSTRINGS WHEN HANDLING CASIO ENCODING!

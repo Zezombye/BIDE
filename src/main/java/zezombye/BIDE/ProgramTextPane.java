@@ -1,46 +1,26 @@
 package zezombye.BIDE;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import javax.swing.JEditorPane;
-import javax.swing.JWindow;
-import javax.swing.plaf.TextUI;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
-import javax.swing.text.DocumentFilter.FilterBypass;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.Segment;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
 
-import org.fife.ui.autocomplete.AbstractCompletionProvider;
 import org.fife.ui.autocomplete.AutoCompletion;
 import org.fife.ui.autocomplete.BasicCompletion;
 import org.fife.ui.autocomplete.CompletionCellRenderer;
-import org.fife.ui.autocomplete.CompletionProvider;
 import org.fife.ui.autocomplete.DefaultCompletionProvider;
 import org.fife.ui.autocomplete.ShorthandCompletion;
-import org.fife.ui.autocomplete.ParameterizedCompletion;
-import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.Style;
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 import org.fife.ui.rsyntaxtextarea.Token;
-import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
-import org.fife.ui.rsyntaxtextarea.TokenTypes;
 import org.fife.ui.rtextarea.CaretStyle;
-import org.fife.ui.rtextarea.ConfigurableCaret;
-import org.fife.ui.rtextarea.RTextArea;
 
 public class ProgramTextPane extends RSyntaxTextArea {
 	

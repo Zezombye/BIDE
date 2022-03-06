@@ -1,7 +1,6 @@
 package zezombye.BIDE;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import javax.swing.JTextArea;
 
 public class CustomOutputStream extends OutputStream {

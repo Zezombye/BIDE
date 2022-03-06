@@ -1,14 +1,10 @@
 package zezombye.BIDE;
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Window;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class FixedInputDialog extends JDialog {

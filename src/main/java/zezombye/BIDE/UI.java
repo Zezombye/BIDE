@@ -2,9 +2,6 @@ package zezombye.BIDE;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,23 +14,14 @@ import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicButtonUI;
-import javax.swing.plaf.basic.BasicTabbedPaneUI;
-import javax.swing.plaf.multi.MultiTabbedPaneUI;
-import javax.swing.plaf.synth.SynthTabbedPaneUI;
-
-import org.fife.rsta.ui.search.FindDialog;
 
 import com.sun.java.swing.plaf.windows.WindowsTabbedPaneUI;
-import com.sun.java.swing.plaf.windows.WindowsTabbedPaneUI2;
 
 import javax.swing.*;
-import javax.swing.UIManager.LookAndFeelInfo;
 
 import java.awt.*;
 
@@ -81,7 +69,7 @@ public class UI {
 			}
 		};
 		
-		WindowsTabbedPaneUI2 btpui = new WindowsTabbedPaneUI2();
+		WindowsTabbedPaneUI btpui = new WindowsTabbedPaneUI();
 		jtp.setUI(btpui);
 		
 		

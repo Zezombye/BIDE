@@ -1,6 +1,5 @@
 package zezombye.BIDE;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Macro {
