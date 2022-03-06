@@ -92,7 +92,7 @@ public class Window extends JFrame implements SearchListener {
 		else {
 			text = "Text not found";
 		}
-		replaceDialog.statusBar.setLabel(text);
+		// statusBar.setLabel(text);
 
 	}
 

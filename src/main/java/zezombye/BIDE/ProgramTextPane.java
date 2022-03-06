@@ -70,15 +70,15 @@ public class ProgramTextPane extends RSyntaxTextArea {
 		final Color commentColor = new Color(Integer.parseInt(BIDE.options.getProperty("commentColor"), 16));
 		final Color preprocessorColor = new Color(Integer.parseInt(BIDE.options.getProperty("preprocessorColor"), 16));
 		
-		ss.setStyle(Token.RESERVED_WORD, new Style(keywordColor, this.getFont()));
+		ss.setStyle(Token.RESERVED_WORD, new Style(keywordColor));
 		ss.setStyle(Token.OPERATOR, new Style(operatorColor));
 		ss.setStyle(Token.VARIABLE, new Style(variableColor));
 		ss.setStyle(Token.MARKUP_ENTITY_REFERENCE, new Style(entityColor));
 		ss.setStyle(Token.RESERVED_WORD_2, new Style(operatorColor));
 		ss.setStyle(Token.LITERAL_STRING_DOUBLE_QUOTE, new Style(strColor));
 		ss.setStyle(Token.ERROR_STRING_DOUBLE, new Style(strColor));
-		ss.setStyle(Token.LITERAL_CHAR, new Style(commentColor, this.getFont().deriveFont(Font.ITALIC)));
-		ss.setStyle(Token.ERROR_CHAR, new Style(commentColor, this.getFont().deriveFont(Font.ITALIC)));
+		ss.setStyle(Token.LITERAL_CHAR, new Style(commentColor));
+		ss.setStyle(Token.ERROR_CHAR, new Style(commentColor));
 		ss.setStyle(Token.PREPROCESSOR, new Style(preprocessorColor));
 		ss.setStyle(Token.FUNCTION, new Style(new Color(Integer.parseInt(BIDE.options.getProperty("textColor"), 16))));
 		//ss.setStyle(Token.DATA_TYPE, new Style(borderColor));
@@ -161,14 +161,19 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	    		if (opcodes2.get(i).unicode != null && BIDE.options.getProperty("allowUnicode").equals("true")) {
 	    			//Add unicode representation of character in description
 	    			if (opcodes2.get(i).unicode.length() == 1) {
-				    	provider.addCompletion(new ShorthandCompletion(provider, txt, opcodes2.get(i).unicode, opcodes2.get(i).unicode, opcodes2.get(i).relevance, summary));
+				    	provider.addCompletion(
+								new ShorthandCompletion(
+										provider, txt, opcodes2.get(i).unicode,
+										opcodes2.get(i).description, summary
+								)
+						);
 	    			} else {
-				    	provider.addCompletion(new ShorthandCompletion(provider, txt, opcodes2.get(i).unicode, opcodes2.get(i).relevance, summary));
+				    	provider.addCompletion(new ShorthandCompletion(provider, txt, opcodes2.get(i).unicode, opcodes2.get(i).description, summary));
 	    			}
 			    	
 	    		} else {
 	    			//System.out.println("relevance = "+opcodes2.get(i).relevance);
-			    	provider.addCompletion(new BasicCompletion(provider, txt, opcodes2.get(i).relevance, summary));
+			    	provider.addCompletion(new BasicCompletion(provider, txt, opcodes2.get(i).description, summary));
 	    		}
 	    	}
 	    }
@@ -183,13 +188,13 @@ public class ProgramTextPane extends RSyntaxTextArea {
 	    	
 	    }
 	    
-	    cp.addCompletion(new BasicCompletion(cp, "#nocheck", 2, "Tells BIDE to not throw an error if there is a non-existing opcode. Use this to write plain text into programs (such as formulas)."));
-	    cp.addCompletion(new BasicCompletion(cp, "#yescheck", 2, "Tells BIDE to check again for non-existing opcodes. See #nocheck."));
+	    cp.addCompletion(new BasicCompletion(cp, "#nocheck", "2", "Tells BIDE to not throw an error if there is a non-existing opcode. Use this to write plain text into programs (such as formulas)."));
+	    cp.addCompletion(new BasicCompletion(cp, "#yescheck", "2", "Tells BIDE to check again for non-existing opcodes. See #nocheck."));
 	}
 	
 	public static void addMacroToCompletions(Macro macro) {
 		cp.addCompletion(new BasicCompletion(
-				cp, macro.text, 2, generateHtmlSection(
+				cp, macro.text, "2", generateHtmlSection(
 						"Resolves to:", convertToHtml("[code]"+macro.replacement+"[/code]"))));
 	}
 	
